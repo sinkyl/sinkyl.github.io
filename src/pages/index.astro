@@ -1,127 +1,350 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog'))
-  .filter(post => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 5);
+const projects = [
+  {
+    id: 'xtranodly',
+    name: 'xtranodly.ai',
+    description: 'A node-based graph system for visual programming and AI workflows',
+    color: '#61afef'
+  },
+  {
+    id: 'bazaar',
+    name: 'Bazaar.Shop',
+    description: 'A marketplace platform connecting buyers and sellers',
+    color: '#d19a66'
+  },
+  {
+    id: 'spatium',
+    name: 'Spatium.ai',
+    description: 'Spatial computing and immersive experience platform',
+    color: '#c678dd'
+  }
+];
 ---
 
 <BaseLayout title="Engineering Devlog">
-  <section class="hero">
-    <h1>Engineering Devlog</h1>
-    <p>Weekly progress, discoveries, and learnings from building software.</p>
+  <canvas id="circuit-bg"></canvas>
+
+  <section class="about">
+    <h1>Hey, I'm Nodly</h1>
+    <p>
+      This blog documents my journey building three projects in parallel.
+      I share weekly progress, technical discoveries, architectural decisions,
+      and lessons learned along the way.
+    </p>
   </section>
 
-  <section class="recent">
-    <h2>Recent Posts</h2>
-    {posts.length === 0 ? (
-      <p class="empty">No posts yet. Run the weekly post generator to create your first post.</p>
-    ) : (
-      <ul class="post-list">
-        {posts.map(post => (
-          <li>
-            <a href={`/blog/${post.slug}`}>
-              <article>
-                <h3>{post.data.title}</h3>
-                <time datetime={post.data.date.toISOString()}>
-                  {post.data.date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </time>
-                {post.data.languages.length > 0 && (
-                  <div class="langs">
-                    {post.data.languages.slice(0, 3).map(lang => (
-                      <span class="lang-tag">{lang}</span>
-                    ))}
-                  </div>
-                )}
-              </article>
-            </a>
-          </li>
-        ))}
-      </ul>
-    )}
-    <a href="/blog" class="view-all">View all posts &rarr;</a>
+  <section class="projects-overview">
+    <h2>The Projects</h2>
+    <div class="project-cards">
+      {projects.map(project => (
+        <a href={`/projects/${project.id}`} class="project-card" style={`--project-color: ${project.color}`}>
+          <h3>{project.name}</h3>
+          <p>{project.description}</p>
+          <span class="view-posts">View posts &rarr;</span>
+        </a>
+      ))}
+    </div>
   </section>
+
+  <a href="/blog" class="view-all">View all posts &rarr;</a>
 </BaseLayout>
 
 <style>
-  .hero {
+  #circuit-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .about {
     text-align: center;
     padding: 3rem 0;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
   }
 
-  .hero h1 {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
+  .about h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
   }
 
-  .hero p {
+  .about p {
     color: var(--text-muted);
     font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
   }
 
-  .recent h2 {
+  .projects-overview {
+    padding: 2rem 0;
+    position: relative;
+  }
+
+  .projects-overview h2 {
     margin-bottom: 1.5rem;
   }
 
-  .empty {
-    color: var(--text-muted);
-  }
-
-  .post-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
+  .project-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1rem;
   }
 
-  .post-list a {
+  .project-card {
     display: block;
     text-decoration: none;
     color: inherit;
     padding: 1.5rem;
     background: var(--bg-secondary);
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid var(--border);
-    transition: border-color 0.2s;
+    border-top: 3px solid var(--project-color);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 4px 8px rgba(0, 0, 0, 0.15),
+      0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
   }
 
-  .post-list a:hover {
-    border-color: var(--accent);
+  .project-card:hover {
+    border-color: var(--project-color);
+    transform: translateY(-4px);
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.25),
+      0 8px 16px rgba(0, 0, 0, 0.2),
+      0 16px 32px rgba(0, 0, 0, 0.15);
   }
 
-  .post-list h3 {
-    color: var(--text);
+  .project-card h3 {
+    color: var(--project-color);
     margin-bottom: 0.5rem;
+    font-size: 1.2rem;
   }
 
-  .post-list time {
+  .project-card p {
     color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .project-card .view-posts {
     font-size: 0.85rem;
+    color: var(--project-color);
+    opacity: 0.7;
+    transition: opacity 0.2s;
   }
 
-  .langs {
-    margin-top: 0.75rem;
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .lang-tag {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.4rem;
-    border: 1px solid #f97316;
-    color: #f97316;
-    border-radius: 3px;
+  .project-card:hover .view-posts {
+    opacity: 1;
   }
 
   .view-all {
     display: inline-block;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+
+  .view-all:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 600px) {
+    .about h1 {
+      font-size: 2rem;
+    }
+
+    .project-cards {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
+
+<script>
+  const canvas = document.getElementById('circuit-bg') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  let mouseX = width / 2;
+  let mouseY = height / 2;
+  let animationId: number;
+
+  interface Node {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+    baseX: number;
+    baseY: number;
+  }
+
+  const nodes: Node[] = [];
+  const nodeCount = Math.min(80, Math.floor((width * height) / 15000));
+  const connectionDistance = 150;
+  const mouseInfluenceRadius = 200;
+
+  const colors = {
+    node: '#61afef',
+    line: '#61afef',
+    nodeGlow: '#c678dd'
+  };
+
+  function init() {
+    canvas.width = width;
+    canvas.height = height;
+
+    nodes.length = 0;
+    const count = Math.min(80, Math.floor((width * height) / 15000));
+
+    for (let i = 0; i < count; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      nodes.push({
+        x,
+        y,
+        baseX: x,
+        baseY: y,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        radius: Math.random() * 2 + 1
+      });
+    }
+  }
+
+  function drawNode(node: Node, intensity: number) {
+    const glow = intensity > 0;
+
+    if (glow) {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius + 4, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(198, 120, 221, ${intensity * 0.3})`;
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+    ctx.fillStyle = glow
+      ? `rgba(198, 120, 221, ${0.6 + intensity * 0.4})`
+      : `rgba(97, 175, 239, 0.6)`;
+    ctx.fill();
+  }
+
+  function drawConnection(node1: Node, node2: Node, distance: number) {
+    const opacity = (1 - distance / connectionDistance) * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(node1.x, node1.y);
+    ctx.lineTo(node2.x, node2.y);
+    ctx.strokeStyle = `rgba(97, 175, 239, ${opacity})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Update and draw nodes
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+
+      // Gentle floating motion
+      node.x += node.vx;
+      node.y += node.vy;
+
+      // Mouse influence - nodes are attracted slightly
+      const dx = mouseX - node.x;
+      const dy = mouseY - node.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < mouseInfluenceRadius) {
+        const force = (1 - dist / mouseInfluenceRadius) * 0.02;
+        node.x += dx * force;
+        node.y += dy * force;
+      }
+
+      // Soft boundary bounce with damping
+      if (node.x < 0 || node.x > width) node.vx *= -1;
+      if (node.y < 0 || node.y > height) node.vy *= -1;
+      node.x = Math.max(0, Math.min(width, node.x));
+      node.y = Math.max(0, Math.min(height, node.y));
+
+      // Draw connections to nearby nodes
+      for (let j = i + 1; j < nodes.length; j++) {
+        const other = nodes[j];
+        const connDx = node.x - other.x;
+        const connDy = node.y - other.y;
+        const connDist = Math.sqrt(connDx * connDx + connDy * connDy);
+
+        if (connDist < connectionDistance) {
+          drawConnection(node, other, connDist);
+        }
+      }
+
+      // Mouse proximity intensity for glow effect
+      const mouseIntensity = dist < mouseInfluenceRadius
+        ? 1 - dist / mouseInfluenceRadius
+        : 0;
+
+      drawNode(node, mouseIntensity);
+    }
+
+    // Draw circuit traces from mouse
+    const nearNodes = nodes
+      .map(n => ({ node: n, dist: Math.sqrt((n.x - mouseX) ** 2 + (n.y - mouseY) ** 2) }))
+      .filter(n => n.dist < mouseInfluenceRadius)
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, 3);
+
+    for (const { node, dist } of nearNodes) {
+      const opacity = (1 - dist / mouseInfluenceRadius) * 0.4;
+      ctx.beginPath();
+      ctx.moveTo(mouseX, mouseY);
+      ctx.lineTo(node.x, node.y);
+      ctx.strokeStyle = `rgba(198, 120, 221, ${opacity})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    animationId = requestAnimationFrame(animate);
+  }
+
+  function handleResize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    init();
+  }
+
+  function handleMouseMove(e: MouseEvent) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }
+
+  function handleMouseLeave() {
+    mouseX = width / 2;
+    mouseY = height / 2;
+  }
+
+  init();
+  animate();
+
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('mouseleave', handleMouseLeave);
+</script>

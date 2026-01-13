@@ -6,6 +6,7 @@ const blog = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     description: z.string().optional(),
+    project: z.enum(['xtranodly', 'bazaar', 'spatium']).optional(),
     tags: z.array(z.string()).default([]),
     languages: z.array(z.string()).default([]),
     patterns: z.array(z.string()).default([]),
