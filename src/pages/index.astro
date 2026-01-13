@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+---
+
+<BaseLayout title="Engineering Devlog">
+  <section class="hero">
+    <h1>Engineering Devlog</h1>
+    <p>Weekly progress, discoveries, and learnings from building software.</p>
+  </section>
+
+  <section class="recent">
+    <h2>Recent Posts</h2>
+    {posts.length === 0 ? (
+      <p class="empty">No posts yet. Run the weekly post generator to create your first post.</p>
+    ) : (
+      <ul class="post-list">
+        {posts.map(post => (
+          <li>
+            <a href={`/blog/${post.slug}`}>
+              <article>
+                <h3>{post.data.title}</h3>
+                <time datetime={post.data.date.toISOString()}>
+                  {post.data.date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </time>
+                {post.data.languages.length > 0 && (
+                  <div class="langs">
+                    {post.data.languages.slice(0, 3).map(lang => (
+                      <span class="lang-tag">{lang}</span>
+                    ))}
+                  </div>
+                )}
+              </article>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+    <a href="/blog" class="view-all">View all posts &rarr;</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+
+  .recent h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  .empty {
+    color: var(--text-muted);
+  }
+
+  .post-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .post-list a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+
+  .post-list a:hover {
+    border-color: var(--accent);
+  }
+
+  .post-list h3 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .post-list time {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .langs {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .lang-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #f97316;
+    color: #f97316;
+    border-radius: 3px;
+  }
+
+  .view-all {
+    display: inline-block;
+    margin-top: 1.5rem;
+  }
+</style>

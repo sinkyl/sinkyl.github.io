@@ -1,0 +1,22 @@
+# Commit Message Template
+# Copy and fill in when writing commits manually
+
+<type>(<scope>): <summary>
+
+Context:
+Why:
+Impact:
+Validation:
+
+Blog-Intent: normal
+Blog-Audience: devs
+Blog-Summary:
+Tech-Lang:
+Tech-Patterns:
+Tech-Arch:
+Pros:
+Cons:
+Refs:
+Confidentiality: public
+Redact-Notes:
+Diagram: none

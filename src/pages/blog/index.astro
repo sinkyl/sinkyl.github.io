@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="All Posts - Engineering Devlog">
+  <h1>All Posts</h1>
+
+  {posts.length === 0 ? (
+    <p class="empty">No posts yet.</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map(post => (
+        <li>
+          <a href={`/blog/${post.slug}`}>
+            <article>
+              <div class="post-main">
+                <h2>{post.data.title}</h2>
+                <time datetime={post.data.date.toISOString()}>
+                  {post.data.date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </time>
+              </div>
+              <div class="post-meta">
+                {post.data.languages.length > 0 && (
+                  <div class="meta-tags">
+                    {post.data.languages.map(lang => (
+                      <span class="tag lang">{lang}</span>
+                    ))}
+                  </div>
+                )}
+                {post.data.patterns.length > 0 && (
+                  <div class="meta-tags">
+                    {post.data.patterns.map(p => (
+                      <span class="tag pattern">{p}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-bottom: 2rem;
+  }
+
+  .empty {
+    color: var(--text-muted);
+  }
+
+  .post-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .post-list a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+
+  .post-list a:hover {
+    border-color: var(--accent);
+  }
+
+  .post-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-list h2 {
+    color: var(--text);
+    font-size: 1.25rem;
+  }
+
+  .post-list time {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .post-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  .tag.lang {
+    border-color: #f97316;
+    color: #f97316;
+  }
+
+  .tag.pattern {
+    border-color: #a855f7;
+    color: #a855f7;
+  }
+</style>
