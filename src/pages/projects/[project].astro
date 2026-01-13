@@ -1,17 +1,30 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { getTechColor } from '../../lib/colors';
 
 export async function getStaticPaths() {
-  const projects = [
-    { id: 'xtranodly', name: 'xtranodly.ai', color: '#61afef' },
-    { id: 'bazaar', name: 'Bazaar.Shop', color: '#d19a66' },
-    { id: 'spatium', name: 'Spatium.ai', color: '#c678dd' }
-  ];
+  const projectsData = {
+    xtranodly: {
+      name: 'xtranodly.ai',
+      color: '#61afef',
+      description: 'A visual node-based graph system for building AI workflows, data pipelines, and complex automation. Drag, connect, and orchestrate — code optional.'
+    },
+    bazaar: {
+      name: 'Bazaar.Shop',
+      color: '#d19a66',
+      description: 'A multi-tenant marketplace platform with PCI-DSS compliant payments, SSO authentication, and a microservices architecture designed for scale.'
+    },
+    spatium: {
+      name: 'Spatium.ai',
+      color: '#c678dd',
+      description: 'Spatial computing platform for immersive 3D experiences, AR/VR applications, and next-generation human-computer interaction.'
+    }
+  };
 
-  return projects.map(project => ({
-    params: { project: project.id },
-    props: { project }
+  return Object.entries(projectsData).map(([id, data]) => ({
+    params: { project: id },
+    props: { project: { id, ...data } }
   }));
 }
 
@@ -20,42 +33,88 @@ const { project } = Astro.props;
 const posts = (await getCollection('blog'))
   .filter(post => !post.data.draft && post.data.project === project.id)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group posts by week
+function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function getWeekEnd(weekStart: Date): Date {
+  const end = new Date(weekStart);
+  end.setDate(end.getDate() + 6);
+  return end;
+}
+
+function formatWeekRange(start: Date, end: Date): string {
+  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return `${startStr} — ${endStr}`;
+}
+
+const groupedPosts = posts.reduce((acc, post) => {
+  const weekStart = getWeekStart(post.data.date);
+  const key = weekStart.toISOString();
+  if (!acc[key]) {
+    acc[key] = { weekStart, posts: [] };
+  }
+  acc[key].posts.push(post);
+  return acc;
+}, {} as Record<string, { weekStart: Date; posts: typeof posts }>);
+
+const weeks = Object.values(groupedPosts).sort(
+  (a, b) => b.weekStart.valueOf() - a.weekStart.valueOf()
+);
 ---
 
 <BaseLayout title={`${project.name} — Engineering Devlog`}>
   <section class="header">
     <a href="/" class="back">&larr; Back</a>
-    <h1 style={`color: ${project.color}`}>{project.name}</h1>
+    <h1 style={`--project-color: ${project.color}`}>{project.name}</h1>
+    <p class="project-description">{project.description}</p>
     <p class="count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
   </section>
 
   {posts.length === 0 ? (
     <p class="empty">No posts yet for this project.</p>
   ) : (
-    <div class="post-cards">
-      {posts.map(post => (
-        <a href={`/blog/${post.slug}`} class="post-card" style={`--project-color: ${project.color}`}>
-          <article>
-            <time datetime={post.data.date.toISOString()}>
-              {post.data.date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              })}
-            </time>
-            <h3>{post.data.title}</h3>
-            {post.data.description && (
-              <p class="description">{post.data.description}</p>
-            )}
-            {post.data.languages.length > 0 && (
-              <div class="langs">
-                {post.data.languages.slice(0, 3).map(lang => (
-                  <span class="lang-tag">{lang}</span>
-                ))}
-              </div>
-            )}
-          </article>
-        </a>
+    <div class="weeks">
+      {weeks.map(({ weekStart, posts: weekPosts }) => (
+        <section class="week-section">
+          <h2 class="week-header">
+            <span class="week-label">Week of</span>
+            {formatWeekRange(weekStart, getWeekEnd(weekStart))}
+          </h2>
+          <ul class="post-list">
+            {weekPosts.map(post => {
+              const preview = post.data.description || post.data.patterns?.slice(0, 3).join(' • ') || '';
+              return (
+                <li>
+                  <a href={`/blog/${post.slug}`} style={`--project-color: ${project.color}`}>
+                    <article>
+                      <div class="post-header">
+                        {post.data.languages.length > 0 && (
+                          <div class="tags">
+                            {post.data.languages.slice(0, 3).map(lang => (
+                              <span class="tag" style={`--tech-color: ${getTechColor(lang)}`}>{lang}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {preview && (
+                        <p class="preview">{preview}</p>
+                      )}
+                    </article>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       ))}
     </div>
   )}
@@ -64,12 +123,11 @@ const posts = (await getCollection('blog'))
 <style>
   .header {
     padding: 2rem 0;
-    border-bottom: 1px solid var(--border);
     margin-bottom: 2rem;
   }
 
   .back {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     margin-bottom: 1rem;
     display: inline-block;
@@ -80,13 +138,23 @@ const posts = (await getCollection('blog'))
   }
 
   .header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin: 0.5rem 0;
+    color: var(--project-color);
+  }
+
+  .project-description {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 1rem 0;
   }
 
   .count {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    opacity: 0.7;
   }
 
   .empty {
@@ -94,71 +162,91 @@ const posts = (await getCollection('blog'))
     font-style: italic;
   }
 
-  .post-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+  .weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
   }
 
-  .post-card {
+  .week-section {
+    position: relative;
+  }
+
+  .week-header {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .week-label {
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-right: 0.5rem;
+  }
+
+  .post-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .post-list a {
     display: block;
     text-decoration: none;
     color: inherit;
-    padding: 1.5rem;
+    padding: 1.25rem;
     background: var(--bg-secondary);
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid var(--border);
-    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, transform 0.2s;
   }
 
-  .post-card:hover {
-    border-color: var(--project-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  .post-list a:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
   }
 
-  .post-card time {
-    display: block;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    margin-bottom: 0.5rem;
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
-  .post-card h3 {
-    color: var(--text);
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
+  .tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
   }
 
-  .post-card .description {
+  .tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--tech-color) 12%, transparent);
+    color: var(--tech-color);
+    border: 1px solid color-mix(in srgb, var(--tech-color) 30%, transparent);
+  }
+
+  .preview {
     color: var(--text-muted);
     font-size: 0.85rem;
     line-height: 1.5;
-    margin-bottom: 0.75rem;
-  }
-
-  .langs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
-  .lang-tag {
-    font-size: 0.7rem;
-    padding: 0.15rem 0.4rem;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    border-radius: 3px;
+    margin-top: 0.5rem;
   }
 
   @media (max-width: 600px) {
     .header h1 {
-      font-size: 2rem;
+      font-size: 1.75rem;
     }
 
-    .post-cards {
-      grid-template-columns: 1fr;
+    .post-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
     }
   }
 </style>

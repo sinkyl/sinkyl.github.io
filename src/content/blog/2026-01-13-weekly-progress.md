@@ -1,6 +1,8 @@
 ---
 title: "Weekly Progress — 2026-01-06 to 2026-01-13"
 date: 2026-01-13
+project: bazaar
+description: "5-cluster architecture, PCI-DSS payment isolation, back-channel logout, OIDC migration"
 tags: [devlog, weekly]
 languages: [C#, .NET 9]
 patterns: [Back-Channel Logout, Multi-Tenancy, Cluster Isolation]

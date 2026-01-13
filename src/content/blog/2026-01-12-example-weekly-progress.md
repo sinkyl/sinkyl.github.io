@@ -1,6 +1,8 @@
 ---
 title: "Weekly Progress — 2026-01-06 to 2026-01-12"
 date: 2026-01-12
+project: xtranodly
+description: "Cross-context port wiring, spatial indexing for 3x faster traversal, renderer refactor"
 tags: [devlog, weekly]
 languages: [Rust, TypeScript]
 patterns: [Observer, Mediator]
