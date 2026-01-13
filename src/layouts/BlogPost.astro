@@ -162,4 +162,58 @@ const { title, date, tags, languages, patterns, architectures } = post.data;
     color: var(--text-muted);
     margin: 1.5rem 0;
   }
+
+  /* Mermaid diagram styling */
+  .content :global(.mermaid) {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    text-align: center;
+  }
 </style>
+
+<script is:inline>
+  // Load Mermaid and render diagrams
+  (async function() {
+    // Find all mermaid code blocks (Astro/Shiki uses data-language attribute)
+    const mermaidBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
+
+    if (mermaidBlocks.length === 0) return;
+
+    // Dynamically load Mermaid
+    const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#58a6ff',
+        primaryTextColor: '#e6edf3',
+        primaryBorderColor: '#30363d',
+        lineColor: '#8b949e',
+        secondaryColor: '#161b22',
+        tertiaryColor: '#0d1117',
+        background: '#0d1117',
+        mainBkg: '#161b22',
+        nodeBorder: '#30363d',
+        clusterBkg: '#161b22',
+        clusterBorder: '#30363d',
+        titleColor: '#e6edf3',
+        edgeLabelBackground: '#161b22',
+      }
+    });
+
+    // Convert code blocks to mermaid divs
+    mermaidBlocks.forEach((pre) => {
+      const code = pre.textContent;
+      const div = document.createElement('div');
+      div.className = 'mermaid';
+      div.textContent = code;
+      pre.replaceWith(div);
+    });
+
+    // Render all mermaid diagrams
+    await mermaid.run();
+  })();
+</script>
