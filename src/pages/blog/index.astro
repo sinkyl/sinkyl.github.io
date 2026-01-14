@@ -69,16 +69,16 @@ const weeks = Object.values(groupedPosts).sort(
                         {project && (
                           <span class="project-badge">{project.name}</span>
                         )}
-                        {post.data.languages.length > 0 && (
-                          <div class="tags">
-                            {post.data.languages.slice(0, 3).map(lang => (
-                              <span class="tag" style={`--tech-color: ${getTechColor(lang)}`}>{lang}</span>
-                            ))}
-                          </div>
-                        )}
                       </div>
                       {preview && (
                         <p class="preview">{preview}</p>
+                      )}
+                      {post.data.languages.length > 0 && (
+                        <div class="tags">
+                          {post.data.languages.slice(0, 3).map(lang => (
+                            <span class="tag" style={`--tech-color: ${getTechColor(lang)}`}>{lang}</span>
+                          ))}
+                        </div>
                       )}
                     </article>
                   </a>
@@ -167,10 +167,17 @@ const weeks = Object.values(groupedPosts).sort(
     border-radius: 4px;
   }
 
+  .preview {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
   .tags {
     display: flex;
     gap: 0.4rem;
     flex-wrap: wrap;
+    margin-top: 0.5rem;
   }
 
   .tag {
@@ -180,13 +187,6 @@ const weeks = Object.values(groupedPosts).sort(
     background: color-mix(in srgb, var(--tech-color) 12%, transparent);
     color: var(--tech-color);
     border: 1px solid color-mix(in srgb, var(--tech-color) 30%, transparent);
-  }
-
-  .preview {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    margin-top: 0.5rem;
   }
 
   @media (max-width: 600px) {

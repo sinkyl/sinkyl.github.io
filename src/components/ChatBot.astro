@@ -1,0 +1,526 @@
+---
+// Simple FAQ Chat Bot - No AI, just pattern matching
+const faqData = {
+  greetings: ['hi', 'hello', 'hey', 'howdy', 'hola'],
+  about: ['who', 'about', 'sinan', 'yourself', 'introduce'],
+  projects: ['project', 'working', 'building', 'xtranodly', 'bazaar', 'spatium'],
+  stack: ['stack', 'tech', 'language', 'tool', 'use', 'code'],
+  experience: ['experience', 'background', 'career', 'work'],
+  contact: ['contact', 'reach', 'email', 'hire', 'connect'],
+  blog: ['blog', 'devlog', 'post', 'write', 'article'],
+};
+
+const responses = {
+  greetings: "Hey there! I'm a simple bot here to answer questions about Sinan. Ask me about his projects, tech stack, or background!",
+  about: "Sinan is a software engineer building three ambitious projects in parallel. He loves systems programming, distributed architectures, and creating tools that empower developers. This devlog captures his journey — the wins, the bugs, and everything in between.",
+  projects: "Sinan is currently building three projects:\n\n◈ <a href=\"/projects/xtranodly\" target=\"_blank\">xtranodly.ai</a> — A visual node-based graph system for AI workflows and automation\n\n◉ <a href=\"/projects/bazaar\" target=\"_blank\">Bazaar.Shop</a> — A multi-tenant marketplace with PCI-DSS compliant payments and SSO\n\n◎ <a href=\"/projects/spatium\" target=\"_blank\">Spatium.ai</a> — Spatial computing for immersive 3D experiences",
+  stack: "Sinan's tech stack includes:\n\n• **C#/.NET** — Backend services, microservices\n• **Rust** — Systems programming, performance-critical code\n• **Python** — AI/ML, scripting\n• **TypeScript** — Frontend, tooling\n• **Tauri** — Desktop apps\n• **gRPC** — Service communication\n• **Docker** — Containerization",
+  experience: "Sinan has experience building complex distributed systems, marketplace platforms, and developer tools. His focus is on clean architecture, performance, and shipping quality software.",
+  contact: "You can explore Sinan's work through this devlog. Check out the projects section or read the blog posts to see what he's building!",
+  blog: "This devlog documents Sinan's weekly progress across all three projects. Each post covers architectural decisions, technical challenges, and lessons learned. Check out /blog for all posts!",
+  unknown: "I'm not sure about that one! Try asking about:\n• Who Sinan is\n• His projects (xtranodly, Bazaar, Spatium)\n• His tech stack\n• The blog/devlog",
+};
+---
+
+<div id="chat-widget" class="chat-widget">
+  <button id="chat-toggle" class="chat-toggle" aria-label="Open chat">
+    <svg class="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+    </svg>
+    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+
+  <div id="chat-panel" class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <span class="chat-avatar">◈</span>
+        <div>
+          <h3>Ask About Sinan</h3>
+          <span class="chat-status">FAQ Bot</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="chat-messages" class="chat-messages">
+      <button id="suggestions-toggle" class="suggestions-toggle" aria-label="Show suggestions">?</button>
+
+      <div id="suggestions-panel" class="suggestions-panel">
+        <span class="suggestions-label">Try asking:</span>
+        <div class="suggestions-list">
+          <button class="suggestion-btn" data-question="Who is Sinan?">Who is Sinan?</button>
+          <button class="suggestion-btn" data-question="What projects is he building?">What projects?</button>
+          <button class="suggestion-btn" data-question="What's his tech stack?">Tech stack?</button>
+          <button class="suggestion-btn" data-question="Tell me about the blog">About the blog?</button>
+        </div>
+      </div>
+
+      <div class="message bot">
+        <div class="message-content">
+          Hey! I'm here to answer questions about Sinan. Try asking:
+          <ul>
+            <li><button class="inline-suggestion" data-question="Who is Sinan?">Who is Sinan?</button></li>
+            <li><button class="inline-suggestion" data-question="What projects is he building?">What projects is he building?</button></li>
+            <li><button class="inline-suggestion" data-question="What's his tech stack?">What's his tech stack?</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <form id="chat-form" class="chat-input-form">
+      <input
+        type="text"
+        id="chat-input"
+        placeholder="Ask a question..."
+        autocomplete="off"
+      />
+      <button type="submit" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .chat-widget {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    font-family: inherit;
+  }
+
+  .chat-toggle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #61afef, #c678dd);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(97, 175, 239, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .chat-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(97, 175, 239, 0.4);
+  }
+
+  .chat-toggle svg {
+    width: 24px;
+    height: 24px;
+    color: white;
+  }
+
+  .chat-toggle .icon-close {
+    display: none;
+  }
+
+  .chat-widget.open .chat-toggle .icon-chat {
+    display: none;
+  }
+
+  .chat-widget.open .chat-toggle .icon-close {
+    display: block;
+  }
+
+  .chat-panel {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 340px;
+    max-height: 450px;
+    background: rgba(22, 27, 34, 0.98);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.25s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .chat-widget.open .chat-panel {
+    display: flex;
+  }
+
+  .chat-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(30, 35, 42, 0.8);
+  }
+
+  .chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #61afef, #c678dd);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: white;
+  }
+
+  .chat-header h3 {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .chat-status {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 300px;
+  }
+
+  .message {
+    max-width: 85%;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.bot {
+    align-self: flex-start;
+  }
+
+  .message.user {
+    align-self: flex-end;
+  }
+
+  .message-content {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .message.bot .message-content {
+    background: rgba(97, 175, 239, 0.1);
+    border: 1px solid rgba(97, 175, 239, 0.2);
+    color: var(--text);
+  }
+
+  .message.bot .message-content a {
+    color: #61afef;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .message.bot .message-content a:hover {
+    color: #c678dd;
+    text-decoration: underline;
+  }
+
+  .message.user .message-content {
+    background: linear-gradient(135deg, #61afef, #c678dd);
+    color: white;
+  }
+
+  .message-content ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .message-content li {
+    margin: 0.25rem 0;
+  }
+
+  .inline-suggestion {
+    background: none;
+    border: none;
+    color: #61afef;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0;
+    text-align: left;
+    transition: color 0.2s;
+  }
+
+  .inline-suggestion:hover {
+    color: #c678dd;
+    text-decoration: underline;
+  }
+
+  /* Suggestions Toggle */
+  .suggestions-toggle {
+    position: absolute;
+    top: 5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(97, 175, 239, 0.1);
+    border: 1px solid rgba(97, 175, 239, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #61afef;
+  }
+
+  .suggestions-toggle:hover {
+    background: rgba(97, 175, 239, 0.2);
+    border-color: #61afef;
+  }
+
+  .suggestions-toggle.active {
+    background: #e06c75;
+    border-color: transparent;
+    color: white;
+  }
+
+  /* Suggestions Panel */
+  .suggestions-panel {
+    display: none;
+    position: absolute;
+    top: 5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    background: rgba(30, 35, 42, 0.98);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    z-index: 5;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .suggestions-panel.show {
+    display: block;
+  }
+
+  .suggestions-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .suggestions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .suggestion-btn {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.7rem;
+    background: rgba(97, 175, 239, 0.1);
+    border: 1px solid rgba(97, 175, 239, 0.25);
+    border-radius: 15px;
+    color: #61afef;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .suggestion-btn:hover {
+    background: rgba(97, 175, 239, 0.2);
+    border-color: #61afef;
+    transform: translateY(-1px);
+  }
+
+  .chat-input-form {
+    display: flex;
+    padding: 0.75rem;
+    gap: 0.5rem;
+    border-top: 1px solid var(--border);
+    background: rgba(30, 35, 42, 0.5);
+  }
+
+  .chat-input-form input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: rgba(22, 27, 34, 0.8);
+    color: var(--text);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .chat-input-form input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .chat-input-form input:focus {
+    border-color: #61afef;
+  }
+
+  .chat-input-form button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #61afef, #c678dd);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+
+  .chat-input-form button:hover {
+    transform: scale(1.05);
+  }
+
+  .chat-input-form button svg {
+    width: 16px;
+    height: 16px;
+    color: white;
+  }
+
+  @media (max-width: 400px) {
+    .chat-panel {
+      width: calc(100vw - 2rem);
+      right: -0.5rem;
+    }
+  }
+</style>
+
+<script define:vars={{ faqData, responses }}>
+  const toggle = document.getElementById('chat-toggle');
+  const widget = document.getElementById('chat-widget');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('chat-input');
+  const messages = document.getElementById('chat-messages');
+  const suggestionsToggle = document.getElementById('suggestions-toggle');
+  const suggestionsPanel = document.getElementById('suggestions-panel');
+
+  toggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    widget?.classList.toggle('open');
+    if (widget?.classList.contains('open')) {
+      input?.focus();
+    }
+  });
+
+  // Close chat panel when clicking outside
+  document.addEventListener('click', (e) => {
+    if (widget?.classList.contains('open') && !widget?.contains(e.target)) {
+      widget?.classList.remove('open');
+    }
+  });
+
+  // Suggestions toggle
+  suggestionsToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    suggestionsToggle.classList.toggle('active');
+    suggestionsPanel?.classList.toggle('show');
+  });
+
+  // Close suggestions panel when clicking elsewhere in chat
+  const chatPanel = document.getElementById('chat-panel');
+  chatPanel?.addEventListener('click', (e) => {
+    const target = e.target;
+    // Don't close if clicking on the toggle or inside the panel
+    if (!suggestionsToggle?.contains(target) && !suggestionsPanel?.contains(target)) {
+      suggestionsToggle?.classList.remove('active');
+      suggestionsPanel?.classList.remove('show');
+    }
+  });
+
+  // Handle suggestion button clicks (both inline and panel)
+  function handleSuggestionClick(e) {
+    const btn = e.target.closest('[data-question]');
+    if (btn && input) {
+      e.stopPropagation();
+      input.value = btn.dataset.question;
+      input.focus();
+      // Close suggestions panel if open
+      suggestionsToggle?.classList.remove('active');
+      suggestionsPanel?.classList.remove('show');
+    }
+  }
+
+  messages?.addEventListener('click', handleSuggestionClick);
+
+  function findResponse(query) {
+    const lower = query.toLowerCase();
+
+    for (const [category, keywords] of Object.entries(faqData)) {
+      if (keywords.some(keyword => lower.includes(keyword))) {
+        return responses[category];
+      }
+    }
+
+    return responses.unknown;
+  }
+
+  function addMessage(content, isUser = false) {
+    const div = document.createElement('div');
+    div.className = `message ${isUser ? 'user' : 'bot'}`;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+
+    // Convert markdown-style formatting
+    const formatted = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    contentDiv.innerHTML = formatted;
+    div.appendChild(contentDiv);
+    messages?.appendChild(div);
+    messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const query = input?.value.trim();
+    if (!query) return;
+
+    addMessage(query, true);
+    input.value = '';
+
+    // Simulate typing delay
+    setTimeout(() => {
+      const response = findResponse(query);
+      addMessage(response);
+    }, 400);
+  });
+</script>

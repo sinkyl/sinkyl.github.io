@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ChatBot from '../components/ChatBot.astro';
 import { getCollection } from 'astro:content';
 import { getTechColor } from '../lib/colors';
 
@@ -132,6 +133,8 @@ const philosophies = [
     </div>
 
   </div>
+
+  <ChatBot />
 </BaseLayout>
 
 <style>
