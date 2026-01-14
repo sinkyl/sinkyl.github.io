@@ -9,17 +9,26 @@ export async function getStaticPaths() {
     xtranodly: {
       name: 'xtranodly.ai',
       color: '#61afef',
-      description: 'A visual node-based graph system for building AI workflows, data pipelines, and complex automation. Drag, connect, and orchestrate — code optional.'
+      description: 'A visual node-based graph system for building AI workflows, data pipelines, and complex automation. Drag, connect, and orchestrate — code optional.',
+      extendedDescription: `The platform features an intuitive canvas where nodes represent discrete operations — from data ingestion and transformation to model inference and output routing. Each node exposes configurable parameters through a clean interface, allowing fine-grained control without diving into code.
+
+Under the hood, the execution engine handles parallelization, error recovery, and resource management automatically. Workflows can be versioned, exported, and shared across teams. Integration with popular ML frameworks, databases, and cloud services comes built-in through our extensible connector system.`
     },
     bazaar: {
       name: 'Bazaar.Shop',
       color: '#d19a66',
-      description: 'A multi-tenant marketplace platform with PCI-DSS compliant payments, SSO authentication, and a microservices architecture designed for scale.'
+      description: 'A multi-tenant marketplace platform with PCI-DSS compliant payments, SSO authentication, and a microservices architecture designed for scale.',
+      extendedDescription: `The architecture separates concerns across dedicated services: catalog management, order processing, inventory sync, and payment orchestration each run independently with event-driven communication.
+
+Sellers onboard through a streamlined verification flow with KYC/AML compliance checks. The storefront SDK enables white-label deployments with customizable themes, while the admin dashboard provides real-time analytics on GMV, conversion funnels, and seller performance metrics.`
     },
     spatium: {
       name: 'Spatium.ai',
       color: '#c678dd',
-      description: 'Spatial computing platform for immersive 3D experiences, AR/VR applications, and next-generation human-computer interaction.'
+      description: 'Spatial computing platform for immersive 3D experiences, AR/VR applications, and next-generation human-computer interaction.',
+      extendedDescription: `Built on a custom rendering engine optimized for mixed reality, Spatium handles spatial anchoring, occlusion mapping, and hand tracking with sub-millisecond latency. The scene graph supports collaborative editing where multiple users can manipulate shared 3D spaces in real-time.
+
+Developers access these capabilities through a declarative API that abstracts device-specific quirks across Meta Quest, Apple Vision Pro, and HoloLens. Asset pipelines support glTF, USD, and proprietary formats with automatic LOD generation and texture compression.`
     }
   };
 
@@ -77,7 +86,15 @@ const weeks = Object.values(groupedPosts).sort(
   <section class="header">
     <a href="/" class="back">&larr; Back</a>
     <h1 style={`--project-color: ${project.color}`}>{project.name}</h1>
-    <p class="project-description">{project.description}</p>
+    <div class="description-container" id="description-container">
+      <p class="project-description">
+        <span class="description-preview"></span><span class="toggle-more">...more</span><span class="description-full"></span><span class="toggle-less">...less</span>
+      </p>
+      <script define:vars={{ description: project.description, extendedDescription: project.extendedDescription || '' }}>
+        window.__projectDescription = description;
+        window.__projectExtended = extendedDescription;
+      </script>
+    </div>
     <p class="count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
   </section>
 
@@ -125,7 +142,6 @@ const weeks = Object.values(groupedPosts).sort(
 <style>
   .header {
     padding: 2rem 0;
-    margin-bottom: 2rem;
   }
 
   .back {
@@ -145,12 +161,44 @@ const weeks = Object.values(groupedPosts).sort(
     color: var(--project-color);
   }
 
+  .description-container {
+    max-width: 600px;
+    margin: 1rem 0;
+    position: relative;
+  }
+
   .project-description {
     color: var(--text-muted);
     font-size: 0.95rem;
     line-height: 1.6;
-    max-width: 600px;
-    margin: 1rem 0;
+    margin: 0;
+  }
+
+  .toggle-more,
+  .toggle-less {
+    color: var(--accent);
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .toggle-more:hover,
+  .toggle-less:hover {
+    opacity: 1;
+  }
+
+  .description-full,
+  .toggle-less {
+    display: none;
+  }
+
+  .description-container.expanded .description-full,
+  .description-container.expanded .toggle-less {
+    display: inline;
+  }
+
+  .description-container.expanded .toggle-more {
+    display: none;
   }
 
   .count {
@@ -225,8 +273,8 @@ const weeks = Object.values(groupedPosts).sort(
   }
 
   .tag {
-    font-size: 0.65rem;
-    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.3rem;
     border-radius: 3px;
     background: color-mix(in srgb, var(--tech-color) 12%, transparent);
     color: var(--tech-color);
@@ -252,3 +300,45 @@ const weeks = Object.values(groupedPosts).sort(
     }
   }
 </style>
+
+<script>
+  const container = document.getElementById('description-container');
+  const previewEl = container?.querySelector('.description-preview');
+  const fullEl = container?.querySelector('.description-full');
+  const moreBtn = container?.querySelector('.toggle-more');
+  const lessBtn = container?.querySelector('.toggle-less');
+
+  if (container && previewEl && fullEl && moreBtn && lessBtn) {
+    const description = (window as any).__projectDescription || '';
+    const extended = (window as any).__projectExtended || '';
+
+    const fullText = extended ? `${description} ${extended.replace(/\n\n/g, ' ')}` : description;
+    const words = fullText.split(/\s+/);
+    const previewWords = 21;
+
+    if (words.length > previewWords) {
+      previewEl.textContent = words.slice(0, previewWords).join(' ') + ' ';
+      fullEl.textContent = words.slice(previewWords).join(' ') + ' ';
+    } else {
+      previewEl.textContent = fullText;
+      moreBtn.style.display = 'none';
+      lessBtn.style.display = 'none';
+    }
+
+    moreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      container.classList.add('expanded');
+    });
+
+    lessBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      container.classList.remove('expanded');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (container.classList.contains('expanded') && !container.contains(e.target as Node)) {
+        container.classList.remove('expanded');
+      }
+    });
+  }
+</script>

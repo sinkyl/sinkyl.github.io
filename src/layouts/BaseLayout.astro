@@ -49,9 +49,28 @@ const currentPath = Astro.url.pathname;
           <a href="/blog" class:list={['nav-link', { active: currentPath.startsWith('/blog') }]}>
             <span class="nav-text">Blog<span class="link-indicator"></span></span>
           </a>
-          <a href="/projects/bazaar" class:list={['nav-link', { active: currentPath.startsWith('/projects') }]}>
-            <span class="nav-text">Projects<span class="link-indicator"></span></span>
-          </a>
+          <div class="nav-dropdown" id="projects-dropdown">
+            <button type="button" class:list={['nav-link', 'dropdown-toggle', { active: currentPath.startsWith('/projects') }]}>
+              <span class="nav-text">Projects<span class="link-indicator"></span></span>
+              <svg class="dropdown-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 5l3 3 3-3"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="/projects/xtranodly" class="dropdown-item" style="--project-color: #61afef">
+                <span class="dropdown-dot"></span>
+                xtranodly.ai
+              </a>
+              <a href="/projects/bazaar" class="dropdown-item" style="--project-color: #d19a66">
+                <span class="dropdown-dot"></span>
+                Bazaar.Shop
+              </a>
+              <a href="/projects/spatium" class="dropdown-item" style="--project-color: #c678dd">
+                <span class="dropdown-dot"></span>
+                Spatium.ai
+              </a>
+            </div>
+          </div>
         </div>
         <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -180,6 +199,85 @@ const currentPath = Astro.url.pathname;
   }
 
 
+  .nav-dropdown {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .nav-dropdown .nav-link {
+    gap: 0.3rem;
+  }
+
+  .dropdown-toggle {
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .dropdown-arrow {
+    width: 12px;
+    height: 12px;
+    margin-top: 0.33em;
+    transition: transform 0.2s;
+  }
+
+  .nav-dropdown.open .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    min-width: 160px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-dropdown.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+  }
+
+  .dropdown-item:hover {
+    background: var(--bg-secondary);
+    color: var(--project-color);
+  }
+
+  .dropdown-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--project-color);
+    opacity: 0.7;
+  }
+
+  .dropdown-item:hover .dropdown-dot {
+    opacity: 1;
+  }
+
   .theme-toggle {
     margin: 1rem 0;
     margin-left: auto;
@@ -307,6 +405,21 @@ const currentPath = Astro.url.pathname;
     localStorage.setItem('theme', next);
   });
 
+  // Projects dropdown toggle
+  const projectsDropdown = document.getElementById('projects-dropdown');
+  const dropdownToggle = projectsDropdown?.querySelector('.dropdown-toggle');
+
+  dropdownToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    projectsDropdown?.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (projectsDropdown?.classList.contains('open') && !projectsDropdown.contains(e.target as Node)) {
+      projectsDropdown.classList.remove('open');
+    }
+  });
+
   // Nav indicator - line passes "behind" the gap between links
   const navLinksContainer = document.querySelector('.nav-links') as HTMLElement;
   const links = Array.from(document.querySelectorAll('.nav-link')) as HTMLElement[];
@@ -314,6 +427,13 @@ const currentPath = Astro.url.pathname;
   const indicators = textSpans.map(span => span.querySelector('.link-indicator') as HTMLElement);
   const activeIndex = links.findIndex(link => link.classList.contains('active'));
   let lastMouseX = 0;
+
+  // Get offset relative to nav-links container
+  function getOffsetLeft(el: HTMLElement): number {
+    const containerRect = navLinksContainer.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    return elRect.left - containerRect.left;
+  }
 
   function setIndicatorAnchor(ind: HTMLElement, anchor: 'left' | 'right') {
     if (anchor === 'left') {
@@ -348,8 +468,8 @@ const currentPath = Astro.url.pathname;
 
     const firstLink = links[0];
     const lastLink = links[links.length - 1];
-    const firstLinkStart = firstLink.offsetLeft;
-    const lastLinkEnd = lastLink.offsetLeft + lastLink.offsetWidth;
+    const firstLinkStart = getOffsetLeft(firstLink);
+    const lastLinkEnd = getOffsetLeft(lastLink) + lastLink.offsetWidth;
 
     // Check if in left edge zone (before first link)
     // Skip animation if first link is the active one
@@ -411,12 +531,12 @@ const currentPath = Astro.url.pathname;
       const link = links[i];
       const textSpan = textSpans[i];
 
-      // Link boundaries (larger hover area)
-      const linkStart = link.offsetLeft;
+      // Link boundaries (larger hover area) - using getBoundingClientRect for accuracy
+      const linkStart = getOffsetLeft(link);
       const linkEnd = linkStart + link.offsetWidth;
 
       // Text boundaries (for gap calculation)
-      const textStart = linkStart + textSpan.offsetLeft;
+      const textStart = getOffsetLeft(textSpan);
       const textEnd = textStart + textSpan.offsetWidth;
 
       // Mouse is over this link's hover area
@@ -434,12 +554,13 @@ const currentPath = Astro.url.pathname;
       if (i < links.length - 1) {
         const nextLink = links[i + 1];
         const nextTextSpan = textSpans[i + 1];
-        const nextTextStart = nextLink.offsetLeft + nextTextSpan.offsetLeft;
+        const nextLinkStart = getOffsetLeft(nextLink);
+        const nextTextStart = getOffsetLeft(nextTextSpan);
 
         const gapStart = textEnd;
         const gapEnd = nextTextStart;
 
-        if (mouseX > linkEnd && mouseX < nextLink.offsetLeft) {
+        if (mouseX > linkEnd && mouseX < nextLinkStart) {
           // In the actual gap between hover areas - calculate based on text positions
           const progress = (mouseX - gapStart) / (gapEnd - gapStart);
           const clampedProgress = Math.max(0, Math.min(1, progress));
