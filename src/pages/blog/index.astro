@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlocksBackground from '../../components/BlocksBackground.astro';
 import { getCollection } from 'astro:content';
 import { getTechColor, projectColors } from '../../lib/colors';
 
@@ -45,6 +46,7 @@ const weeks = Object.values(groupedPosts).sort(
 ---
 
 <BaseLayout title="All Posts - Engineering Devlog">
+  <BlocksBackground />
   <h1>All Posts</h1>
 
   {posts.length === 0 ? (

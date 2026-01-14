@@ -19,6 +19,28 @@ const { title, description = 'Engineering devlog' } = Astro.props;
   <body>
     <header>
       <nav>
+        <a href="/" class="logo" aria-label="Home">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Central node triangle (smaller) -->
+            <polygon points="20,9 25,18 15,18" fill="#61afef" opacity="0.9"/>
+            <!-- Left module (point at top, flat base at bottom) -->
+            <polygon points="15,31 19,31 17,25" fill="#c678dd" opacity="0.8"/>
+            <!-- Right module (point at top, flat base at bottom) -->
+            <polygon points="21,31 25,31 23,25" fill="#c678dd" opacity="0.8"/>
+            <!-- Left flame -->
+            <polygon points="16,31 18,31 17,35" fill="#d19a66" opacity="0.9"/>
+            <!-- Right flame -->
+            <polygon points="22,31 24,31 23,35" fill="#d19a66" opacity="0.9"/>
+            <!-- Connection lines -->
+            <line x1="20" y1="18" x2="20" y2="21" stroke="#61afef" stroke-width="1" opacity="0.6"/>
+            <line x1="20" y1="21" x2="17" y2="25" stroke="#61afef" stroke-width="1" opacity="0.6"/>
+            <line x1="20" y1="21" x2="23" y2="25" stroke="#61afef" stroke-width="1" opacity="0.6"/>
+            <!-- Node points -->
+            <circle cx="20" cy="21" r=".8" fill="#e6edf3"/>
+            <circle cx="17" cy="25" r=".8" fill="#e6edf3"/>
+            <circle cx="23" cy="25" r=".8" fill="#e6edf3"/>
+          </svg>
+        </a>
         <a href="/">Home</a>
         <a href="/blog">Blog</a>
       </nav>
@@ -27,7 +49,7 @@ const { title, description = 'Engineering devlog' } = Astro.props;
       <slot />
     </main>
     <footer>
-      <p>&copy; {new Date().getFullYear()} - Engineering Devlog</p>
+      <p>&copy; {new Date().getFullYear()} - sinkyl Devlog</p>
     </footer>
   </body>
 </html>
@@ -68,6 +90,7 @@ const { title, description = 'Engineering devlog' } = Astro.props;
   nav {
     display: flex;
     gap: 1.5rem;
+    align-items: center;
   }
 
   nav a {
@@ -77,6 +100,35 @@ const { title, description = 'Engineering devlog' } = Astro.props;
 
   nav a:hover {
     color: var(--accent);
+  }
+
+  nav a.logo {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+  }
+
+  nav a.logo svg {
+    width: 55px;
+    height: 55px;
+    animation: none;
+    transition: transform 0.5s ease-out, filter 0.5s ease-out;
+  }
+
+  nav a.logo:hover svg {
+    transform: translateY(-8px) scale(1.05);
+    filter: drop-shadow(0 10px 15px rgba(97, 175, 239, 0.4));
+    animation: rocketFly 2s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+
+  @keyframes rocketFly {
+    0%, 100% {
+      transform: translateY(-8px) scale(1.05) rotate(-3deg);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.05) rotate(3deg);
+    }
   }
 
   main {

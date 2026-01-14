@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlocksBackground from '../../components/BlocksBackground.astro';
 import { getCollection } from 'astro:content';
 import { getTechColor } from '../../lib/colors';
 
@@ -72,6 +73,7 @@ const weeks = Object.values(groupedPosts).sort(
 ---
 
 <BaseLayout title={`${project.name} — Engineering Devlog`}>
+  <BlocksBackground />
   <section class="header">
     <a href="/" class="back">&larr; Back</a>
     <h1 style={`--project-color: ${project.color}`}>{project.name}</h1>
