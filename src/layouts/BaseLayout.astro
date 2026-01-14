@@ -164,7 +164,7 @@ const currentPath = Astro.url.pathname;
   .nav-links {
     position: relative;
     display: flex;
-    gap: 1.5rem;
+    gap: 1.2rem;
     align-items: stretch;
     padding: 0 1.5rem;
     margin: 0 -1.5rem;
@@ -174,7 +174,7 @@ const currentPath = Astro.url.pathname;
     position: relative;
     color: var(--text);
     text-decoration: none;
-    padding: 1rem 0;
+    padding: 1rem 0.3rem;
     display: flex;
     align-items: center;
     transition: color 0.2s;
@@ -427,6 +427,7 @@ const currentPath = Astro.url.pathname;
   const indicators = textSpans.map(span => span.querySelector('.link-indicator') as HTMLElement);
   const activeIndex = links.findIndex(link => link.classList.contains('active'));
   let lastMouseX = 0;
+  let lastHoveredIndex = activeIndex; // Track which link was last highlighted
 
   // Get offset relative to nav-links container
   function getOffsetLeft(el: HTMLElement): number {
@@ -449,9 +450,23 @@ const currentPath = Astro.url.pathname;
     indicators.forEach((ind, i) => {
       if (!ind) return;
       ind.style.transition = animate ? 'width 0.25s ease-out' : 'none';
-      setIndicatorAnchor(ind, 'left');
-      ind.style.width = i === activeIndex ? '100%' : '0';
+
+      if (i === activeIndex) {
+        // When returning to active, fill from the direction of the last hovered link
+        // If last hovered was on the left, fill from left to right (anchor left)
+        // If last hovered was on the right, fill from right to left (anchor right)
+        if (lastHoveredIndex < activeIndex) {
+          setIndicatorAnchor(ind, 'left');
+        } else {
+          setIndicatorAnchor(ind, 'right');
+        }
+        ind.style.width = '100%';
+      } else {
+        ind.style.width = '0';
+      }
     });
+
+    lastHoveredIndex = activeIndex;
   }
 
   // Set initial state
@@ -495,6 +510,9 @@ const currentPath = Astro.url.pathname;
           ind.style.width = '0';
         }
       });
+
+      // Update lastHoveredIndex based on which link has more indicator
+      lastHoveredIndex = squeezeProgress >= 0.5 ? activeIndex : 0;
       return;
     }
 
@@ -523,6 +541,9 @@ const currentPath = Astro.url.pathname;
           ind.style.width = '0';
         }
       });
+
+      // Update lastHoveredIndex based on which link has more indicator
+      lastHoveredIndex = squeezeProgress >= 0.5 ? activeIndex : links.length - 1;
       return;
     }
 
@@ -544,9 +565,33 @@ const currentPath = Astro.url.pathname;
         indicators.forEach((ind, j) => {
           if (!ind) return;
           ind.style.transition = 'width 0.15s ease-out';
-          setIndicatorAnchor(ind, 'left');
-          ind.style.width = j === i ? '100%' : '0';
+
+          if (j === i) {
+            // Set anchor based on position relative to active link
+            // If hovered link is left of active, fill from right to left (anchor right)
+            // If hovered link is right of active, fill from left to right (anchor left)
+            if (i < activeIndex) {
+              setIndicatorAnchor(ind, 'right');
+            } else {
+              setIndicatorAnchor(ind, 'left');
+            }
+            ind.style.width = '100%';
+          } else if (j === activeIndex) {
+            // Active link losing its line - set anchor so it disappears toward hovered link
+            // If hovered is left, disappear to left (anchor left, shrinks from right)
+            // If hovered is right, disappear to right (anchor right, shrinks from left)
+            if (i < activeIndex) {
+              setIndicatorAnchor(ind, 'left');
+            } else {
+              setIndicatorAnchor(ind, 'right');
+            }
+            ind.style.width = '0';
+          } else {
+            ind.style.width = '0';
+          }
         });
+
+        lastHoveredIndex = i;
         return;
       }
 
@@ -585,6 +630,9 @@ const currentPath = Astro.url.pathname;
               ind.style.width = '0';
             }
           });
+
+          // Update lastHoveredIndex based on which link has more indicator
+          lastHoveredIndex = clampedProgress >= 0.5 ? i + 1 : i;
           return;
         }
       }

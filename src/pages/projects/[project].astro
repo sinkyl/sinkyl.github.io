@@ -54,31 +54,23 @@ function getWeekStart(date: Date): Date {
   return d;
 }
 
-function getWeekEnd(weekStart: Date): Date {
-  const end = new Date(weekStart);
+function formatWeekRange(start: Date): string {
+  const end = new Date(start);
   end.setDate(end.getDate() + 6);
-  return end;
-}
-
-function formatWeekRange(start: Date, end: Date): string {
   const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   return `${startStr} — ${endStr}`;
 }
 
-const groupedPosts = posts.reduce((acc, post) => {
-  const weekStart = getWeekStart(post.data.date);
-  const key = weekStart.toISOString();
-  if (!acc[key]) {
-    acc[key] = { weekStart, posts: [] };
-  }
-  acc[key].posts.push(post);
-  return acc;
-}, {} as Record<string, { weekStart: Date; posts: typeof posts }>);
+// Add week info to each post
+const postsWithWeek = posts.map(post => ({
+  post,
+  weekKey: getWeekStart(post.data.date).toISOString(),
+  weekLabel: formatWeekRange(getWeekStart(post.data.date))
+}));
 
-const weeks = Object.values(groupedPosts).sort(
-  (a, b) => b.weekStart.valueOf() - a.weekStart.valueOf()
-);
+const POSTS_PER_PAGE = 6;
+const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
 ---
 
 <BaseLayout title={`${project.name} — Engineering Devlog`}>
@@ -101,47 +93,79 @@ const weeks = Object.values(groupedPosts).sort(
   {posts.length === 0 ? (
     <p class="empty">No posts yet for this project.</p>
   ) : (
-    <div class="weeks">
-      {weeks.map(({ weekStart, posts: weekPosts }) => (
-        <section class="week-section">
-          <h2 class="week-header">
-            <span class="week-label">Week of</span>
-            {formatWeekRange(weekStart, getWeekEnd(weekStart))}
-          </h2>
-          <ul class="post-list">
-            {weekPosts.map(post => {
-              const preview = post.data.description || post.data.patterns?.slice(0, 3).join(' • ') || '';
-              return (
-                <li>
-                  <a href={`/blog/${post.slug}`} style={`--project-color: ${project.color}`}>
-                    <article>
-                      <div class="post-header">
-                        {post.data.languages.length > 0 && (
-                          <div class="tags">
-                            {post.data.languages.slice(0, 3).map(lang => (
-                              <span class="tag" style={`--tech-color: ${getTechColor(lang)}`}>{lang}</span>
-                            ))}
-                          </div>
-                        )}
+    <>
+      <div class="posts-container" id="posts-container">
+        {postsWithWeek.map(({ post, weekKey, weekLabel }, index) => {
+          const preview = post.data.description || post.data.patterns?.slice(0, 3).join(' • ') || '';
+          const isFirstOfWeek = index === 0 || postsWithWeek[index - 1].weekKey !== weekKey;
+
+          return (
+            <>
+              {isFirstOfWeek && (
+                <h2 class="week-header" data-week={weekKey} data-index={index}>
+                  <span class="week-label">Week of</span>
+                  {weekLabel}
+                </h2>
+              )}
+              <article class="post-item" data-index={index} data-week={weekKey}>
+                <a href={`/blog/${post.slug}`} style={`--project-color: ${project.color}`}>
+                  <div class="post-header">
+                    {post.data.languages.length > 0 && (
+                      <div class="tags">
+                        {post.data.languages.slice(0, 3).map(lang => (
+                          <span class="tag" style={`--tech-color: ${getTechColor(lang)}`}>{lang}</span>
+                        ))}
                       </div>
-                      {preview && (
-                        <p class="preview">{preview}</p>
-                      )}
-                    </article>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
-    </div>
+                    )}
+                    <span class="post-date">{post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  </div>
+                  {preview && (
+                    <p class="preview">{preview}</p>
+                  )}
+                </a>
+              </article>
+            </>
+          );
+        })}
+      </div>
+
+      {totalPages > 1 && (
+        <>
+          <nav class="pagination" id="pagination">
+            <button class="page-btn prev" id="prev-btn" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <input type="text" class="page-indicator" id="page-indicator" value={`1 . . ${totalPages}`} readonly />
+            <button class="page-btn next" id="next-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </nav>
+          <nav class="pagination-float" id="pagination-float">
+            <button class="page-btn prev" id="prev-btn-float">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <span class="page-indicator-float" id="page-indicator-float">1 . . {totalPages}</span>
+            <button class="page-btn next" id="next-btn-float">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </nav>
+        </>
+      )}
+    </>
   )}
 </BaseLayout>
 
 <style>
   .header {
-    padding: 2rem 0;
+    padding-bottom: 2rem;
   }
 
   .back {
@@ -212,23 +236,29 @@ const weeks = Object.values(groupedPosts).sort(
     font-style: italic;
   }
 
-  .weeks {
+  .posts-container {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-  }
-
-  .week-section {
-    position: relative;
+    gap: 0.75rem;
   }
 
   .week-header {
     font-size: 0.85rem;
     color: var(--text-muted);
-    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border);
     font-weight: 500;
+    display: none;
+  }
+
+  .week-header.first-visible {
+    margin-top: 0;
+  }
+
+  .week-header.visible {
+    display: block;
   }
 
   .week-label {
@@ -237,14 +267,15 @@ const weeks = Object.values(groupedPosts).sort(
     margin-right: 0.5rem;
   }
 
-  .post-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  .post-item {
+    display: none;
   }
 
-  .post-list a {
+  .post-item.visible {
+    display: block;
+  }
+
+  .post-item a {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -255,7 +286,7 @@ const weeks = Object.values(groupedPosts).sort(
     transition: border-color 0.2s, transform 0.2s, background-color 0.3s ease;
   }
 
-  .post-list a:hover {
+  .post-item a:hover {
     border-color: var(--accent);
     transform: translateX(4px);
   }
@@ -281,11 +312,116 @@ const weeks = Object.values(groupedPosts).sort(
     border: 1px solid color-mix(in srgb, var(--tech-color) 30%, transparent);
   }
 
+  .post-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-left: auto;
+  }
+
   .preview {
     color: var(--text-muted);
     font-size: 0.85rem;
     line-height: 1.5;
     margin-top: 0.5rem;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding: 1rem 0;
+  }
+
+  .page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+  }
+
+  .page-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--bg-secondary);
+  }
+
+  .page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .page-btn svg {
+    width: 18px;
+    height: 18px;
+    color: var(--text);
+  }
+
+  .page-indicator {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    width: 70px;
+    text-align: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .page-indicator:hover {
+    border-color: var(--border);
+  }
+
+  .page-indicator:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg-card);
+    cursor: text;
+  }
+
+  .pagination-float {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
+    z-index: 50;
+  }
+
+  .pagination-float.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .pagination-float .page-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .page-indicator-float {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    padding: 0 0.25rem;
   }
 
   @media (max-width: 600px) {
@@ -298,17 +434,27 @@ const weeks = Object.values(groupedPosts).sort(
       align-items: flex-start;
       gap: 0.25rem;
     }
+
+    .post-date {
+      margin-left: 0;
+    }
   }
 </style>
 
-<script>
-  const container = document.getElementById('description-container');
-  const previewEl = container?.querySelector('.description-preview');
-  const fullEl = container?.querySelector('.description-full');
-  const moreBtn = container?.querySelector('.toggle-more');
-  const lessBtn = container?.querySelector('.toggle-less');
+<script define:vars={{ totalPages, POSTS_PER_PAGE }}>
+  window.__totalPages = totalPages;
+  window.__postsPerPage = POSTS_PER_PAGE;
+</script>
 
-  if (container && previewEl && fullEl && moreBtn && lessBtn) {
+<script>
+  // Description toggle
+  const descContainer = document.getElementById('description-container');
+  const previewEl = descContainer?.querySelector('.description-preview');
+  const fullEl = descContainer?.querySelector('.description-full');
+  const moreBtn = descContainer?.querySelector('.toggle-more');
+  const lessBtn = descContainer?.querySelector('.toggle-less');
+
+  if (descContainer && previewEl && fullEl && moreBtn && lessBtn) {
     const description = (window as any).__projectDescription || '';
     const extended = (window as any).__projectExtended || '';
 
@@ -321,24 +467,204 @@ const weeks = Object.values(groupedPosts).sort(
       fullEl.textContent = words.slice(previewWords).join(' ') + ' ';
     } else {
       previewEl.textContent = fullText;
-      moreBtn.style.display = 'none';
-      lessBtn.style.display = 'none';
+      (moreBtn as HTMLElement).style.display = 'none';
+      (lessBtn as HTMLElement).style.display = 'none';
     }
 
     moreBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      container.classList.add('expanded');
+      descContainer.classList.add('expanded');
     });
 
     lessBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      container.classList.remove('expanded');
+      descContainer.classList.remove('expanded');
     });
 
     document.addEventListener('click', (e) => {
-      if (container.classList.contains('expanded') && !container.contains(e.target as Node)) {
-        container.classList.remove('expanded');
+      if (descContainer.classList.contains('expanded') && !descContainer.contains(e.target as Node)) {
+        descContainer.classList.remove('expanded');
       }
     });
+  }
+
+  // Pagination
+  const container = document.getElementById('posts-container');
+  const postItems = container?.querySelectorAll('.post-item');
+  const weekHeaders = container?.querySelectorAll('.week-header');
+  const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
+  const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
+  const pageIndicator = document.getElementById('page-indicator') as HTMLInputElement;
+  const pagination = document.getElementById('pagination');
+
+  // Floating pagination elements
+  const paginationFloat = document.getElementById('pagination-float');
+  const prevBtnFloat = document.getElementById('prev-btn-float') as HTMLButtonElement;
+  const nextBtnFloat = document.getElementById('next-btn-float') as HTMLButtonElement;
+  const pageIndicatorFloat = document.getElementById('page-indicator-float');
+
+  const totalPages = (window as any).__totalPages || 1;
+  const postsPerPage = (window as any).__postsPerPage || 6;
+  let currentPage = 1;
+
+  function getIndicatorText() {
+    return currentPage === totalPages ? `${currentPage}` : `${currentPage} . . ${totalPages}`;
+  }
+
+  function updatePagination() {
+    if (!postItems || !pageIndicator) return;
+
+    const startIndex = (currentPage - 1) * postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+
+    // Track which weeks have visible posts
+    const visibleWeeks = new Set<string>();
+
+    // Show/hide posts
+    postItems.forEach((post, index) => {
+      if (index >= startIndex && index < endIndex) {
+        post.classList.add('visible');
+        const weekKey = post.getAttribute('data-week');
+        if (weekKey) visibleWeeks.add(weekKey);
+      } else {
+        post.classList.remove('visible');
+      }
+    });
+
+    // Show/hide week headers
+    let firstVisibleHeader = true;
+    weekHeaders?.forEach(header => {
+      header.classList.remove('first-visible');
+      const weekKey = header.getAttribute('data-week');
+      const headerIndex = parseInt(header.getAttribute('data-index') || '0');
+
+      let shouldShow = false;
+      if (weekKey && visibleWeeks.has(weekKey) && headerIndex >= startIndex && headerIndex < endIndex) {
+        shouldShow = true;
+      } else if (weekKey && visibleWeeks.has(weekKey)) {
+        const firstPostOfWeek = container?.querySelector(`.post-item[data-week="${weekKey}"].visible`);
+        const firstPostIndex = firstPostOfWeek ? parseInt(firstPostOfWeek.getAttribute('data-index') || '0') : -1;
+        if (firstPostIndex === startIndex || (headerIndex < startIndex && firstPostIndex >= startIndex)) {
+          shouldShow = true;
+        }
+      }
+
+      if (shouldShow) {
+        header.classList.add('visible');
+        if (firstVisibleHeader) {
+          header.classList.add('first-visible');
+          firstVisibleHeader = false;
+        }
+      } else {
+        header.classList.remove('visible');
+      }
+    });
+
+    // Update buttons
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+
+    // Update indicator
+    pageIndicator.value = getIndicatorText();
+    pageIndicator.readOnly = true;
+
+    // Update floating pagination
+    if (prevBtnFloat) prevBtnFloat.disabled = currentPage === 1;
+    if (nextBtnFloat) nextBtnFloat.disabled = currentPage === totalPages;
+    if (pageIndicatorFloat) pageIndicatorFloat.textContent = getIndicatorText();
+  }
+
+  prevBtn?.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePagination();
+    }
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePagination();
+    }
+  });
+
+  // Click to edit page number
+  pageIndicator?.addEventListener('click', () => {
+    pageIndicator.readOnly = false;
+    pageIndicator.value = String(currentPage);
+    pageIndicator.select();
+  });
+
+  // Handle input submission
+  pageIndicator?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const value = parseInt(pageIndicator.value);
+      if (!isNaN(value) && value >= 1 && value <= totalPages) {
+        currentPage = value;
+      }
+      updatePagination();
+      pageIndicator.blur();
+    } else if (e.key === 'Escape') {
+      updatePagination();
+      pageIndicator.blur();
+    }
+  });
+
+  // Reset on blur
+  pageIndicator?.addEventListener('blur', () => {
+    pageIndicator.value = getIndicatorText();
+    pageIndicator.readOnly = true;
+  });
+
+  // Floating pagination handlers
+  prevBtnFloat?.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePagination();
+    }
+  });
+
+  nextBtnFloat?.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePagination();
+    }
+  });
+
+  // Show/hide floating pagination based on main pagination visibility
+  function updateFloatVisibility() {
+    if (!pagination || !paginationFloat) return;
+    const rect = pagination.getBoundingClientRect();
+    const paginationHeight = rect.height;
+    const viewportBottom = window.innerHeight;
+
+    // Check if more than half of pagination is visible
+    const visibleAmount = Math.min(rect.bottom, viewportBottom) - Math.max(rect.top, 0);
+    const isHalfVisible = visibleAmount > paginationHeight / 2;
+
+    paginationFloat.classList.toggle('visible', !isHalfVisible);
+  }
+
+  window.addEventListener('scroll', updateFloatVisibility, { passive: true });
+  window.addEventListener('resize', updateFloatVisibility, { passive: true });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    // Don't navigate if user is typing in an input
+    if (document.activeElement?.tagName === 'INPUT') return;
+
+    if (e.key === 'ArrowLeft' && currentPage > 1) {
+      currentPage--;
+      updatePagination();
+    } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
+      currentPage++;
+      updatePagination();
+    }
+  });
+
+  // Initial render
+  if (postItems && postItems.length > 0) {
+    updatePagination();
+    updateFloatVisibility();
   }
 </script>
