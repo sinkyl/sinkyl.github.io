@@ -159,7 +159,7 @@ const philosophies = [
   }
 
   .bento-card {
-    background: rgba(22, 27, 34, 0.95);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 1.5rem;
@@ -169,6 +169,7 @@ const philosophies = [
     animation-delay: calc(var(--delay) * 0.08s);
     opacity: 0;
     transform: translateY(20px);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   @keyframes fadeSlideIn {
@@ -196,9 +197,6 @@ const philosophies = [
     display: flex;
     flex-direction: column;
     justify-content: center;
-    box-shadow:
-      0 4px 8px rgba(0, 0, 0, 0.2),
-      0 8px 16px rgba(0, 0, 0, 0.15);
   }
 
   .hero h1 {
@@ -303,16 +301,16 @@ const philosophies = [
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: color-mix(in srgb, var(--text) 3%, transparent);
     border: 1px solid transparent;
     border-radius: 12px;
     text-decoration: none;
     color: inherit;
-    transition: all 0.2s;
+    transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease;
   }
 
   .project-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: color-mix(in srgb, var(--text) 6%, transparent);
     border-color: var(--project-color);
     transform: translateX(4px);
   }
@@ -357,10 +355,7 @@ const philosophies = [
     display: flex;
     flex-direction: column;
     justify-content: center;
-    transition: transform 0.2s, border-color 0.2s;
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.2),
-      0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   .latest:hover {
@@ -434,7 +429,6 @@ const philosophies = [
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(22, 27, 34, 0.85);
     border-color: color-mix(in srgb, var(--grad-start) 15%, var(--border));
   }
 
@@ -455,6 +449,24 @@ const philosophies = [
     text-align: center;
     line-height: 1.5;
     font-weight: 500;
+  }
+
+  /* Light mode shadows */
+  :global([data-theme="light"]) .bento-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  :global([data-theme="light"]) .hero,
+  :global([data-theme="light"]) .latest {
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.1),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  :global([data-theme="light"]) .latest:hover {
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.12),
+      0 12px 32px rgba(0, 0, 0, 0.1);
   }
 
   /* Responsive */

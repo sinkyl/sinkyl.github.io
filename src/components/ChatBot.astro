@@ -24,8 +24,13 @@ const responses = {
 
 <div id="chat-widget" class="chat-widget">
   <button id="chat-toggle" class="chat-toggle" aria-label="Open chat">
-    <svg class="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+    <svg class="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <!-- Sound wave bars -->
+      <line x1="4" y1="12" x2="4" y2="12" class="wave-bar wave-1"/>
+      <line x1="8" y1="9" x2="8" y2="15" class="wave-bar wave-2"/>
+      <line x1="12" y1="5" x2="12" y2="19" class="wave-bar wave-3"/>
+      <line x1="16" y1="9" x2="16" y2="15" class="wave-bar wave-4"/>
+      <line x1="20" y1="12" x2="20" y2="12" class="wave-bar wave-5"/>
     </svg>
     <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="18" y1="6" x2="6" y2="18"/>
@@ -36,7 +41,15 @@ const responses = {
   <div id="chat-panel" class="chat-panel">
     <div class="chat-header">
       <div class="chat-header-info">
-        <span class="chat-avatar">◈</span>
+        <span class="chat-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="4" y1="12" x2="4" y2="12" class="avatar-wave wave-1"/>
+            <line x1="8" y1="9" x2="8" y2="15" class="avatar-wave wave-2"/>
+            <line x1="12" y1="5" x2="12" y2="19" class="avatar-wave wave-3"/>
+            <line x1="16" y1="9" x2="16" y2="15" class="avatar-wave wave-4"/>
+            <line x1="20" y1="12" x2="20" y2="12" class="avatar-wave wave-5"/>
+          </svg>
+        </span>
         <div>
           <h3>Ask About Sinan</h3>
           <span class="chat-status">FAQ Bot</span>
@@ -99,25 +112,41 @@ const responses = {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #61afef, #c678dd);
-    border: none;
+    background: linear-gradient(135deg, #1a1d23, #2d3748);
+    border: 1px solid rgba(97, 175, 239, 0.3);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(97, 175, 239, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.3s;
+  }
+
+  :global([data-theme="light"]) .chat-toggle {
+    background: linear-gradient(135deg, #f8f7f4, #e8e6e1);
+    border-color: rgba(9, 105, 218, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
   .chat-toggle:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(97, 175, 239, 0.4);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-color: rgba(97, 175, 239, 0.5);
+  }
+
+  :global([data-theme="light"]) .chat-toggle:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border-color: rgba(9, 105, 218, 0.5);
   }
 
   .chat-toggle svg {
     width: 24px;
     height: 24px;
-    color: white;
+    color: #61afef;
+  }
+
+  :global([data-theme="light"]) .chat-toggle svg {
+    color: #0969da;
   }
 
   .chat-toggle .icon-close {
@@ -132,20 +161,104 @@ const responses = {
     display: block;
   }
 
+  /* Sound wave animation */
+  .wave-bar {
+    transform-origin: center;
+  }
+
+  .chat-toggle:not(:hover) .wave-1 {
+    animation: waveOuter 1.2s ease-in-out infinite;
+    animation-delay: 0s;
+  }
+
+  .chat-toggle:not(:hover) .wave-2 {
+    animation: waveInner 0.8s ease-in-out infinite;
+    animation-delay: 0.1s;
+  }
+
+  .chat-toggle:not(:hover) .wave-3 {
+    animation: waveCenter 0.6s ease-in-out infinite;
+    animation-delay: 0s;
+  }
+
+  .chat-toggle:not(:hover) .wave-4 {
+    animation: waveInner 0.8s ease-in-out infinite;
+    animation-delay: 0.2s;
+  }
+
+  .chat-toggle:not(:hover) .wave-5 {
+    animation: waveOuter 1.2s ease-in-out infinite;
+    animation-delay: 0.1s;
+  }
+
+  .chat-toggle:hover .wave-1 {
+    animation: waveOuterActive 0.5s ease-in-out infinite;
+  }
+
+  .chat-toggle:hover .wave-2 {
+    animation: waveInnerActive 0.4s ease-in-out infinite;
+    animation-delay: 0.05s;
+  }
+
+  .chat-toggle:hover .wave-3 {
+    animation: waveCenterActive 0.3s ease-in-out infinite;
+  }
+
+  .chat-toggle:hover .wave-4 {
+    animation: waveInnerActive 0.4s ease-in-out infinite;
+    animation-delay: 0.1s;
+  }
+
+  .chat-toggle:hover .wave-5 {
+    animation: waveOuterActive 0.5s ease-in-out infinite;
+    animation-delay: 0.05s;
+  }
+
+  @keyframes waveOuter {
+    0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+    50% { transform: scaleY(0.8); opacity: 0.8; }
+  }
+
+  @keyframes waveInner {
+    0%, 100% { transform: scaleY(0.6); opacity: 0.7; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  @keyframes waveCenter {
+    0%, 100% { transform: scaleY(0.7); opacity: 0.8; }
+    50% { transform: scaleY(1.1); opacity: 1; }
+  }
+
+  @keyframes waveOuterActive {
+    0%, 100% { transform: scaleY(0.5); opacity: 0.7; }
+    50% { transform: scaleY(1.2); opacity: 1; }
+  }
+
+  @keyframes waveInnerActive {
+    0%, 100% { transform: scaleY(0.7); opacity: 0.8; }
+    50% { transform: scaleY(1.3); opacity: 1; }
+  }
+
+  @keyframes waveCenterActive {
+    0%, 100% { transform: scaleY(0.8); opacity: 0.9; }
+    50% { transform: scaleY(1.4); opacity: 1; }
+  }
+
   .chat-panel {
     position: absolute;
     bottom: 70px;
     right: 0;
     width: 340px;
     max-height: 450px;
-    background: rgba(22, 27, 34, 0.98);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 16px;
     display: none;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     animation: slideUp 0.25s ease-out;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
   @keyframes slideUp {
@@ -166,7 +279,7 @@ const responses = {
   .chat-header {
     padding: 1rem;
     border-bottom: 1px solid var(--border);
-    background: rgba(30, 35, 42, 0.8);
+    background: var(--bg);
   }
 
   .chat-header-info {
@@ -178,13 +291,58 @@ const responses = {
   .chat-avatar {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #61afef, #c678dd);
+    background: linear-gradient(135deg, #1a1d23, #2d3748);
+    border: 1px solid rgba(97, 175, 239, 0.3);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
-    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+
+  :global([data-theme="light"]) .chat-avatar {
+    background: linear-gradient(135deg, #f8f7f4, #e8e6e1);
+    border-color: rgba(9, 105, 218, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .chat-avatar svg {
+    width: 18px;
+    height: 18px;
+    color: #61afef;
+    transition: color 0.3s;
+  }
+
+  :global([data-theme="light"]) .chat-avatar svg {
+    color: #0969da;
+  }
+
+  .avatar-wave {
+    transform-origin: center;
+  }
+
+  .avatar-wave.wave-1 {
+    animation: waveOuter 1.2s ease-in-out infinite;
+  }
+
+  .avatar-wave.wave-2 {
+    animation: waveInner 0.8s ease-in-out infinite;
+    animation-delay: 0.1s;
+  }
+
+  .avatar-wave.wave-3 {
+    animation: waveCenter 0.6s ease-in-out infinite;
+  }
+
+  .avatar-wave.wave-4 {
+    animation: waveInner 0.8s ease-in-out infinite;
+    animation-delay: 0.2s;
+  }
+
+  .avatar-wave.wave-5 {
+    animation: waveOuter 1.2s ease-in-out infinite;
+    animation-delay: 0.1s;
   }
 
   .chat-header h3 {
@@ -321,7 +479,7 @@ const responses = {
     top: 5rem;
     right: 0.5rem;
     left: 0.5rem;
-    background: rgba(30, 35, 42, 0.98);
+    background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 0.75rem;
@@ -368,7 +526,7 @@ const responses = {
     padding: 0.75rem;
     gap: 0.5rem;
     border-top: 1px solid var(--border);
-    background: rgba(30, 35, 42, 0.5);
+    background: var(--bg);
   }
 
   .chat-input-form input {
@@ -376,11 +534,11 @@ const responses = {
     padding: 0.6rem 1rem;
     border: 1px solid var(--border);
     border-radius: 20px;
-    background: rgba(22, 27, 34, 0.8);
+    background: var(--bg-card);
     color: var(--text);
     font-size: 0.85rem;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background-color 0.3s ease;
   }
 
   .chat-input-form input::placeholder {
@@ -392,26 +550,50 @@ const responses = {
   }
 
   .chat-input-form button {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #61afef, #c678dd);
+    background: none;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s;
-  }
-
-  .chat-input-form button:hover {
-    transform: scale(1.05);
+    padding: 0.5rem;
   }
 
   .chat-input-form button svg {
-    width: 16px;
-    height: 16px;
-    color: white;
+    width: 22px;
+    height: 22px;
+    color: #c678dd;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+
+  .chat-input-form button:hover svg {
+    transform: translate(3px, -3px) rotate(-12deg);
+    filter: drop-shadow(-2px 2px 3px rgba(198, 120, 221, 0.5));
+    animation: sendPulse 0.6s ease-in-out infinite;
+  }
+
+  .chat-input-form button.sending svg {
+    animation: sendLaunch 0.4s ease-out forwards;
+  }
+
+  @keyframes sendPulse {
+    0%, 100% { transform: translate(3px, -3px) rotate(-12deg) scale(1); }
+    50% { transform: translate(4px, -4px) rotate(-12deg) scale(1.1); }
+  }
+
+  @keyframes sendLaunch {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+    50% { transform: translate(15px, -15px) rotate(-20deg) scale(0.8); opacity: 0.3; }
+    51% { transform: translate(-5px, 5px) rotate(0deg) scale(0.6); opacity: 0; }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  }
+
+  :global([data-theme="light"]) .chat-input-form button svg {
+    color: #8b5cf6;
+  }
+
+  :global([data-theme="light"]) .chat-input-form button:hover svg {
+    filter: drop-shadow(-2px 2px 3px rgba(139, 92, 246, 0.5));
   }
 
   @media (max-width: 400px) {
@@ -467,13 +649,14 @@ const responses = {
   // Handle suggestion button clicks (both inline and panel)
   function handleSuggestionClick(e) {
     const btn = e.target.closest('[data-question]');
-    if (btn && input) {
+    if (btn && input && form) {
       e.stopPropagation();
       input.value = btn.dataset.question;
-      input.focus();
       // Close suggestions panel if open
       suggestionsToggle?.classList.remove('active');
       suggestionsPanel?.classList.remove('show');
+      // Auto-submit the question
+      form.requestSubmit();
     }
   }
 
@@ -509,10 +692,16 @@ const responses = {
     messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
   }
 
+  const submitBtn = form?.querySelector('button[type="submit"]');
+
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
     const query = input?.value.trim();
     if (!query) return;
+
+    // Trigger send animation
+    submitBtn?.classList.add('sending');
+    setTimeout(() => submitBtn?.classList.remove('sending'), 400);
 
     addMessage(query, true);
     input.value = '';
