@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ChatBot from '../components/ChatBot.astro';
+import Tag from '../components/Tag.astro';
 import { getCollection } from 'astro:content';
-import { getTechColor } from '../lib/colors';
+import { projects } from '../lib/projects';
 
 const allPosts = (await getCollection('blog'))
   .filter(post => !post.data.draft)
@@ -10,29 +11,12 @@ const allPosts = (await getCollection('blog'))
 
 const latestPost = allPosts[0];
 
-const projects = [
-  {
-    id: 'xtranodly',
-    name: 'xtranodly.ai',
-    description: 'Visual programming & AI workflows',
-    color: '#61afef',
-    icon: '◈'
-  },
-  {
-    id: 'bazaar',
-    name: 'Bazaar.Shop',
-    description: 'Marketplace platform',
-    color: '#d19a66',
-    icon: '◉'
-  },
-  {
-    id: 'spatium',
-    name: 'Spatium.ai',
-    description: 'Spatial computing',
-    color: '#c678dd',
-    icon: '◎'
-  }
-];
+// Short descriptions for homepage display
+const projectDescriptions: Record<string, string> = {
+  xtranodly: 'Visual programming & AI workflows',
+  bazaar: 'Marketplace platform',
+  spatium: 'Spatial computing'
+};
 
 const currentProject = projects[Math.floor(Date.now() / 86400000) % 3];
 
@@ -89,7 +73,7 @@ const philosophies = [
             <span class="project-icon">{project.icon}</span>
             <div class="project-info">
               <h3>{project.name}</h3>
-              <p>{project.description}</p>
+              <p>{projectDescriptions[project.id]}</p>
             </div>
             <span class="project-arrow">&rarr;</span>
           </a>
@@ -122,7 +106,7 @@ const philosophies = [
       <span class="label">Stack</span>
       <div class="stack-items">
         {techStack.map(tech => (
-          <span class="stack-item" style={`--tech-color: ${getTechColor(tech)}`}>{tech}</span>
+          <Tag label={tech} size="md" />
         ))}
       </div>
     </div>
@@ -387,21 +371,6 @@ const philosophies = [
     color: var(--text);
   }
 
-  .latest-tags {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  .tag {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.3rem;
-    background: rgba(97, 175, 239, 0.08);
-    border: 1px solid rgba(97, 175, 239, 0.2);
-    color: rgba(97, 175, 239, 0.7);
-    border-radius: 4px;
-  }
-
   /* Stack Card */
   .stack {
     grid-column: span 2;
@@ -412,15 +381,6 @@ const philosophies = [
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-top: 0.5rem;
-  }
-
-  .stack-item {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-    background: color-mix(in srgb, var(--tech-color) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--tech-color) 30%, transparent);
-    border-radius: 4px;
-    color: var(--tech-color);
   }
 
   /* Quote Cards */
@@ -523,160 +483,6 @@ const philosophies = [
 </style>
 
 <script>
-  const canvas = document.getElementById('circuit-bg') as HTMLCanvasElement;
-  const ctx = canvas.getContext('2d')!;
-
-  let width = window.innerWidth;
-  let height = window.innerHeight;
-  let mouseX = width / 2;
-  let mouseY = height / 2;
-  let animationId: number;
-
-  interface Node {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    radius: number;
-    baseX: number;
-    baseY: number;
-  }
-
-  const nodes: Node[] = [];
-  const connectionDistance = 150;
-  const mouseInfluenceRadius = 200;
-
-  function init() {
-    canvas.width = width;
-    canvas.height = height;
-
-    nodes.length = 0;
-    const count = Math.min(80, Math.floor((width * height) / 15000));
-
-    for (let i = 0; i < count; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      nodes.push({
-        x,
-        y,
-        baseX: x,
-        baseY: y,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        radius: Math.random() * 2 + 1
-      });
-    }
-  }
-
-  function drawNode(node: Node, intensity: number) {
-    const glow = intensity > 0;
-
-    if (glow) {
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, node.radius + 4, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(198, 120, 221, ${intensity * 0.3})`;
-      ctx.fill();
-    }
-
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-    ctx.fillStyle = glow
-      ? `rgba(198, 120, 221, ${0.6 + intensity * 0.4})`
-      : `rgba(97, 175, 239, 0.6)`;
-    ctx.fill();
-  }
-
-  function drawConnection(node1: Node, node2: Node, distance: number) {
-    const opacity = (1 - distance / connectionDistance) * 0.3;
-    ctx.beginPath();
-    ctx.moveTo(node1.x, node1.y);
-    ctx.lineTo(node2.x, node2.y);
-    ctx.strokeStyle = `rgba(97, 175, 239, ${opacity})`;
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-  }
-
-  function animate() {
-    ctx.clearRect(0, 0, width, height);
-
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-
-      node.x += node.vx;
-      node.y += node.vy;
-
-      const dx = mouseX - node.x;
-      const dy = mouseY - node.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < mouseInfluenceRadius) {
-        const force = (1 - dist / mouseInfluenceRadius) * 0.02;
-        node.x += dx * force;
-        node.y += dy * force;
-      }
-
-      if (node.x < 0 || node.x > width) node.vx *= -1;
-      if (node.y < 0 || node.y > height) node.vy *= -1;
-      node.x = Math.max(0, Math.min(width, node.x));
-      node.y = Math.max(0, Math.min(height, node.y));
-
-      for (let j = i + 1; j < nodes.length; j++) {
-        const other = nodes[j];
-        const connDx = node.x - other.x;
-        const connDy = node.y - other.y;
-        const connDist = Math.sqrt(connDx * connDx + connDy * connDy);
-
-        if (connDist < connectionDistance) {
-          drawConnection(node, other, connDist);
-        }
-      }
-
-      const mouseIntensity = dist < mouseInfluenceRadius
-        ? 1 - dist / mouseInfluenceRadius
-        : 0;
-
-      drawNode(node, mouseIntensity);
-    }
-
-    const nearNodes = nodes
-      .map(n => ({ node: n, dist: Math.sqrt((n.x - mouseX) ** 2 + (n.y - mouseY) ** 2) }))
-      .filter(n => n.dist < mouseInfluenceRadius)
-      .sort((a, b) => a.dist - b.dist)
-      .slice(0, 3);
-
-    for (const { node, dist } of nearNodes) {
-      const opacity = (1 - dist / mouseInfluenceRadius) * 0.4;
-      ctx.beginPath();
-      ctx.moveTo(mouseX, mouseY);
-      ctx.lineTo(node.x, node.y);
-      ctx.strokeStyle = `rgba(198, 120, 221, ${opacity})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    animationId = requestAnimationFrame(animate);
-  }
-
-  function handleResize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    init();
-  }
-
-  function handleMouseMove(e: MouseEvent) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  }
-
-  function handleMouseLeave() {
-    mouseX = width / 2;
-    mouseY = height / 2;
-  }
-
-  init();
-  animate();
-
-  window.addEventListener('resize', handleResize);
-  window.addEventListener('mousemove', handleMouseMove);
-  window.addEventListener('mouseleave', handleMouseLeave);
+  import { initCircuitBackground } from '../lib/circuitBackground';
+  initCircuitBackground();
 </script>

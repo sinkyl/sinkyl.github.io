@@ -28,9 +28,3 @@ export const techColors: Record<string, string> = {
 };
 
 export const getTechColor = (tech: string): string => techColors[tech] || '#8b949e';
-
-export const projectColors = {
-  xtranodly: { name: 'xtranodly.ai', color: '#61afef' },
-  bazaar: { name: 'Bazaar.Shop', color: '#d19a66' },
-  spatium: { name: 'Spatium.ai', color: '#c678dd' }
-} as const;

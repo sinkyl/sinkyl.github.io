@@ -1,17 +1,24 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import type { CollectionEntry } from 'astro:content';
+import { getProject } from '../lib/projects';
 
 interface Props {
   post: CollectionEntry<'blog'>;
+  prevPost?: CollectionEntry<'blog'> | null;
+  nextPost?: CollectionEntry<'blog'> | null;
 }
 
-const { post } = Astro.props;
+const { post, prevPost, nextPost } = Astro.props;
 const { title, date, tags, languages, patterns, architectures } = post.data;
+
+const prevProject = prevPost?.data.project ? getProject(prevPost.data.project) : null;
+const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) : null;
 ---
 
 <BaseLayout title={title}>
   <article>
+    <a href="#" class="back" id="back-link">&larr; Back</a>
     <header class="post-header">
       <h1>{title}</h1>
       <time datetime={date.toISOString()}>
@@ -55,12 +62,54 @@ const { title, date, tags, languages, patterns, architectures } = post.data;
     <div class="content">
       <slot />
     </div>
+
+    {(prevPost || nextPost) && (
+      <nav class:list={['post-nav', { 'single': !prevPost || !nextPost }]}>
+        {nextPost && (
+          <a href={`/blog/${nextPost.slug}`} class="nav-link next" style={`--project-color: ${nextProject?.color || 'var(--text-muted)'}`}>
+            <span class="nav-direction">&larr; Next</span>
+            <span class="nav-info">
+              {nextProject && <span class="nav-project">{nextProject.name}</span>}
+              {nextProject && ' · '}
+              {nextPost.data.description || nextPost.data.languages?.slice(0, 2).join(', ') || ''}
+              {' · '}
+              {nextPost.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
+          </a>
+        )}
+
+        {prevPost && (
+          <a href={`/blog/${prevPost.slug}`} class="nav-link prev" style={`--project-color: ${prevProject?.color || 'var(--text-muted)'}`}>
+            <span class="nav-direction">Previous &rarr;</span>
+            <span class="nav-info">
+              {prevProject && <span class="nav-project">{prevProject.name}</span>}
+              {prevProject && ' · '}
+              {prevPost.data.description || prevPost.data.languages?.slice(0, 2).join(', ') || ''}
+              {' · '}
+              {prevPost.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
+          </a>
+        )}
+      </nav>
+    )}
   </article>
 </BaseLayout>
 
 <style>
   article {
     max-width: 100%;
+  }
+
+  .back {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    display: inline-block;
+    text-decoration: underline;
+  }
+
+  .back:hover {
+    color: var(--accent);
   }
 
   .post-header {
@@ -171,6 +220,83 @@ const { title, date, tags, languages, patterns, architectures } = post.data;
     margin: 1.5rem 0;
     text-align: center;
   }
+
+  /* Post navigation */
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .post-nav.single {
+    justify-content: center;
+  }
+
+  .post-nav.single .nav-link {
+    margin-left: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .nav-link.prev {
+    margin-left: auto;
+  }
+
+  .nav-direction {
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .nav-link:hover .nav-direction {
+    color: var(--project-color);
+  }
+
+  .nav-info {
+    color: var(--text-muted);
+    opacity: 0.8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+  }
+
+  .nav-project {
+    transition: color 0.2s;
+  }
+
+  .nav-link:hover .nav-project {
+    color: var(--project-color);
+  }
+
+  @media (max-width: 600px) {
+    .post-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      align-items: flex-start;
+    }
+
+    .nav-link.next {
+      margin-left: 0;
+    }
+
+    .nav-info {
+      max-width: 100%;
+    }
+  }
 </style>
 
 <script is:inline>
@@ -252,4 +378,32 @@ const { title, date, tags, languages, patterns, architectures } = post.data;
       });
     }
   })();
+</script>
+
+<script>
+  const backLink = document.getElementById('back-link');
+  const storageKey = 'postListSource';
+
+  // Check if we came from a list page (not another post)
+  if (document.referrer) {
+    const referrerUrl = new URL(document.referrer);
+    const isFromSameSite = referrerUrl.origin === window.location.origin;
+    const isFromPost = referrerUrl.pathname.startsWith('/blog/') && referrerUrl.pathname !== '/blog/';
+
+    // Only store if coming from a list page, not from another post
+    if (isFromSameSite && !isFromPost) {
+      sessionStorage.setItem(storageKey, document.referrer);
+    }
+  }
+
+  backLink?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const source = sessionStorage.getItem(storageKey);
+    if (source) {
+      window.location.href = source;
+    } else {
+      window.location.href = '/blog';
+    }
+  });
+
 </script>

@@ -1,40 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlocksBackground from '../../components/BlocksBackground.astro';
+import PostCard from '../../components/PostCard.astro';
+import WeekHeader from '../../components/WeekHeader.astro';
+import Pagination from '../../components/Pagination.astro';
 import { getCollection } from 'astro:content';
-import { getTechColor } from '../../lib/colors';
+import { projects } from '../../lib/projects';
+import { addWeekInfo, isFirstOfWeek } from '../../lib/weekGrouping';
+import { POSTS_PER_PAGE, CONTAINER_IDS } from '../../lib/constants';
 
 export async function getStaticPaths() {
-  const projectsData = {
-    xtranodly: {
-      name: 'xtranodly.ai',
-      color: '#61afef',
-      description: 'A visual node-based graph system for building AI workflows, data pipelines, and complex automation. Drag, connect, and orchestrate — code optional.',
-      extendedDescription: `The platform features an intuitive canvas where nodes represent discrete operations — from data ingestion and transformation to model inference and output routing. Each node exposes configurable parameters through a clean interface, allowing fine-grained control without diving into code.
-
-Under the hood, the execution engine handles parallelization, error recovery, and resource management automatically. Workflows can be versioned, exported, and shared across teams. Integration with popular ML frameworks, databases, and cloud services comes built-in through our extensible connector system.`
-    },
-    bazaar: {
-      name: 'Bazaar.Shop',
-      color: '#d19a66',
-      description: 'A multi-tenant marketplace platform with PCI-DSS compliant payments, SSO authentication, and a microservices architecture designed for scale.',
-      extendedDescription: `The architecture separates concerns across dedicated services: catalog management, order processing, inventory sync, and payment orchestration each run independently with event-driven communication.
-
-Sellers onboard through a streamlined verification flow with KYC/AML compliance checks. The storefront SDK enables white-label deployments with customizable themes, while the admin dashboard provides real-time analytics on GMV, conversion funnels, and seller performance metrics.`
-    },
-    spatium: {
-      name: 'Spatium.ai',
-      color: '#c678dd',
-      description: 'Spatial computing platform for immersive 3D experiences, AR/VR applications, and next-generation human-computer interaction.',
-      extendedDescription: `Built on a custom rendering engine optimized for mixed reality, Spatium handles spatial anchoring, occlusion mapping, and hand tracking with sub-millisecond latency. The scene graph supports collaborative editing where multiple users can manipulate shared 3D spaces in real-time.
-
-Developers access these capabilities through a declarative API that abstracts device-specific quirks across Meta Quest, Apple Vision Pro, and HoloLens. Asset pipelines support glTF, USD, and proprietary formats with automatic LOD generation and texture compression.`
-    }
-  };
-
-  return Object.entries(projectsData).map(([id, data]) => ({
-    params: { project: id },
-    props: { project: { id, ...data } }
+  return projects.map(project => ({
+    params: { project: project.id },
+    props: { project }
   }));
 }
 
@@ -44,39 +22,15 @@ const posts = (await getCollection('blog'))
   .filter(post => !post.data.draft && post.data.project === project.id)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// Group posts by week
-function getWeekStart(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
+const postsWithWeek = addWeekInfo(posts);
 
-function formatWeekRange(start: Date): string {
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  return `${startStr} — ${endStr}`;
-}
-
-// Add week info to each post
-const postsWithWeek = posts.map(post => ({
-  post,
-  weekKey: getWeekStart(post.data.date).toISOString(),
-  weekLabel: formatWeekRange(getWeekStart(post.data.date))
-}));
-
-const POSTS_PER_PAGE = 6;
 const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+const containerId = CONTAINER_IDS.posts;
 ---
 
 <BaseLayout title={`${project.name} — Engineering Devlog`}>
   <BlocksBackground />
   <section class="header">
-    <a href="/" class="back">&larr; Back</a>
     <h1 style={`--project-color: ${project.color}`}>{project.name}</h1>
     <div class="description-container" id="description-container">
       <p class="project-description">
@@ -94,71 +48,34 @@ const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
     <p class="empty">No posts yet for this project.</p>
   ) : (
     <>
-      <div class="posts-container" id="posts-container">
-        {postsWithWeek.map(({ post, weekKey, weekLabel }, index) => {
-          const preview = post.data.description || post.data.patterns?.slice(0, 3).join(' • ') || '';
-          const isFirstOfWeek = index === 0 || postsWithWeek[index - 1].weekKey !== weekKey;
-
-          return (
-            <>
-              {isFirstOfWeek && (
-                <h2 class="week-header" data-week={weekKey} data-index={index}>
-                  <span class="week-label">Week of</span>
-                  {weekLabel}
-                </h2>
-              )}
-              <article class="post-item" data-index={index} data-week={weekKey}>
-                <a href={`/blog/${post.slug}`} style={`--project-color: ${project.color}`}>
-                  <div class="post-header">
-                    {post.data.languages.length > 0 && (
-                      <div class="tags">
-                        {post.data.languages.slice(0, 3).map(lang => (
-                          <span class="tag" style={`--tech-color: ${getTechColor(lang)}`}>{lang}</span>
-                        ))}
-                      </div>
-                    )}
-                    <span class="post-date">{post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  </div>
-                  {preview && (
-                    <p class="preview">{preview}</p>
-                  )}
-                </a>
-              </article>
-            </>
-          );
-        })}
+      <div class="posts-container" id={containerId}>
+        {postsWithWeek.map(({ post, weekKey, weekLabel }, index) => (
+          <>
+            {isFirstOfWeek(postsWithWeek, index) && (
+              <WeekHeader weekKey={weekKey} weekLabel={weekLabel} index={index} />
+            )}
+            <PostCard
+              slug={post.slug}
+              date={post.data.date}
+              languages={post.data.languages}
+              description={post.data.description}
+              patterns={post.data.patterns}
+              project={project.id}
+              showProjectBadge={false}
+              showLeftBorder={false}
+              tagsPosition="header"
+              index={index}
+              weekKey={weekKey}
+            />
+          </>
+        ))}
       </div>
 
-      {totalPages > 1 && (
-        <>
-          <nav class="pagination" id="pagination">
-            <button class="page-btn prev" id="prev-btn" disabled>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-              </svg>
-            </button>
-            <input type="text" class="page-indicator" id="page-indicator" value={`1 . . ${totalPages}`} readonly />
-            <button class="page-btn next" id="next-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </button>
-          </nav>
-          <nav class="pagination-float" id="pagination-float">
-            <button class="page-btn prev" id="prev-btn-float">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-              </svg>
-            </button>
-            <span class="page-indicator-float" id="page-indicator-float">1 . . {totalPages}</span>
-            <button class="page-btn next" id="next-btn-float">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </button>
-          </nav>
-        </>
-      )}
+      <Pagination
+        totalPages={totalPages}
+        postsPerPage={POSTS_PER_PAGE}
+        containerId={containerId}
+      />
     </>
   )}
 </BaseLayout>
@@ -166,17 +83,6 @@ const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
 <style>
   .header {
     padding-bottom: 2rem;
-  }
-
-  .back {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
-    display: inline-block;
-  }
-
-  .back:hover {
-    color: var(--accent);
   }
 
   .header h1 {
@@ -242,429 +148,26 @@ const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
     gap: 0.75rem;
   }
 
-  .week-header {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-    font-weight: 500;
-    display: none;
-  }
-
-  .week-header.first-visible {
-    margin-top: 0;
-  }
-
-  .week-header.visible {
-    display: block;
-  }
-
-  .week-label {
-    color: var(--text-muted);
-    opacity: 0.6;
-    margin-right: 0.5rem;
-  }
-
-  .post-item {
-    display: none;
-  }
-
-  .post-item.visible {
-    display: block;
-  }
-
-  .post-item a {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    padding: 1.25rem;
-    background: var(--bg-card);
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    transition: border-color 0.2s, transform 0.2s, background-color 0.3s ease;
-  }
-
-  .post-item a:hover {
-    border-color: var(--accent);
-    transform: translateX(4px);
-  }
-
-  .post-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .tags {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.3rem;
-    border-radius: 3px;
-    background: color-mix(in srgb, var(--tech-color) 12%, transparent);
-    color: var(--tech-color);
-    border: 1px solid color-mix(in srgb, var(--tech-color) 30%, transparent);
-  }
-
-  .post-date {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    opacity: 0.7;
-    margin-left: auto;
-  }
-
-  .preview {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    margin-top: 0.5rem;
-  }
-
-  .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    padding: 1rem 0;
-  }
-
-  .page-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s, opacity 0.2s;
-  }
-
-  .page-btn:hover:not(:disabled) {
-    border-color: var(--accent);
-    background: var(--bg-secondary);
-  }
-
-  .page-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-
-  .page-btn svg {
-    width: 18px;
-    height: 18px;
-    color: var(--text);
-  }
-
-  .page-indicator {
-    font-size: 1.1rem;
-    color: var(--text-muted);
-    width: 70px;
-    text-align: center;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 0.25rem;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-  }
-
-  .page-indicator:hover {
-    border-color: var(--border);
-  }
-
-  .page-indicator:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: var(--bg-card);
-    cursor: text;
-  }
-
-  .pagination-float {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    visibility: hidden;
-    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
-    z-index: 50;
-  }
-
-  .pagination-float.visible {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .pagination-float .page-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .page-indicator-float {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    padding: 0 0.25rem;
-  }
-
   @media (max-width: 600px) {
     .header h1 {
       font-size: 1.75rem;
     }
-
-    .post-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.25rem;
-    }
-
-    .post-date {
-      margin-left: 0;
-    }
   }
 </style>
 
-<script define:vars={{ totalPages, POSTS_PER_PAGE }}>
-  window.__totalPages = totalPages;
-  window.__postsPerPage = POSTS_PER_PAGE;
-</script>
-
 <script>
+  import { initPagination } from '../../lib/paginationController';
+  import { initDescriptionToggle } from '../../lib/descriptionToggle';
+  import { CONTAINER_IDS } from '../../lib/constants';
+
   // Description toggle
-  const descContainer = document.getElementById('description-container');
-  const previewEl = descContainer?.querySelector('.description-preview');
-  const fullEl = descContainer?.querySelector('.description-full');
-  const moreBtn = descContainer?.querySelector('.toggle-more');
-  const lessBtn = descContainer?.querySelector('.toggle-less');
-
-  if (descContainer && previewEl && fullEl && moreBtn && lessBtn) {
-    const description = (window as any).__projectDescription || '';
-    const extended = (window as any).__projectExtended || '';
-
-    const fullText = extended ? `${description} ${extended.replace(/\n\n/g, ' ')}` : description;
-    const words = fullText.split(/\s+/);
-    const previewWords = 21;
-
-    if (words.length > previewWords) {
-      previewEl.textContent = words.slice(0, previewWords).join(' ') + ' ';
-      fullEl.textContent = words.slice(previewWords).join(' ') + ' ';
-    } else {
-      previewEl.textContent = fullText;
-      (moreBtn as HTMLElement).style.display = 'none';
-      (lessBtn as HTMLElement).style.display = 'none';
-    }
-
-    moreBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      descContainer.classList.add('expanded');
-    });
-
-    lessBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      descContainer.classList.remove('expanded');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (descContainer.classList.contains('expanded') && !descContainer.contains(e.target as Node)) {
-        descContainer.classList.remove('expanded');
-      }
-    });
-  }
-
-  // Pagination
-  const container = document.getElementById('posts-container');
-  const postItems = container?.querySelectorAll('.post-item');
-  const weekHeaders = container?.querySelectorAll('.week-header');
-  const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
-  const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
-  const pageIndicator = document.getElementById('page-indicator') as HTMLInputElement;
-  const pagination = document.getElementById('pagination');
-
-  // Floating pagination elements
-  const paginationFloat = document.getElementById('pagination-float');
-  const prevBtnFloat = document.getElementById('prev-btn-float') as HTMLButtonElement;
-  const nextBtnFloat = document.getElementById('next-btn-float') as HTMLButtonElement;
-  const pageIndicatorFloat = document.getElementById('page-indicator-float');
-
-  const totalPages = (window as any).__totalPages || 1;
-  const postsPerPage = (window as any).__postsPerPage || 6;
-  let currentPage = 1;
-
-  function getIndicatorText() {
-    return currentPage === totalPages ? `${currentPage}` : `${currentPage} . . ${totalPages}`;
-  }
-
-  function updatePagination() {
-    if (!postItems || !pageIndicator) return;
-
-    const startIndex = (currentPage - 1) * postsPerPage;
-    const endIndex = startIndex + postsPerPage;
-
-    // Track which weeks have visible posts
-    const visibleWeeks = new Set<string>();
-
-    // Show/hide posts
-    postItems.forEach((post, index) => {
-      if (index >= startIndex && index < endIndex) {
-        post.classList.add('visible');
-        const weekKey = post.getAttribute('data-week');
-        if (weekKey) visibleWeeks.add(weekKey);
-      } else {
-        post.classList.remove('visible');
-      }
-    });
-
-    // Show/hide week headers
-    let firstVisibleHeader = true;
-    weekHeaders?.forEach(header => {
-      header.classList.remove('first-visible');
-      const weekKey = header.getAttribute('data-week');
-      const headerIndex = parseInt(header.getAttribute('data-index') || '0');
-
-      let shouldShow = false;
-      if (weekKey && visibleWeeks.has(weekKey) && headerIndex >= startIndex && headerIndex < endIndex) {
-        shouldShow = true;
-      } else if (weekKey && visibleWeeks.has(weekKey)) {
-        const firstPostOfWeek = container?.querySelector(`.post-item[data-week="${weekKey}"].visible`);
-        const firstPostIndex = firstPostOfWeek ? parseInt(firstPostOfWeek.getAttribute('data-index') || '0') : -1;
-        if (firstPostIndex === startIndex || (headerIndex < startIndex && firstPostIndex >= startIndex)) {
-          shouldShow = true;
-        }
-      }
-
-      if (shouldShow) {
-        header.classList.add('visible');
-        if (firstVisibleHeader) {
-          header.classList.add('first-visible');
-          firstVisibleHeader = false;
-        }
-      } else {
-        header.classList.remove('visible');
-      }
-    });
-
-    // Update buttons
-    if (prevBtn) prevBtn.disabled = currentPage === 1;
-    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
-
-    // Update indicator
-    pageIndicator.value = getIndicatorText();
-    pageIndicator.readOnly = true;
-
-    // Update floating pagination
-    if (prevBtnFloat) prevBtnFloat.disabled = currentPage === 1;
-    if (nextBtnFloat) nextBtnFloat.disabled = currentPage === totalPages;
-    if (pageIndicatorFloat) pageIndicatorFloat.textContent = getIndicatorText();
-  }
-
-  prevBtn?.addEventListener('click', () => {
-    if (currentPage > 1) {
-      currentPage--;
-      updatePagination();
-    }
+  const description = (window as any).__projectDescription || '';
+  const extended = (window as any).__projectExtended || '';
+  initDescriptionToggle('description-container', {
+    description,
+    extendedDescription: extended,
   });
 
-  nextBtn?.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      updatePagination();
-    }
-  });
-
-  // Click to edit page number
-  pageIndicator?.addEventListener('click', () => {
-    pageIndicator.readOnly = false;
-    pageIndicator.value = String(currentPage);
-    pageIndicator.select();
-  });
-
-  // Handle input submission
-  pageIndicator?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const value = parseInt(pageIndicator.value);
-      if (!isNaN(value) && value >= 1 && value <= totalPages) {
-        currentPage = value;
-      }
-      updatePagination();
-      pageIndicator.blur();
-    } else if (e.key === 'Escape') {
-      updatePagination();
-      pageIndicator.blur();
-    }
-  });
-
-  // Reset on blur
-  pageIndicator?.addEventListener('blur', () => {
-    pageIndicator.value = getIndicatorText();
-    pageIndicator.readOnly = true;
-  });
-
-  // Floating pagination handlers
-  prevBtnFloat?.addEventListener('click', () => {
-    if (currentPage > 1) {
-      currentPage--;
-      updatePagination();
-    }
-  });
-
-  nextBtnFloat?.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      updatePagination();
-    }
-  });
-
-  // Show/hide floating pagination based on main pagination visibility
-  function updateFloatVisibility() {
-    if (!pagination || !paginationFloat) return;
-    const rect = pagination.getBoundingClientRect();
-    const paginationHeight = rect.height;
-    const viewportBottom = window.innerHeight;
-
-    // Check if more than half of pagination is visible
-    const visibleAmount = Math.min(rect.bottom, viewportBottom) - Math.max(rect.top, 0);
-    const isHalfVisible = visibleAmount > paginationHeight / 2;
-
-    paginationFloat.classList.toggle('visible', !isHalfVisible);
-  }
-
-  window.addEventListener('scroll', updateFloatVisibility, { passive: true });
-  window.addEventListener('resize', updateFloatVisibility, { passive: true });
-
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    // Don't navigate if user is typing in an input
-    if (document.activeElement?.tagName === 'INPUT') return;
-
-    if (e.key === 'ArrowLeft' && currentPage > 1) {
-      currentPage--;
-      updatePagination();
-    } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
-      currentPage++;
-      updatePagination();
-    }
-  });
-
-  // Initial render
-  if (postItems && postItems.length > 0) {
-    updatePagination();
-    updateFloatVisibility();
-  }
+  // Initialize pagination
+  initPagination(CONTAINER_IDS.posts);
 </script>

@@ -24,13 +24,31 @@ const responses = {
 
 <div id="chat-widget" class="chat-widget">
   <button id="chat-toggle" class="chat-toggle" aria-label="Open chat">
-    <svg class="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-      <!-- Sound wave bars -->
-      <line x1="4" y1="12" x2="4" y2="12" class="wave-bar wave-1"/>
-      <line x1="8" y1="9" x2="8" y2="15" class="wave-bar wave-2"/>
-      <line x1="12" y1="5" x2="12" y2="19" class="wave-bar wave-3"/>
-      <line x1="16" y1="9" x2="16" y2="15" class="wave-bar wave-4"/>
-      <line x1="20" y1="12" x2="20" y2="12" class="wave-bar wave-5"/>
+    <svg class="icon-chat" viewBox="0 -4 40 36" fill="none" stroke-width="1">
+      <!-- UFO ship -->
+      <g class="ufo" stroke="#7a8590">
+        <!-- Dome -->
+        <path d="M15 14 Q20 8 25 14" stroke-width="0.8" fill="none"/>
+        <!-- Body -->
+        <ellipse cx="20" cy="16" rx="12" ry="4" stroke-width="0.8"/>
+        <!-- Bottom detail -->
+        <ellipse cx="20" cy="17" rx="6" ry="1.5" stroke-width="0.5"/>
+        <!-- Lights -->
+        <circle cx="12" cy="16" r="1" fill="#7a8590" stroke="none" class="ufo-light light-1"/>
+        <circle cx="20" cy="17.5" r="1" fill="#7a8590" stroke="none" class="ufo-light light-2"/>
+        <circle cx="28" cy="16" r="1" fill="#7a8590" stroke="none" class="ufo-light light-3"/>
+        <!-- Alien eyes in dome -->
+        <circle cx="18" cy="12" r="0.8" fill="#7a8590" stroke="none"/>
+        <circle cx="22" cy="12" r="0.8" fill="#7a8590" stroke="none"/>
+      </g>
+      <!-- Chat bubble (small, follows ship) -->
+      <g class="chat-shape" stroke="currentColor">
+        <path d="M24 -3h9a1.2 1.2 0 0 1 1.2 1.2v5a1.2 1.2 0 0 1-1.2 1.2h-5l-2 2v-2h-2a1.2 1.2 0 0 1-1.2-1.2v-5a1.2 1.2 0 0 1 1.2-1.2z" stroke-width="0.6"/>
+        <!-- Typing text lines -->
+        <line class="text-line line-1" x1="25" y1="-1" x2="32" y2="-1" stroke-width="0.5" stroke-linecap="round"/>
+        <line class="text-line line-2" x1="25" y1="1" x2="30" y2="1" stroke-width="0.5" stroke-linecap="round"/>
+        <line class="text-line line-3" x1="25" y1="3" x2="28" y2="3" stroke-width="0.5" stroke-linecap="round"/>
+      </g>
     </svg>
     <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="18" y1="6" x2="6" y2="18"/>
@@ -42,13 +60,12 @@ const responses = {
     <div class="chat-header">
       <div class="chat-header-info">
         <span class="chat-avatar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="4" y1="12" x2="4" y2="12" class="avatar-wave wave-1"/>
-            <line x1="8" y1="9" x2="8" y2="15" class="avatar-wave wave-2"/>
-            <line x1="12" y1="5" x2="12" y2="19" class="avatar-wave wave-3"/>
-            <line x1="16" y1="9" x2="16" y2="15" class="avatar-wave wave-4"/>
-            <line x1="20" y1="12" x2="20" y2="12" class="avatar-wave wave-5"/>
-          </svg>
+          <div class="slinky small">
+            <span class="slinky-ring ring-1"></span>
+            <span class="slinky-ring ring-2"></span>
+            <span class="slinky-ring ring-3"></span>
+            <span class="slinky-dot"></span>
+          </div>
         </span>
         <div>
           <h3>Ask About Sinan</h3>
@@ -102,55 +119,129 @@ const responses = {
 <style>
   .chat-widget {
     position: fixed;
-    bottom: 1.5rem;
+    bottom: 2rem;
     right: 1.5rem;
     z-index: 1000;
     font-family: inherit;
   }
 
   .chat-toggle {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a1d23, #2d3748);
-    border: 1px solid rgba(97, 175, 239, 0.3);
+    width: 112px;
+    background: none;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.3s;
-  }
-
-  :global([data-theme="light"]) .chat-toggle {
-    background: linear-gradient(135deg, #f8f7f4, #e8e6e1);
-    border-color: rgba(9, 105, 218, 0.3);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: transform 0.2s;
+    position: relative;
   }
 
   .chat-toggle:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    border-color: rgba(97, 175, 239, 0.5);
   }
 
-  :global([data-theme="light"]) .chat-toggle:hover {
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border-color: rgba(9, 105, 218, 0.5);
-  }
-
-  .chat-toggle svg {
-    width: 24px;
-    height: 24px;
+  .chat-toggle .icon-chat {
+    height: 112px;
     color: #61afef;
+    transition: opacity 0.2s;
   }
 
-  :global([data-theme="light"]) .chat-toggle svg {
+  :global([data-theme="light"]) .chat-toggle .icon-chat {
     color: #0969da;
   }
 
+  /* Typing text effect */
+  .chat-toggle .icon-chat .text-line {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 10;
+    opacity: 0.7;
+  }
+
+  .chat-toggle .icon-chat .line-1 {
+    animation: typeLine 4s ease-in-out infinite, lineColor 6s ease-in-out infinite;
+  }
+
+  .chat-toggle .icon-chat .line-2 {
+    animation: typeLine 4s ease-in-out infinite, lineColor 6s ease-in-out infinite;
+    animation-delay: 0.15s, 2s;
+  }
+
+  .chat-toggle .icon-chat .line-3 {
+    animation: typeLine 4s ease-in-out infinite, lineColor 6s ease-in-out infinite;
+    animation-delay: 0.3s, 4s;
+  }
+
+  @keyframes lineColor {
+    0%, 100% { stroke: #61afef; }
+    33% { stroke: #d19a66; }
+    66% { stroke: #c678dd; }
+  }
+
+  /* UFO animations */
+  .chat-toggle .icon-chat .ufo,
+  .chat-toggle .icon-chat .chat-shape {
+    animation: ufoHover 3s ease-in-out infinite;
+  }
+
+  .chat-toggle .icon-chat .ufo-light {
+    animation: ufoLights 1.5s ease-in-out infinite;
+  }
+
+  .chat-toggle .icon-chat .light-2 {
+    animation-delay: 0.5s;
+  }
+
+  .chat-toggle .icon-chat .light-3 {
+    animation-delay: 1s;
+  }
+
+  @keyframes ufoHover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  @keyframes ufoLights {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes typeLine {
+    0% {
+      stroke-dashoffset: 10;
+      opacity: 0.7;
+    }
+    15%, 50% {
+      stroke-dashoffset: 0;
+      opacity: 0.7;
+    }
+    60% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+    90% {
+      stroke-dashoffset: 10;
+      opacity: 0;
+    }
+    100% {
+      stroke-dashoffset: 10;
+      opacity: 0.7;
+    }
+  }
+
+
   .chat-toggle .icon-close {
+    width: 24px;
+    height: 24px;
+    color: #61afef;
     display: none;
+    position: relative;
+    bottom: 2.1rem;
+    left: 3rem;
+  }
+
+  :global([data-theme="light"]) .chat-toggle .icon-close {
+    color: #0969da;
   }
 
   .chat-widget.open .chat-toggle .icon-chat {
@@ -161,87 +252,143 @@ const responses = {
     display: block;
   }
 
-  /* Sound wave animation */
-  .wave-bar {
-    transform-origin: center;
+  /* Chat header slinky (small) */
+  .slinky {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .chat-toggle:not(:hover) .wave-1 {
-    animation: waveOuter 1.2s ease-in-out infinite;
-    animation-delay: 0s;
+  .slinky.small {
+    width: 32px;
+    height: 32px;
   }
 
-  .chat-toggle:not(:hover) .wave-2 {
-    animation: waveInner 0.8s ease-in-out infinite;
-    animation-delay: 0.1s;
+  .slinky .slinky-ring {
+    position: absolute;
+    border: 2px solid #2a2d31;
+    border-radius: 50%;
+    opacity: 0;
   }
 
-  .chat-toggle:not(:hover) .wave-3 {
-    animation: waveCenter 0.6s ease-in-out infinite;
-    animation-delay: 0s;
+  :global([data-theme="light"]) .slinky .slinky-ring {
+    border-color: #d8d5d0;
   }
 
-  .chat-toggle:not(:hover) .wave-4 {
-    animation: waveInner 0.8s ease-in-out infinite;
-    animation-delay: 0.2s;
+  .slinky .ring-1 {
+    width: 100%;
+    height: 100%;
+    animation: slinkyOut 4s ease-in-out infinite, slinkyRingColor 12s ease-in-out infinite;
   }
 
-  .chat-toggle:not(:hover) .wave-5 {
-    animation: waveOuter 1.2s ease-in-out infinite;
-    animation-delay: 0.1s;
+  .slinky .ring-2 {
+    width: 70%;
+    height: 70%;
+    animation: slinkyOut 4s ease-in-out infinite, slinkyRingColor 12s ease-in-out infinite;
+    animation-delay: 0.3s, 4s;
   }
 
-  .chat-toggle:hover .wave-1 {
-    animation: waveOuterActive 0.5s ease-in-out infinite;
+  .slinky .ring-3 {
+    width: 40%;
+    height: 40%;
+    animation: slinkyOut 4s ease-in-out infinite, slinkyRingColor 12s ease-in-out infinite;
+    animation-delay: 0.6s, 8s;
   }
 
-  .chat-toggle:hover .wave-2 {
-    animation: waveInnerActive 0.4s ease-in-out infinite;
-    animation-delay: 0.05s;
+  .slinky .slinky-dot {
+    width: 6px;
+    height: 6px;
+    background: #61afef;
+    border-radius: 50%;
+    animation: slinkyDot 4s ease-in-out infinite, slinkyColorDark 16s ease-in-out infinite;
   }
 
-  .chat-toggle:hover .wave-3 {
-    animation: waveCenterActive 0.3s ease-in-out infinite;
+  .slinky.small .slinky-dot {
+    width: 4px;
+    height: 4px;
   }
 
-  .chat-toggle:hover .wave-4 {
-    animation: waveInnerActive 0.4s ease-in-out infinite;
-    animation-delay: 0.1s;
+  :global([data-theme="light"]) .slinky .slinky-dot {
+    animation: slinkyDot 4s ease-in-out infinite, slinkyColorLight 16s ease-in-out infinite;
   }
 
-  .chat-toggle:hover .wave-5 {
-    animation: waveOuterActive 0.5s ease-in-out infinite;
-    animation-delay: 0.05s;
+  @keyframes slinkyOut {
+    0%, 100% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    25% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.4;
+    }
+    75% {
+      transform: scale(0.8);
+      opacity: 0.6;
+    }
   }
 
-  @keyframes waveOuter {
-    0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
-    50% { transform: scaleY(0.8); opacity: 0.8; }
+  @keyframes slinkyDot {
+    0%, 100% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(0.6);
+    }
+    50% {
+      transform: scale(0.4);
+    }
+    75% {
+      transform: scale(0.8);
+    }
   }
 
-  @keyframes waveInner {
-    0%, 100% { transform: scaleY(0.6); opacity: 0.7; }
-    50% { transform: scaleY(1); opacity: 1; }
+  @keyframes slinkyColorDark {
+    0%, 100% {
+      background: #61afef;
+    }
+    25% {
+      background: #d19a66;
+    }
+    50% {
+      background: #c678dd;
+    }
+    75% {
+      background: #e6edf3;
+    }
   }
 
-  @keyframes waveCenter {
-    0%, 100% { transform: scaleY(0.7); opacity: 0.8; }
-    50% { transform: scaleY(1.1); opacity: 1; }
+  @keyframes slinkyColorLight {
+    0%, 100% {
+      background: #0969da;
+    }
+    25% {
+      background: #d19a66;
+    }
+    50% {
+      background: #c678dd;
+    }
+    75% {
+      background: #1f2328;
+    }
   }
 
-  @keyframes waveOuterActive {
-    0%, 100% { transform: scaleY(0.5); opacity: 0.7; }
-    50% { transform: scaleY(1.2); opacity: 1; }
-  }
-
-  @keyframes waveInnerActive {
-    0%, 100% { transform: scaleY(0.7); opacity: 0.8; }
-    50% { transform: scaleY(1.3); opacity: 1; }
-  }
-
-  @keyframes waveCenterActive {
-    0%, 100% { transform: scaleY(0.8); opacity: 0.9; }
-    50% { transform: scaleY(1.4); opacity: 1; }
+  @keyframes slinkyRingColor {
+    0%, 100% {
+      border-color: #61afef;
+    }
+    33% {
+      border-color: #d19a66;
+    }
+    66% {
+      border-color: #c678dd;
+    }
   }
 
   .chat-panel {
@@ -291,58 +438,9 @@ const responses = {
   .chat-avatar {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #1a1d23, #2d3748);
-    border: 1px solid rgba(97, 175, 239, 0.3);
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
-  }
-
-  :global([data-theme="light"]) .chat-avatar {
-    background: linear-gradient(135deg, #f8f7f4, #e8e6e1);
-    border-color: rgba(9, 105, 218, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .chat-avatar svg {
-    width: 18px;
-    height: 18px;
-    color: #61afef;
-    transition: color 0.3s;
-  }
-
-  :global([data-theme="light"]) .chat-avatar svg {
-    color: #0969da;
-  }
-
-  .avatar-wave {
-    transform-origin: center;
-  }
-
-  .avatar-wave.wave-1 {
-    animation: waveOuter 1.2s ease-in-out infinite;
-  }
-
-  .avatar-wave.wave-2 {
-    animation: waveInner 0.8s ease-in-out infinite;
-    animation-delay: 0.1s;
-  }
-
-  .avatar-wave.wave-3 {
-    animation: waveCenter 0.6s ease-in-out infinite;
-  }
-
-  .avatar-wave.wave-4 {
-    animation: waveInner 0.8s ease-in-out infinite;
-    animation-delay: 0.2s;
-  }
-
-  .avatar-wave.wave-5 {
-    animation: waveOuter 1.2s ease-in-out infinite;
-    animation-delay: 0.1s;
   }
 
   .chat-header h3 {
@@ -605,111 +703,22 @@ const responses = {
 </style>
 
 <script define:vars={{ faqData, responses }}>
-  const toggle = document.getElementById('chat-toggle');
-  const widget = document.getElementById('chat-widget');
-  const form = document.getElementById('chat-form');
-  const input = document.getElementById('chat-input');
-  const messages = document.getElementById('chat-messages');
-  const suggestionsToggle = document.getElementById('suggestions-toggle');
-  const suggestionsPanel = document.getElementById('suggestions-panel');
+  window.__chatBotConfig = { faqData, responses };
+</script>
 
-  toggle?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    widget?.classList.toggle('open');
-    if (widget?.classList.contains('open')) {
-      input?.focus();
-    }
-  });
+<script>
+  import { initChatBot } from '../lib/chatBot';
 
-  // Close chat panel when clicking outside
-  document.addEventListener('click', (e) => {
-    if (widget?.classList.contains('open') && !widget?.contains(e.target)) {
-      widget?.classList.remove('open');
-    }
-  });
-
-  // Suggestions toggle
-  suggestionsToggle?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    suggestionsToggle.classList.toggle('active');
-    suggestionsPanel?.classList.toggle('show');
-  });
-
-  // Close suggestions panel when clicking elsewhere in chat
-  const chatPanel = document.getElementById('chat-panel');
-  chatPanel?.addEventListener('click', (e) => {
-    const target = e.target;
-    // Don't close if clicking on the toggle or inside the panel
-    if (!suggestionsToggle?.contains(target) && !suggestionsPanel?.contains(target)) {
-      suggestionsToggle?.classList.remove('active');
-      suggestionsPanel?.classList.remove('show');
-    }
-  });
-
-  // Handle suggestion button clicks (both inline and panel)
-  function handleSuggestionClick(e) {
-    const btn = e.target.closest('[data-question]');
-    if (btn && input && form) {
-      e.stopPropagation();
-      input.value = btn.dataset.question;
-      // Close suggestions panel if open
-      suggestionsToggle?.classList.remove('active');
-      suggestionsPanel?.classList.remove('show');
-      // Auto-submit the question
-      form.requestSubmit();
-    }
+  const config = (window as any).__chatBotConfig;
+  if (config) {
+    initChatBot(config);
   }
 
-  messages?.addEventListener('click', handleSuggestionClick);
-
-  function findResponse(query) {
-    const lower = query.toLowerCase();
-
-    for (const [category, keywords] of Object.entries(faqData)) {
-      if (keywords.some(keyword => lower.includes(keyword))) {
-        return responses[category];
-      }
-    }
-
-    return responses.unknown;
+  // Random color for chat icon (muted)
+  const chatIcon = document.querySelector('.chat-toggle .icon-chat') as SVGElement;
+  if (chatIcon) {
+    const colors = ['#5c7a8a', '#8a7265', '#7a6580'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    chatIcon.style.color = randomColor;
   }
-
-  function addMessage(content, isUser = false) {
-    const div = document.createElement('div');
-    div.className = `message ${isUser ? 'user' : 'bot'}`;
-
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-content';
-
-    // Convert markdown-style formatting
-    const formatted = content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\n/g, '<br>');
-
-    contentDiv.innerHTML = formatted;
-    div.appendChild(contentDiv);
-    messages?.appendChild(div);
-    messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
-  }
-
-  const submitBtn = form?.querySelector('button[type="submit"]');
-
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const query = input?.value.trim();
-    if (!query) return;
-
-    // Trigger send animation
-    submitBtn?.classList.add('sending');
-    setTimeout(() => submitBtn?.classList.remove('sending'), 400);
-
-    addMessage(query, true);
-    input.value = '';
-
-    // Simulate typing delay
-    setTimeout(() => {
-      const response = findResponse(query);
-      addMessage(response);
-    }, 400);
-  });
 </script>

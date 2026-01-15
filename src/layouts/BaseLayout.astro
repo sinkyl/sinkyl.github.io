@@ -1,4 +1,6 @@
 ---
+import { projects } from '../lib/projects';
+
 interface Props {
   title: string;
   description?: string;
@@ -57,18 +59,12 @@ const currentPath = Astro.url.pathname;
               </svg>
             </button>
             <div class="dropdown-menu">
-              <a href="/projects/xtranodly" class="dropdown-item" style="--project-color: #61afef">
-                <span class="dropdown-dot"></span>
-                xtranodly.ai
-              </a>
-              <a href="/projects/bazaar" class="dropdown-item" style="--project-color: #d19a66">
-                <span class="dropdown-dot"></span>
-                Bazaar.Shop
-              </a>
-              <a href="/projects/spatium" class="dropdown-item" style="--project-color: #c678dd">
-                <span class="dropdown-dot"></span>
-                Spatium.ai
-              </a>
+              {projects.map(project => (
+                <a href={`/projects/${project.id}`} class="dropdown-item" style={`--project-color: ${project.color}`}>
+                  <span class="dropdown-dot"></span>
+                  {project.name}
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -390,257 +386,10 @@ const currentPath = Astro.url.pathname;
 </script>
 
 <script>
-  const toggle = document.getElementById('theme-toggle');
+  import { initThemeToggle, initDropdown } from '../lib/domUtils';
+  import { initNavIndicator } from '../lib/navIndicator';
 
-  toggle?.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-
-    if (next === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-
-    localStorage.setItem('theme', next);
-  });
-
-  // Projects dropdown toggle
-  const projectsDropdown = document.getElementById('projects-dropdown');
-  const dropdownToggle = projectsDropdown?.querySelector('.dropdown-toggle');
-
-  dropdownToggle?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    projectsDropdown?.classList.toggle('open');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (projectsDropdown?.classList.contains('open') && !projectsDropdown.contains(e.target as Node)) {
-      projectsDropdown.classList.remove('open');
-    }
-  });
-
-  // Nav indicator - line passes "behind" the gap between links
-  const navLinksContainer = document.querySelector('.nav-links') as HTMLElement;
-  const links = Array.from(document.querySelectorAll('.nav-link')) as HTMLElement[];
-  const textSpans = Array.from(document.querySelectorAll('.nav-text')) as HTMLElement[];
-  const indicators = textSpans.map(span => span.querySelector('.link-indicator') as HTMLElement);
-  const activeIndex = links.findIndex(link => link.classList.contains('active'));
-  let lastMouseX = 0;
-  let lastHoveredIndex = activeIndex; // Track which link was last highlighted
-
-  // Get offset relative to nav-links container
-  function getOffsetLeft(el: HTMLElement): number {
-    const containerRect = navLinksContainer.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-    return elRect.left - containerRect.left;
-  }
-
-  function setIndicatorAnchor(ind: HTMLElement, anchor: 'left' | 'right') {
-    if (anchor === 'left') {
-      ind.style.left = '0';
-      ind.style.right = 'auto';
-    } else {
-      ind.style.left = 'auto';
-      ind.style.right = '0';
-    }
-  }
-
-  function resetToActive(animate = true) {
-    indicators.forEach((ind, i) => {
-      if (!ind) return;
-      ind.style.transition = animate ? 'width 0.25s ease-out' : 'none';
-
-      if (i === activeIndex) {
-        // When returning to active, fill from the direction of the last hovered link
-        // If last hovered was on the left, fill from left to right (anchor left)
-        // If last hovered was on the right, fill from right to left (anchor right)
-        if (lastHoveredIndex < activeIndex) {
-          setIndicatorAnchor(ind, 'left');
-        } else {
-          setIndicatorAnchor(ind, 'right');
-        }
-        ind.style.width = '100%';
-      } else {
-        ind.style.width = '0';
-      }
-    });
-
-    lastHoveredIndex = activeIndex;
-  }
-
-  // Set initial state
-  resetToActive(false);
-
-  // Track mouse position within nav-links
-  navLinksContainer?.addEventListener('mousemove', (e) => {
-    if (links.length < 2) return;
-
-    const containerRect = navLinksContainer.getBoundingClientRect();
-    const mouseX = e.clientX - containerRect.left;
-    const movingRight = mouseX > lastMouseX;
-    lastMouseX = mouseX;
-
-    const firstLink = links[0];
-    const lastLink = links[links.length - 1];
-    const firstLinkStart = getOffsetLeft(firstLink);
-    const lastLinkEnd = getOffsetLeft(lastLink) + lastLink.offsetWidth;
-
-    // Check if in left edge zone (before first link)
-    // Skip animation if first link is the active one
-    if (mouseX < firstLinkStart && activeIndex !== 0) {
-      const edgeZoneWidth = firstLinkStart; // The padding zone width
-      const distanceIntoZone = firstLinkStart - mouseX;
-      const squeezeProgress = Math.min(distanceIntoZone / edgeZoneWidth, 1);
-      const squeezeWidth = (1 - squeezeProgress) * 100;
-      const activeWidth = squeezeProgress * 100;
-
-      indicators.forEach((ind, j) => {
-        if (!ind) return;
-        ind.style.transition = 'none';
-        if (j === 0) {
-          // First link: anchor right so it squeezes from the left
-          setIndicatorAnchor(ind, 'right');
-          ind.style.width = `${squeezeWidth}%`;
-        } else if (j === activeIndex) {
-          // Active link: grows from the left as first link squeezes
-          setIndicatorAnchor(ind, 'left');
-          ind.style.width = `${activeWidth}%`;
-        } else {
-          ind.style.width = '0';
-        }
-      });
-
-      // Update lastHoveredIndex based on which link has more indicator
-      lastHoveredIndex = squeezeProgress >= 0.5 ? activeIndex : 0;
-      return;
-    }
-
-    // Check if in right edge zone (after last link)
-    // Skip animation if last link is the active one
-    if (mouseX > lastLinkEnd && activeIndex !== links.length - 1) {
-      const containerWidth = navLinksContainer.offsetWidth;
-      const edgeZoneWidth = containerWidth - lastLinkEnd; // The padding zone width
-      const distanceIntoZone = mouseX - lastLinkEnd;
-      const squeezeProgress = Math.min(distanceIntoZone / edgeZoneWidth, 1);
-      const squeezeWidth = (1 - squeezeProgress) * 100;
-      const activeWidth = squeezeProgress * 100;
-
-      indicators.forEach((ind, j) => {
-        if (!ind) return;
-        ind.style.transition = 'none';
-        if (j === links.length - 1) {
-          // Last link: anchor left so it squeezes from the right
-          setIndicatorAnchor(ind, 'left');
-          ind.style.width = `${squeezeWidth}%`;
-        } else if (j === activeIndex) {
-          // Active link: grows from the right as last link squeezes
-          setIndicatorAnchor(ind, 'right');
-          ind.style.width = `${activeWidth}%`;
-        } else {
-          ind.style.width = '0';
-        }
-      });
-
-      // Update lastHoveredIndex based on which link has more indicator
-      lastHoveredIndex = squeezeProgress >= 0.5 ? activeIndex : links.length - 1;
-      return;
-    }
-
-    // Find which link we're over or in gap between
-    for (let i = 0; i < links.length; i++) {
-      const link = links[i];
-      const textSpan = textSpans[i];
-
-      // Link boundaries (larger hover area) - using getBoundingClientRect for accuracy
-      const linkStart = getOffsetLeft(link);
-      const linkEnd = linkStart + link.offsetWidth;
-
-      // Text boundaries (for gap calculation)
-      const textStart = getOffsetLeft(textSpan);
-      const textEnd = textStart + textSpan.offsetWidth;
-
-      // Mouse is over this link's hover area
-      if (mouseX >= linkStart && mouseX <= linkEnd) {
-        indicators.forEach((ind, j) => {
-          if (!ind) return;
-          ind.style.transition = 'width 0.15s ease-out';
-
-          if (j === i) {
-            // Set anchor based on position relative to active link
-            // If hovered link is left of active, fill from right to left (anchor right)
-            // If hovered link is right of active, fill from left to right (anchor left)
-            if (i < activeIndex) {
-              setIndicatorAnchor(ind, 'right');
-            } else {
-              setIndicatorAnchor(ind, 'left');
-            }
-            ind.style.width = '100%';
-          } else if (j === activeIndex) {
-            // Active link losing its line - set anchor so it disappears toward hovered link
-            // If hovered is left, disappear to left (anchor left, shrinks from right)
-            // If hovered is right, disappear to right (anchor right, shrinks from left)
-            if (i < activeIndex) {
-              setIndicatorAnchor(ind, 'left');
-            } else {
-              setIndicatorAnchor(ind, 'right');
-            }
-            ind.style.width = '0';
-          } else {
-            ind.style.width = '0';
-          }
-        });
-
-        lastHoveredIndex = i;
-        return;
-      }
-
-      // Check if in gap between text areas (after link hover area)
-      if (i < links.length - 1) {
-        const nextLink = links[i + 1];
-        const nextTextSpan = textSpans[i + 1];
-        const nextLinkStart = getOffsetLeft(nextLink);
-        const nextTextStart = getOffsetLeft(nextTextSpan);
-
-        const gapStart = textEnd;
-        const gapEnd = nextTextStart;
-
-        if (mouseX > linkEnd && mouseX < nextLinkStart) {
-          // In the actual gap between hover areas - calculate based on text positions
-          const progress = (mouseX - gapStart) / (gapEnd - gapStart);
-          const clampedProgress = Math.max(0, Math.min(1, progress));
-
-          // Round to clean values near edges to avoid lingering pixels
-          const leftWidth = clampedProgress > 0.95 ? 0 : (1 - clampedProgress) * 100;
-          const rightWidth = clampedProgress < 0.05 ? 0 : clampedProgress * 100;
-
-          indicators.forEach((ind, j) => {
-            if (!ind) return;
-            ind.style.transition = 'none';
-
-            if (j === i) {
-              // Left link: anchor right so it shrinks/grows from the left edge
-              setIndicatorAnchor(ind, 'right');
-              ind.style.width = `${leftWidth}%`;
-            } else if (j === i + 1) {
-              // Right link: anchor left so it shrinks/grows from the right edge
-              setIndicatorAnchor(ind, 'left');
-              ind.style.width = `${rightWidth}%`;
-            } else {
-              ind.style.width = '0';
-            }
-          });
-
-          // Update lastHoveredIndex based on which link has more indicator
-          lastHoveredIndex = clampedProgress >= 0.5 ? i + 1 : i;
-          return;
-        }
-      }
-    }
-  });
-
-  // Return to active link when leaving nav
-  navLinksContainer?.addEventListener('mouseleave', () => {
-    resetToActive(true);
-  });
+  initThemeToggle();
+  initDropdown('projects-dropdown');
+  initNavIndicator();
 </script>

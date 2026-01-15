@@ -1,0 +1,160 @@
+---
+import Tag from './Tag.astro';
+import { projectColors } from '../lib/projects';
+
+interface Props {
+  slug: string;
+  date: Date;
+  languages?: string[];
+  description?: string;
+  patterns?: string[];
+  project?: string;
+  showProjectBadge?: boolean;
+  showLeftBorder?: boolean;
+  tagsPosition?: 'header' | 'bottom';
+  index?: number;
+  weekKey?: string;
+}
+
+const {
+  slug,
+  date,
+  languages = [],
+  description,
+  patterns,
+  project,
+  showProjectBadge = false,
+  showLeftBorder = true,
+  tagsPosition = 'bottom',
+  index,
+  weekKey
+} = Astro.props;
+
+const projectData = project ? projectColors[project] : null;
+const projectColor = projectData?.color || 'var(--border)';
+const preview = description || patterns?.slice(0, 3).join(' • ') || '';
+const showTagsInHeader = tagsPosition === 'header' && languages.length > 0;
+const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
+---
+
+<article
+  class:list={['post-item', { 'with-left-border': showLeftBorder }]}
+  data-index={index}
+  data-week={weekKey}
+>
+  <a href={`/blog/${slug}`} style={`--project-color: ${projectColor}`}>
+    <div class:list={['post-header', { 'with-preview': preview }]}>
+      {showProjectBadge && projectData && (
+        <span class="project-badge">{projectData.name}</span>
+      )}
+      {showTagsInHeader && (
+        <div class="tags">
+          {languages.slice(0, 3).map(lang => (
+            <Tag label={lang} />
+          ))}
+        </div>
+      )}
+      <span class="post-date">
+        {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+      </span>
+    </div>
+    {preview && (
+      <p class="preview">{preview}</p>
+    )}
+    {showTagsAtBottom && (
+      <div class="tags tags-bottom">
+        {languages.slice(0, 3).map(lang => (
+          <Tag label={lang} />
+        ))}
+      </div>
+    )}
+  </a>
+</article>
+
+<style>
+  .post-item {
+    display: none;
+  }
+
+  .post-item.visible {
+    display: block;
+  }
+
+  .post-item a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.25rem;
+    background: var(--bg-card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, transform 0.2s, background-color 0.3s ease;
+  }
+
+  .post-item.with-left-border a {
+    border-left: 3px solid var(--project-color, var(--border));
+  }
+
+  .post-item a:hover {
+    border-color: var(--project-color, var(--accent));
+    transform: translateX(4px);
+  }
+
+  .post-item.with-left-border a:hover {
+    border-left-color: var(--project-color, var(--accent));
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .post-header.with-preview {
+    margin-bottom: 0.5rem;
+  }
+
+  .project-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--project-color);
+    padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, var(--project-color) 10%, transparent);
+    border-radius: 4px;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .tags-bottom {
+    margin-top: 0.5rem;
+  }
+
+  .post-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-left: auto;
+  }
+
+  .preview {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .post-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .post-date {
+      margin-left: 0;
+    }
+  }
+</style>
