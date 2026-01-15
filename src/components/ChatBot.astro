@@ -1,5 +1,7 @@
 ---
 // Simple FAQ Chat Bot - No AI, just pattern matching
+import { TECH_STACK } from '../lib/constants';
+
 const faqData = {
   greetings: ['hi', 'hello', 'hey', 'howdy', 'hola'],
   about: ['who', 'about', 'sinan', 'yourself', 'introduce'],
@@ -10,16 +12,24 @@ const faqData = {
   blog: ['blog', 'devlog', 'post', 'write', 'article'],
 };
 
+// Generate stack response from centralized TECH_STACK
+const stackList = TECH_STACK.map(tech => `• **${tech}**`).join('\n');
+
 const responses = {
   greetings: "Hey there! I'm a simple bot here to answer questions about Sinan. Ask me about his projects, tech stack, or background!",
-  about: "Sinan is a software engineer building three ambitious projects in parallel. He loves systems programming, distributed architectures, and creating tools that empower developers. This devlog captures his journey — the wins, the bugs, and everything in between.",
-  projects: "Sinan is currently building three projects:\n\n◈ <a href=\"/projects/xtranodly\" target=\"_blank\">xtranodly.ai</a> — A visual node-based graph system for AI workflows and automation\n\n◉ <a href=\"/projects/bazaar\" target=\"_blank\">Bazaar.Shop</a> — A multi-tenant marketplace with PCI-DSS compliant payments and SSO\n\n◎ <a href=\"/projects/spatium\" target=\"_blank\">Spatium.ai</a> — Spatial computing for immersive 3D experiences",
-  stack: "Sinan's tech stack includes:\n\n• **C#/.NET** — Backend services, microservices\n• **Rust** — Systems programming, performance-critical code\n• **Python** — AI/ML, scripting\n• **TypeScript** — Frontend, tooling\n• **Tauri** — Desktop apps\n• **gRPC** — Service communication\n• **Docker** — Containerization",
+  about: "Sinan is a **Senior Full-stack Developer** who taught himself to code, then studied electrical engineering just to understand what happens beneath the abstractions. That hardware-meets-software mindset shapes everything he builds — high-performance distributed systems in **C#/.NET**, **Rust**, and **Python**.\n\nWhen not debugging microservices or optimizing queries, he's either at the gym or on a bike — because complex systems need a clear head.",
+  projects: "Sinan is currently building three projects:\n\n◈ <a href=\"/projects/xtranodly#expanded\" target=\"_blank\">xtranodly.ai</a> — A visual node-based graph system for AI workflows and automation\n\n◉ <a href=\"/projects/bazaar#expanded\" target=\"_blank\">Bazaar.Shop</a> — A multi-tenant marketplace with PCI-DSS compliant payments and SSO\n\n◎ <a href=\"/projects/spatium#expanded\" target=\"_blank\">Spatium.ai</a> — Spatial computing for immersive 3D experiences",
+  stack: `Sinan's tech stack includes:\n\n${stackList}`,
   experience: "Sinan has experience building complex distributed systems, marketplace platforms, and developer tools. His focus is on clean architecture, performance, and shipping quality software.",
   contact: "You can explore Sinan's work through this devlog. Check out the projects section or read the blog posts to see what he's building!",
-  blog: "This devlog documents Sinan's weekly progress across all three projects. Each post covers architectural decisions, technical challenges, and lessons learned. Check out /blog for all posts!",
-  unknown: "I'm not sure about that one! Try asking about:\n• Who Sinan is\n• His projects (xtranodly, Bazaar, Spatium)\n• His tech stack\n• The blog/devlog",
+  blog: "Most devs build in silence and only show the wins. This blog is the opposite — a **public accountability experiment**. Three ambitious projects, documented weekly, with zero filter.\n\nArchitectural decisions, bugs that took hours to find, lessons learned the hard way. If it ships, it's here. If it fails, it's here too.\n\nNo stealth mode. No polished PR. Just the raw journey. Check out <a href=\"/blog\">/blog</a>!",
 };
+
+const unknownResponses = [
+  "¯\\_(ツ)_/¯\n\nMy database is just a potato with dreams. Try asking about projects, stack, or the blog!",
+  "🤖 I'm an excellent listener... not so great at answering that one.\n\nI know stuff about: projects, tech stack, or who Sinan is!",
+  "🔮 *consults crystal ball*\n\n...it says \"404: Answer not found\"\n\nTry: projects, stack, experience, or blog!",
+];
 ---
 
 <div id="chat-widget" class="chat-widget">
@@ -83,11 +93,12 @@ const responses = {
           <button class="suggestion-btn" data-question="Who is Sinan?">Who is Sinan?</button>
           <button class="suggestion-btn" data-question="What projects is he building?">What projects?</button>
           <button class="suggestion-btn" data-question="What's his tech stack?">Tech stack?</button>
-          <button class="suggestion-btn" data-question="Tell me about the blog">About the blog?</button>
+          <button class="suggestion-btn" data-question="What is this devlog?">About the blog?</button>
         </div>
       </div>
 
       <div class="message bot">
+        <span class="message-label">Bot</span>
         <div class="message-content">
           Hey! I'm here to answer questions about Sinan. Try asking:
           <ul>
@@ -143,12 +154,12 @@ const responses = {
 
   .chat-toggle .icon-chat {
     height: 112px;
-    color: #61afef;
+    color: var(--color-blue);
     transition: opacity 0.2s;
   }
 
   :global([data-theme="light"]) .chat-toggle .icon-chat {
-    color: #0969da;
+    color: var(--accent);
   }
 
   /* Typing text effect */
@@ -173,9 +184,9 @@ const responses = {
   }
 
   @keyframes lineColor {
-    0%, 100% { stroke: #61afef; }
-    33% { stroke: #d19a66; }
-    66% { stroke: #c678dd; }
+    0%, 100% { stroke: var(--color-blue); }
+    33% { stroke: var(--color-orange); }
+    66% { stroke: var(--color-purple); }
   }
 
   /* UFO animations */
@@ -233,7 +244,7 @@ const responses = {
   .chat-toggle .icon-close {
     width: 24px;
     height: 24px;
-    color: #61afef;
+    color: var(--color-blue);
     display: none;
     position: relative;
     bottom: 2.1rem;
@@ -241,7 +252,7 @@ const responses = {
   }
 
   :global([data-theme="light"]) .chat-toggle .icon-close {
-    color: #0969da;
+    color: var(--accent);
   }
 
   .chat-widget.open .chat-toggle .icon-chat {
@@ -301,7 +312,7 @@ const responses = {
   .slinky .slinky-dot {
     width: 6px;
     height: 6px;
-    background: #61afef;
+    background: var(--color-blue);
     border-radius: 50%;
     animation: slinkyDot 4s ease-in-out infinite, slinkyColorDark 16s ease-in-out infinite;
   }
@@ -351,13 +362,13 @@ const responses = {
 
   @keyframes slinkyColorDark {
     0%, 100% {
-      background: #61afef;
+      background: var(--color-blue);
     }
     25% {
-      background: #d19a66;
+      background: var(--color-orange);
     }
     50% {
-      background: #c678dd;
+      background: var(--color-purple);
     }
     75% {
       background: #e6edf3;
@@ -366,13 +377,13 @@ const responses = {
 
   @keyframes slinkyColorLight {
     0%, 100% {
-      background: #0969da;
+      background: var(--accent);
     }
     25% {
-      background: #d19a66;
+      background: var(--color-orange);
     }
     50% {
-      background: #c678dd;
+      background: var(--color-purple);
     }
     75% {
       background: #1f2328;
@@ -381,13 +392,13 @@ const responses = {
 
   @keyframes slinkyRingColor {
     0%, 100% {
-      border-color: #61afef;
+      border-color: var(--color-blue);
     }
     33% {
-      border-color: #d19a66;
+      border-color: var(--color-orange);
     }
     66% {
-      border-color: #c678dd;
+      border-color: var(--color-purple);
     }
   }
 
@@ -406,17 +417,6 @@ const responses = {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     animation: slideUp 0.25s ease-out;
     transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   .chat-widget.open .chat-panel {
@@ -464,68 +464,86 @@ const responses = {
     max-height: 300px;
   }
 
-  .message {
+  #chat-messages :global(.message) {
     max-width: 85%;
     animation: fadeIn 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .message.bot {
+  #chat-messages :global(.message.bot) {
     align-self: flex-start;
+    align-items: flex-start;
   }
 
-  .message.user {
+  #chat-messages :global(.message.user) {
     align-self: flex-end;
+    align-items: flex-end;
   }
 
-  .message-content {
+  #chat-messages :global(.message-label) {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    padding: 0 0.5rem;
+  }
+
+  #chat-messages :global(.message.bot .message-label) {
+    color: var(--color-blue);
+  }
+
+  #chat-messages :global(.message.user .message-label) {
+    color: var(--guest-color, #7a6580);
+  }
+
+  #chat-messages :global(.message-content) {
     padding: 0.75rem 1rem;
-    border-radius: 12px;
     font-size: 0.85rem;
     line-height: 1.5;
   }
 
-  .message.bot .message-content {
-    background: rgba(97, 175, 239, 0.1);
-    border: 1px solid rgba(97, 175, 239, 0.2);
+  #chat-messages :global(.message.bot .message-content) {
+    background: color-mix(in srgb, var(--color-blue) 15%, var(--bg-secondary));
+    border: 1px solid color-mix(in srgb, var(--color-blue) 30%, var(--border));
     color: var(--text);
+    border-radius: 4px 16px 16px 16px;
   }
 
-  .message.bot .message-content a {
-    color: #61afef;
+  #chat-messages :global(.message.user .message-content) {
+    background: color-mix(in srgb, var(--guest-color, #7a6580) 15%, var(--bg-secondary));
+    border: 1px solid color-mix(in srgb, var(--guest-color, #7a6580) 30%, var(--border));
+    color: var(--text);
+    border-radius: 16px 4px 16px 16px;
+  }
+
+  #chat-messages :global(.message.bot .message-content a) {
+    color: var(--color-blue);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
   }
 
-  .message.bot .message-content a:hover {
-    color: #c678dd;
+  #chat-messages :global(.message.bot .message-content a:hover) {
+    color: var(--color-purple);
     text-decoration: underline;
   }
 
-  .message.user .message-content {
-    background: linear-gradient(135deg, #61afef, #c678dd);
-    color: white;
-  }
-
-  .message-content ul {
+  #chat-messages :global(.message-content ul) {
     margin: 0.5rem 0 0 0;
     padding-left: 0;
     list-style: none;
   }
 
-  .message-content li {
+  #chat-messages :global(.message-content li) {
     margin: 0.25rem 0;
   }
 
-  .inline-suggestion {
+  #chat-messages :global(.inline-suggestion) {
     background: none;
     border: none;
-    color: #61afef;
+    color: var(--color-blue);
     cursor: pointer;
     font-size: inherit;
     padding: 0;
@@ -533,21 +551,21 @@ const responses = {
     transition: color 0.2s;
   }
 
-  .inline-suggestion:hover {
-    color: #c678dd;
+  #chat-messages :global(.inline-suggestion:hover) {
+    color: var(--color-purple);
     text-decoration: underline;
   }
 
   /* Suggestions Toggle */
   .suggestions-toggle {
     position: absolute;
-    top: 5rem;
+    top: 2.4rem;
     right: 0.5rem;
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: rgba(97, 175, 239, 0.1);
-    border: 1px solid rgba(97, 175, 239, 0.3);
+    background: color-mix(in srgb, var(--color-blue) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-blue) 30%, transparent);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -556,12 +574,12 @@ const responses = {
     z-index: 10;
     font-size: 1rem;
     font-weight: 600;
-    color: #61afef;
+    color: var(--color-blue);
   }
 
   .suggestions-toggle:hover {
-    background: rgba(97, 175, 239, 0.2);
-    border-color: #61afef;
+    background: color-mix(in srgb, var(--color-blue) 20%, transparent);
+    border-color: var(--color-blue);
   }
 
   .suggestions-toggle.active {
@@ -605,17 +623,17 @@ const responses = {
   .suggestion-btn {
     font-size: 0.75rem;
     padding: 0.4rem 0.7rem;
-    background: rgba(97, 175, 239, 0.1);
-    border: 1px solid rgba(97, 175, 239, 0.25);
+    background: color-mix(in srgb, var(--color-blue) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-blue) 25%, transparent);
     border-radius: 15px;
-    color: #61afef;
+    color: var(--color-blue);
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .suggestion-btn:hover {
-    background: rgba(97, 175, 239, 0.2);
-    border-color: #61afef;
+    background: color-mix(in srgb, var(--color-blue) 20%, transparent);
+    border-color: var(--color-blue);
     transform: translateY(-1px);
   }
 
@@ -644,7 +662,7 @@ const responses = {
   }
 
   .chat-input-form input:focus {
-    border-color: #61afef;
+    border-color: var(--color-blue);
   }
 
   .chat-input-form button {
@@ -660,7 +678,7 @@ const responses = {
   .chat-input-form button svg {
     width: 22px;
     height: 22px;
-    color: #c678dd;
+    color: var(--color-purple);
     transition: transform 0.3s ease, filter 0.3s ease;
   }
 
@@ -674,24 +692,12 @@ const responses = {
     animation: sendLaunch 0.4s ease-out forwards;
   }
 
-  @keyframes sendPulse {
-    0%, 100% { transform: translate(3px, -3px) rotate(-12deg) scale(1); }
-    50% { transform: translate(4px, -4px) rotate(-12deg) scale(1.1); }
-  }
-
-  @keyframes sendLaunch {
-    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-    50% { transform: translate(15px, -15px) rotate(-20deg) scale(0.8); opacity: 0.3; }
-    51% { transform: translate(-5px, 5px) rotate(0deg) scale(0.6); opacity: 0; }
-    100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-  }
-
   :global([data-theme="light"]) .chat-input-form button svg {
-    color: #8b5cf6;
+    color: var(--color-purple);
   }
 
   :global([data-theme="light"]) .chat-input-form button:hover svg {
-    filter: drop-shadow(-2px 2px 3px rgba(139, 92, 246, 0.5));
+    filter: drop-shadow(-2px 2px 3px color-mix(in srgb, var(--color-purple) 50%, transparent));
   }
 
   @media (max-width: 400px) {
@@ -702,8 +708,8 @@ const responses = {
   }
 </style>
 
-<script define:vars={{ faqData, responses }}>
-  window.__chatBotConfig = { faqData, responses };
+<script define:vars={{ faqData, responses, unknownResponses }}>
+  window.__chatBotConfig = { faqData, responses, unknownResponses };
 </script>
 
 <script>
@@ -714,11 +720,13 @@ const responses = {
     initChatBot(config);
   }
 
-  // Random color for chat icon (muted)
+  // Random color for chat icon and guest bubble (muted)
+  const chatWidget = document.getElementById('chat-widget');
   const chatIcon = document.querySelector('.chat-toggle .icon-chat') as SVGElement;
-  if (chatIcon) {
+  if (chatIcon && chatWidget) {
     const colors = ['#5c7a8a', '#8a7265', '#7a6580'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     chatIcon.style.color = randomColor;
+    chatWidget.style.setProperty('--guest-color', randomColor);
   }
 </script>

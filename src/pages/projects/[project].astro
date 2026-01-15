@@ -4,10 +4,10 @@ import BlocksBackground from '../../components/BlocksBackground.astro';
 import PostCard from '../../components/PostCard.astro';
 import WeekHeader from '../../components/WeekHeader.astro';
 import Pagination from '../../components/Pagination.astro';
-import { getCollection } from 'astro:content';
 import { projects } from '../../lib/projects';
-import { addWeekInfo, isFirstOfWeek } from '../../lib/weekGrouping';
-import { POSTS_PER_PAGE, CONTAINER_IDS } from '../../lib/constants';
+import { isFirstOfWeek } from '../../lib/weekGrouping';
+import { getPosts } from '../../lib/getPosts';
+import { POSTS_PER_PAGE } from '../../lib/constants';
 
 export async function getStaticPaths() {
   return projects.map(project => ({
@@ -17,18 +17,10 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-
-const posts = (await getCollection('blog'))
-  .filter(post => !post.data.draft && post.data.project === project.id)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-const postsWithWeek = addWeekInfo(posts);
-
-const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
-const containerId = CONTAINER_IDS.posts;
+const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = await getPosts(project.id);
 ---
 
-<BaseLayout title={`${project.name} — Engineering Devlog`}>
+<BaseLayout title={`${project.name} — sinkyl Devlog`}>
   <BlocksBackground />
   <section class="header">
     <h1 style={`--project-color: ${project.color}`}>{project.name}</h1>
@@ -66,6 +58,7 @@ const containerId = CONTAINER_IDS.posts;
               tagsPosition="header"
               index={index}
               weekKey={weekKey}
+              indicators={postsWithIndicators.get(post.slug)}
             />
           </>
         ))}

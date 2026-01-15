@@ -1,5 +1,6 @@
 ---
 // Subtle modular blocks SVG background
+import { COLORS } from '../lib/theme';
 ---
 
 <div class="blocks-bg" aria-hidden="true">
@@ -7,14 +8,14 @@
     <defs>
       <!-- Gradient for animated glow -->
       <linearGradient id="flowGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#61afef" stop-opacity="0" />
-        <stop offset="50%" stop-color="#61afef" stop-opacity="0.8" />
-        <stop offset="100%" stop-color="#61afef" stop-opacity="0" />
+        <stop offset="0%" stop-color={COLORS.blue} stop-opacity="0" />
+        <stop offset="50%" stop-color={COLORS.blue} stop-opacity="0.8" />
+        <stop offset="100%" stop-color={COLORS.blue} stop-opacity="0" />
       </linearGradient>
       <linearGradient id="flowGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#c678dd" stop-opacity="0" />
-        <stop offset="50%" stop-color="#c678dd" stop-opacity="0.6" />
-        <stop offset="100%" stop-color="#c678dd" stop-opacity="0" />
+        <stop offset="0%" stop-color={COLORS.purple} stop-opacity="0" />
+        <stop offset="50%" stop-color={COLORS.purple} stop-opacity="0.6" />
+        <stop offset="100%" stop-color={COLORS.purple} stop-opacity="0" />
       </linearGradient>
     </defs>
 
@@ -125,7 +126,7 @@
   }
 
   .line {
-    stroke: #61afef;
+    stroke: var(--color-blue);
     stroke-width: 1.5;
   }
 
@@ -139,7 +140,7 @@
   }
 
   .line.flow {
-    stroke: #61afef;
+    stroke: var(--color-blue);
     stroke-width: 2.5;
     stroke-linecap: round;
     stroke-dasharray: 0 100;
@@ -149,14 +150,14 @@
   /* Left side flow - travels through 4 segments */
   .line.flow-l1 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 0s; }
   .line.flow-l2 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 0.4s; }
-  .line.flow-l3 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 0.8s; stroke: #c678dd; }
-  .line.flow-l4 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 1.2s; stroke: #c678dd; }
+  .line.flow-l3 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 0.8s; stroke: var(--color-purple); }
+  .line.flow-l4 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 1.2s; stroke: var(--color-purple); }
 
   /* Right side flow - travels through 4 segments, offset timing */
   .line.flow-r1 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 3s; }
   .line.flow-r2 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 3.4s; }
-  .line.flow-r3 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 3.8s; stroke: #c678dd; }
-  .line.flow-r4 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 4.2s; stroke: #c678dd; }
+  .line.flow-r3 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 3.8s; stroke: var(--color-purple); }
+  .line.flow-r4 { animation: flowSegment 6s ease-in-out infinite; animation-delay: 4.2s; stroke: var(--color-purple); }
 
   @keyframes flowSegment {
     0%, 15% {
@@ -174,26 +175,26 @@
   }
 
   .block.filled {
-    fill: rgba(97, 175, 239, 0.15);
-    stroke: #61afef;
+    fill: color-mix(in srgb, var(--color-blue) 15%, transparent);
+    stroke: var(--color-blue);
     stroke-width: 1.5;
   }
 
   .block.outline {
     fill: transparent;
-    stroke: #c678dd;
+    stroke: var(--color-purple);
     stroke-width: 1;
     stroke-dasharray: 3 2;
     opacity: 0.6;
   }
 
   .dot {
-    fill: #c678dd;
+    fill: var(--color-purple);
     opacity: 0.4;
   }
 
   .port {
-    fill: #61afef;
+    fill: var(--color-blue);
     opacity: 0.7;
   }
 

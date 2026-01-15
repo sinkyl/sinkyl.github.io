@@ -1,4 +1,4 @@
-# Engineering Devlog
+# sinkyl Devlog
 
 Automated weekly devlog powered by AI-generated commits and Astro.
 

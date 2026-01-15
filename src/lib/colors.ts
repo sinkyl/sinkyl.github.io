@@ -1,3 +1,6 @@
+import { COLORS } from './theme';
+
+// Tech-specific colors (brand colors for technologies)
 export const techColors: Record<string, string> = {
   'Rust': '#DEA584',
   'TypeScript': '#3178C6',
@@ -25,6 +28,9 @@ export const techColors: Record<string, string> = {
   'AWS': '#FF9900',
   'Azure': '#0078D4',
   'GraphQL': '#E10098',
+  'VHDL': '#8B5CF6',
+  'SQL': '#F29111',
+  'NoSQL': '#4DB33D',
 };
 
-export const getTechColor = (tech: string): string => techColors[tech] || '#8b949e';
+export const getTechColor = (tech: string): string => techColors[tech] || COLORS.muted;

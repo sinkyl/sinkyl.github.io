@@ -10,16 +10,17 @@ export interface FAQData {
 
 export interface Responses {
   [category: string]: string;
-  unknown: string;
 }
 
 export interface ChatBotConfig {
   faqData: FAQData;
   responses: Responses;
+  unknownResponses: string[];
 }
 
 export function initChatBot(config: ChatBotConfig) {
-  const { faqData, responses } = config;
+  const { faqData, responses, unknownResponses } = config;
+  let unknownIndex = 0;
 
   const toggle = document.getElementById('chat-toggle');
   const widget = document.getElementById('chat-widget');
@@ -83,18 +84,34 @@ export function initChatBot(config: ChatBotConfig) {
     const lower = query.toLowerCase();
 
     for (const [category, keywords] of Object.entries(faqData)) {
-      if (keywords.some((keyword: string) => lower.includes(keyword))) {
-        return responses[category] || responses.unknown;
+      // Use word boundary matching to avoid partial matches (e.g., "hi" in "his")
+      if (keywords.some((keyword: string) => {
+        const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+        return regex.test(lower);
+      })) {
+        return responses[category] || getUnknownResponse();
       }
     }
 
-    return responses.unknown;
+    return getUnknownResponse();
+  }
+
+  // Get rotating unknown response
+  function getUnknownResponse(): string {
+    const response = unknownResponses[unknownIndex];
+    unknownIndex = (unknownIndex + 1) % unknownResponses.length;
+    return response;
   }
 
   // Add message to chat
   function addMessage(content: string, isUser = false) {
     const div = document.createElement('div');
     div.className = `message ${isUser ? 'user' : 'bot'}`;
+
+    // Add label
+    const label = document.createElement('span');
+    label.className = 'message-label';
+    label.textContent = isUser ? 'Guest' : 'Bot';
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -105,6 +122,7 @@ export function initChatBot(config: ChatBotConfig) {
       .replace(/\n/g, '<br>');
 
     contentDiv.innerHTML = formatted;
+    div.appendChild(label);
     div.appendChild(contentDiv);
     messages.appendChild(div);
     messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });

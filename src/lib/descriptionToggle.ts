@@ -48,7 +48,16 @@ export function initDescriptionToggle(
   lessBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     descContainer.classList.remove('expanded');
+    // Clear hash when collapsing
+    if (window.location.hash === '#expanded') {
+      history.replaceState(null, '', window.location.pathname);
+    }
   });
+
+  // Auto-expand if #expanded hash is present (e.g., from chatbot links)
+  if (window.location.hash === '#expanded') {
+    descContainer.classList.add('expanded');
+  }
 
   setupClickOutside(descContainer, 'expanded');
 }

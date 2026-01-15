@@ -213,12 +213,47 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
   }
 
   /* Mermaid diagram styling */
+  /* Show subtle loading skeleton while mermaid loads */
+  .content :global(pre[data-language="mermaid"]) {
+    position: relative;
+    min-height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    color: transparent;
+    user-select: none;
+  }
+
+  .content :global(pre[data-language="mermaid"])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      var(--bg-secondary) 0%,
+      color-mix(in srgb, var(--border) 50%, var(--bg-secondary)) 50%,
+      var(--bg-secondary) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   .content :global(.mermaid) {
     background: var(--bg-secondary);
     padding: 1rem;
     border-radius: 8px;
     margin: 1.5rem 0;
     text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .content :global(.mermaid[data-processed="true"]) {
+    opacity: 1;
   }
 
   /* Post navigation */
@@ -299,111 +334,10 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
   }
 </style>
 
-<script is:inline>
-  // Load Mermaid and render diagrams with theme toggle support
-  (async function() {
-    // Find all mermaid code blocks (Astro/Shiki uses data-language attribute)
-    const mermaidBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
-
-    if (mermaidBlocks.length === 0) return;
-
-    // Dynamically load Mermaid
-    const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
-
-    // Read CSS variables at runtime so Mermaid respects theme
-    function getThemeVars() {
-      const styles = getComputedStyle(document.documentElement);
-      const get = (name) => styles.getPropertyValue(name).trim();
-
-      return {
-        primaryColor: get('--accent'),
-        primaryTextColor: get('--text'),
-        primaryBorderColor: get('--border'),
-        lineColor: get('--text-muted'),
-        secondaryColor: get('--bg'),
-        tertiaryColor: get('--bg'),
-        background: get('--bg'),
-        mainBkg: get('--bg'),
-        nodeBorder: get('--border'),
-        clusterBkg: get('--bg'),
-        clusterBorder: get('--border'),
-        titleColor: get('--text'),
-        edgeLabelBackground: get('--bg-secondary'),
-      };
-    }
-
-    // Store original code for re-rendering
-    const mermaidData = [];
-
-    // Convert code blocks to mermaid divs
-    mermaidBlocks.forEach((pre, index) => {
-      const code = pre.textContent;
-      mermaidData.push(code);
-      const div = document.createElement('div');
-      div.className = 'mermaid';
-      div.id = `mermaid-${index}`;
-      div.setAttribute('data-mermaid-source', code);
-      div.textContent = code;
-      pre.replaceWith(div);
-    });
-
-    async function renderMermaid() {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: 'base',
-        themeVariables: getThemeVars()
-      });
-
-      // Reset all mermaid divs with source code
-      document.querySelectorAll('.mermaid').forEach((div) => {
-        const source = div.getAttribute('data-mermaid-source');
-        if (source) {
-          div.removeAttribute('data-processed');
-          div.innerHTML = source;
-        }
-      });
-
-      await mermaid.run();
-    }
-
-    // Initial render
-    await renderMermaid();
-
-    // Listen for theme toggle clicks
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        // Small delay to let theme change apply
-        setTimeout(renderMermaid, 50);
-      });
-    }
-  })();
-</script>
-
 <script>
-  const backLink = document.getElementById('back-link');
-  const storageKey = 'postListSource';
+  import { initMermaidRenderer } from '../lib/mermaidRenderer';
+  import { initBackNavigation } from '../lib/backNavigation';
 
-  // Check if we came from a list page (not another post)
-  if (document.referrer) {
-    const referrerUrl = new URL(document.referrer);
-    const isFromSameSite = referrerUrl.origin === window.location.origin;
-    const isFromPost = referrerUrl.pathname.startsWith('/blog/') && referrerUrl.pathname !== '/blog/';
-
-    // Only store if coming from a list page, not from another post
-    if (isFromSameSite && !isFromPost) {
-      sessionStorage.setItem(storageKey, document.referrer);
-    }
-  }
-
-  backLink?.addEventListener('click', (e) => {
-    e.preventDefault();
-    const source = sessionStorage.getItem(storageKey);
-    if (source) {
-      window.location.href = source;
-    } else {
-      window.location.href = '/blog';
-    }
-  });
-
+  initMermaidRenderer();
+  initBackNavigation();
 </script>

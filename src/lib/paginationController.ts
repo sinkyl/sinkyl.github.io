@@ -3,6 +3,27 @@ interface PaginationConfig {
   postsPerPage: number;
 }
 
+function getPageFromUrl(): number {
+  const params = new URLSearchParams(window.location.search);
+  const page = parseInt(params.get('page') || '1');
+  return isNaN(page) || page < 1 ? 1 : page;
+}
+
+function setPageInUrl(page: number, replace = false) {
+  const url = new URL(window.location.href);
+  if (page === 1) {
+    url.searchParams.delete('page');
+  } else {
+    url.searchParams.set('page', String(page));
+  }
+
+  if (replace) {
+    history.replaceState({ page }, '', url.toString());
+  } else {
+    history.pushState({ page }, '', url.toString());
+  }
+}
+
 export function initPagination(containerId: string) {
   const config = (window as any).__paginationConfig?.[containerId] as PaginationConfig | undefined;
   if (!config) return;
@@ -22,7 +43,8 @@ export function initPagination(containerId: string) {
   const nextBtnFloat = document.getElementById(`next-btn-float-${containerId}`) as HTMLButtonElement;
   const pageIndicatorFloat = document.getElementById(`page-indicator-float-${containerId}`);
 
-  let currentPage = 1;
+  // Initialize from URL
+  let currentPage = Math.min(getPageFromUrl(), totalPages);
 
   function getIndicatorText() {
     return currentPage === totalPages ? `${currentPage}` : `${currentPage} . . ${totalPages}`;
@@ -92,19 +114,31 @@ export function initPagination(containerId: string) {
     if (pageIndicatorFloat) pageIndicatorFloat.textContent = getIndicatorText();
   }
 
-  function goToPrevPage() {
-    if (currentPage > 1) {
-      currentPage--;
+  function goToPage(page: number, updateUrl = true) {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      currentPage = page;
+      if (updateUrl) {
+        setPageInUrl(currentPage);
+      }
       updatePagination();
+      // Scroll to top of container
+      container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
-  function goToNextPage() {
-    if (currentPage < totalPages) {
-      currentPage++;
-      updatePagination();
-    }
+  function goToPrevPage() {
+    goToPage(currentPage - 1);
   }
+
+  function goToNextPage() {
+    goToPage(currentPage + 1);
+  }
+
+  // Handle browser back/forward
+  window.addEventListener('popstate', (e) => {
+    const page = e.state?.page || getPageFromUrl();
+    goToPage(Math.min(page, totalPages), false);
+  });
 
   prevBtn?.addEventListener('click', goToPrevPage);
   nextBtn?.addEventListener('click', goToNextPage);
@@ -121,9 +155,10 @@ export function initPagination(containerId: string) {
     if (e.key === 'Enter') {
       const value = parseInt(pageIndicator.value);
       if (!isNaN(value) && value >= 1 && value <= totalPages) {
-        currentPage = value;
+        goToPage(value);
+      } else {
+        updatePagination();
       }
-      updatePagination();
       pageIndicator.blur();
     } else if (e.key === 'Escape') {
       updatePagination();
@@ -162,6 +197,10 @@ export function initPagination(containerId: string) {
   });
 
   if (postItems && postItems.length > 0) {
+    // Set initial state in history (replace, don't push)
+    if (currentPage > 1) {
+      setPageInUrl(currentPage, true);
+    }
     updatePagination();
     updateFloatVisibility();
   }

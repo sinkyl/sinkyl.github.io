@@ -1,0 +1,399 @@
+---
+// Terminal-style About Modal
+---
+
+<button id="footer-trigger" class="footer-trigger">
+  &copy; {new Date().getFullYear()} - sinkyl Devlog
+  <svg class="terminal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="4 17 10 11 4 5"></polyline>
+    <line x1="12" y1="19" x2="20" y2="19"></line>
+  </svg>
+</button>
+
+<div id="about-modal" class="about-modal" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-container">
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-buttons">
+          <span class="btn-close"></span>
+          <span class="btn-minimize"></span>
+          <span class="btn-maximize"></span>
+        </div>
+        <span class="terminal-title">~/sinkyl/about.sh</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat ./manifesto.txt</span>
+        </div>
+        <div class="terminal-output ascii-art">
+{`   _____ _       _          _
+  / ____(_)     | |        | |
+ | (___  _ _ __ | | ___   _| |
+  \\___ \\| | '_ \\| |/ / | | | |
+  ____) | | | | |   <| |_| | |
+ |_____/|_|_| |_|_|\\_\\\\__, |_|
+                       __/ |
+                      |___/   `}
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">echo $PHILOSOPHY</span>
+        </div>
+        <div class="terminal-output philosophy">
+          "I don't build products. I architect obsessions."
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat ./why.md</span>
+        </div>
+        <div class="terminal-output story">
+          <p>This isn't just a devlog. It's a <span class="highlight">public accountability system</span>.</p>
+          <p>Every week, I ship. Every week, I document. No excuses, no hiding behind "stealth mode".</p>
+          <p>Three projects. One human. Zero external funding.</p>
+          <p class="dim">// If I fail, you'll see it here first.</p>
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat LICENSE</span>
+        </div>
+        <div class="terminal-output license">
+          <span class="license-badge">UNLICENSED</span>
+          <p>No license. No permission granted.</p>
+          <p class="dim">This code is my brain on display. Look, but don't copy.</p>
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">uptime</span>
+        </div>
+        <div class="terminal-output stats">
+          <div class="stat-grid">
+            <div class="stat">
+              <span class="stat-value" id="commits-count">∞</span>
+              <span class="stat-label">commits & counting</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">3</span>
+              <span class="stat-label">parallel obsessions</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">24/7</span>
+              <span class="stat-label">brain uptime</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="terminal-line blink">
+          <span class="prompt">$</span>
+          <span class="cursor">_</span>
+        </div>
+      </div>
+    </div>
+    <button class="modal-close" aria-label="Close modal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .footer-trigger {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: color 0.2s;
+  }
+
+  .footer-trigger:hover {
+    color: var(--accent);
+  }
+
+  .terminal-icon {
+    width: 19px;
+    height: 19px;
+    margin-top: 0.2rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .footer-trigger:hover .terminal-icon {
+    opacity: 1;
+  }
+
+  /* About Modal */
+  .about-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+
+  .about-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+  }
+
+  :global([data-theme="light"]) .modal-backdrop {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .modal-container {
+    position: relative;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s ease-out;
+  }
+
+  .about-modal.open .modal-container {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover {
+    color: var(--text);
+  }
+
+  .modal-close svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Terminal Window */
+  .terminal-window {
+    background: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .terminal-header {
+    background: var(--bg-secondary);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .terminal-buttons span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .btn-close { background: #8b4049; }
+  .btn-minimize { background: #8b7335; }
+  .btn-maximize { background: #3d6b4a; }
+
+  .terminal-title {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .terminal-body {
+    padding: 1.5rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .terminal-line {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .prompt {
+    color: var(--color-green);
+    font-weight: bold;
+  }
+
+  .command {
+    color: var(--color-blue);
+  }
+
+  .terminal-output {
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+  }
+
+  .terminal-output.ascii-art {
+    color: var(--color-purple);
+    font-size: 0.65rem;
+    line-height: 1.2;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .terminal-output.philosophy {
+    color: var(--color-orange);
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  .terminal-output.story p {
+    margin-bottom: 0.75rem;
+  }
+
+  .terminal-output .highlight {
+    color: var(--color-blue);
+    font-weight: bold;
+  }
+
+  .terminal-output .dim {
+    color: var(--text-muted);
+  }
+
+  .terminal-output.license {
+    border-left: 2px solid var(--color-red);
+    padding-left: 1rem;
+  }
+
+  .license-badge {
+    display: inline-block;
+    background: var(--color-red);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .terminal-output.license p {
+    margin-bottom: 0.5rem;
+  }
+
+  .terminal-output.license a {
+    color: var(--color-blue);
+    text-decoration: underline;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-blue);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .terminal-line.blink .cursor {
+    animation: cursorBlink 1s step-end infinite;
+  }
+
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .terminal-body {
+      font-size: 0.75rem;
+      padding: 1rem;
+    }
+
+    .terminal-output.ascii-art {
+      font-size: 0.5rem;
+    }
+
+    .stat-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  const modal = document.getElementById('about-modal');
+  const trigger = document.getElementById('footer-trigger');
+  const closeBtn = modal?.querySelector('.modal-close');
+  const backdrop = modal?.querySelector('.modal-backdrop');
+
+  function openModal() {
+    modal?.classList.add('open');
+    modal?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  trigger?.addEventListener('click', openModal);
+  closeBtn?.addEventListener('click', closeModal);
+  backdrop?.addEventListener('click', closeModal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('open')) {
+      closeModal();
+    }
+  });
+</script>

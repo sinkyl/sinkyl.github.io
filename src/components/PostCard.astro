@@ -1,6 +1,8 @@
 ---
 import Tag from './Tag.astro';
+import ContentIndicators from './ContentIndicators.astro';
 import { projectColors } from '../lib/projects';
+import type { ContentIndicators as ContentIndicatorsType } from '../lib/contentIndicators';
 
 interface Props {
   slug: string;
@@ -14,6 +16,7 @@ interface Props {
   tagsPosition?: 'header' | 'bottom';
   index?: number;
   weekKey?: string;
+  indicators?: ContentIndicatorsType;
 }
 
 const {
@@ -27,7 +30,8 @@ const {
   showLeftBorder = true,
   tagsPosition = 'bottom',
   index,
-  weekKey
+  weekKey,
+  indicators
 } = Astro.props;
 
 const projectData = project ? projectColors[project] : null;
@@ -61,13 +65,16 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
     {preview && (
       <p class="preview">{preview}</p>
     )}
-    {showTagsAtBottom && (
-      <div class="tags tags-bottom">
-        {languages.slice(0, 3).map(lang => (
-          <Tag label={lang} />
-        ))}
-      </div>
-    )}
+    <div class="post-footer">
+      {showTagsAtBottom && (
+        <div class="tags tags-bottom">
+          {languages.slice(0, 3).map(lang => (
+            <Tag label={lang} />
+          ))}
+        </div>
+      )}
+      <ContentIndicators indicators={indicators} />
+    </div>
   </a>
 </article>
 
@@ -129,8 +136,20 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
     flex-wrap: wrap;
   }
 
-  .tags-bottom {
+  .post-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 0.5rem;
+  }
+
+  .tags-bottom {
+    margin-top: 0;
+  }
+
+  .post-item a:hover :global(.indicator) {
+    opacity: 0.8;
+    color: var(--project-color, var(--accent));
   }
 
   .post-date {
