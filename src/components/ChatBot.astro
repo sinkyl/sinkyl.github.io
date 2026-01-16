@@ -61,10 +61,6 @@ const unknownResponses = [
         <line class="text-line line-3" x1="25" y1="3" x2="28" y2="3" stroke-width="0.5" stroke-linecap="round"/>
       </g>
     </svg>
-    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="18" y1="6" x2="6" y2="18"/>
-      <line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
   </button>
 
   <div id="chat-panel" class="chat-panel">
@@ -276,26 +272,8 @@ const unknownResponses = [
   }
 
 
-  .chat-toggle .icon-close {
-    width: 24px;
-    height: 24px;
-    color: var(--color-blue);
-    display: none;
-    position: relative;
-    bottom: 2.1rem;
-    left: 2rem;
-  }
-
-  :global([data-theme="light"]) .chat-toggle .icon-close {
-    color: var(--accent);
-  }
-
   .chat-widget.open .chat-toggle .icon-chat {
     display: none;
-  }
-
-  .chat-widget.open .chat-toggle .icon-close {
-    display: block;
   }
 
   /* Chat header slinky (small) */
@@ -742,11 +720,6 @@ const unknownResponses = [
 
     .chat-widget.footer-hidden {
       bottom: 0;
-    }
-
-    .chat-toggle .icon-close {
-      left: 50%;
-      transform: translateX(-50%);
     }
 
     .chat-widget.open .chat-panel {

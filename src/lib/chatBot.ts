@@ -40,14 +40,11 @@ export function initChatBot(config: ChatBotConfig) {
   // Close chat when clicking backdrop (mobile)
   backdrop?.addEventListener('click', () => {
     widget.classList.remove('open');
-    // Reset positions
+    // Reset panel position
     if (chatPanel) {
       chatPanel.style.position = '';
       chatPanel.style.top = '';
       chatPanel.style.bottom = '';
-    }
-    if (toggle) {
-      toggle.style.top = '';
     }
   });
 
@@ -70,11 +67,6 @@ export function initChatBot(config: ChatBotConfig) {
       chatPanel.style.position = 'fixed';
       chatPanel.style.bottom = 'auto';
       chatPanel.style.top = `${panelTop}px`;
-
-      // Position close button at top-right of panel
-      if (toggle) {
-        toggle.style.top = `${panelTop + 8}px`;
-      }
     } catch (e) {
       // Fallback - don't break if visualViewport has issues
     }
@@ -97,16 +89,11 @@ export function initChatBot(config: ChatBotConfig) {
       } else {
         updatePanelPosition();
       }
-    } else {
-      // Reset position when closing
-      if (chatPanel) {
-        chatPanel.style.position = '';
-        chatPanel.style.top = '';
-        chatPanel.style.bottom = '';
-      }
-      if (toggle) {
-        toggle.style.top = '';
-      }
+    } else if (chatPanel) {
+      // Reset panel position when closing
+      chatPanel.style.position = '';
+      chatPanel.style.top = '';
+      chatPanel.style.bottom = '';
     }
   });
 
