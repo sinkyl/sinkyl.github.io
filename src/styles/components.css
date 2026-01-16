@@ -9,7 +9,7 @@
    ============================================================================= */
 
 :root {
-  /* Brand colors */
+  /* Brand colors (One Dark Pro) */
   --color-blue: #61afef;
   --color-purple: #c678dd;
   --color-orange: #d19a66;
@@ -19,10 +19,28 @@
   --color-yellow: #e5c07b;
   --color-slate: #64748b;
 
+  /* Dimmed colors (One Dark Pro muted variants) */
+  --color-blue-dim: #4d8abe;
+  --color-purple-dim: #9a5eb0;
+  --color-orange-dim: #a67a50;
+  --color-green-dim: #7a9f60;
+  --color-red-dim: #b05a63;
+  --color-cyan-dim: #4a9aa3;
+  --color-white-dim: #abb2bf;
+
   /* Functional colors (set by theme) */
   --color-primary: var(--color-blue);
   --color-secondary: var(--color-purple);
   --color-accent: var(--color-blue);
+
+  /* Border radius tokens */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
 }
 
 /* =============================================================================
@@ -40,7 +58,7 @@
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 0.5rem 1rem;
   transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
 }
@@ -89,7 +107,7 @@
 /* Icon-only button */
 .btn-icon {
   padding: 0.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 
 /* Small button */
@@ -106,7 +124,7 @@
 
 /* Pill-shaped button */
 .btn-pill {
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
 }
 
 /* =============================================================================
@@ -117,7 +135,7 @@
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   transition: border-color 0.2s, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -132,7 +150,7 @@
 
 /* Bento card - larger radius, padded */
 .card-bento {
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
@@ -166,7 +184,7 @@
   align-items: center;
   padding: 0.1rem 0.4rem;
   font-size: 0.7rem;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   background: color-mix(in srgb, var(--badge-color, var(--accent)) 12%, transparent);
   color: var(--badge-color, var(--accent));
   border: 1px solid color-mix(in srgb, var(--badge-color, var(--accent)) 30%, transparent);
@@ -181,7 +199,7 @@
   padding: 0.75rem 1rem;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text);
   font-family: inherit;
   font-size: 0.9rem;

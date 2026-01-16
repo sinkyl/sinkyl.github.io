@@ -1,13 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlocksBackground from '../../components/BlocksBackground.astro';
-import PostCard from '../../components/PostCard.astro';
-import WeekHeader from '../../components/WeekHeader.astro';
-import Pagination from '../../components/Pagination.astro';
+import PostsList from '../../components/PostsList.astro';
 import { projects } from '../../lib/projects';
-import { isFirstOfWeek } from '../../lib/weekGrouping';
 import { getPosts } from '../../lib/getPosts';
-import { POSTS_PER_PAGE } from '../../lib/constants';
 
 export async function getStaticPaths() {
   return projects.map(project => ({
@@ -39,37 +35,16 @@ const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = a
   {posts.length === 0 ? (
     <p class="empty">No posts yet for this project.</p>
   ) : (
-    <>
-      <div class="posts-container" id={containerId}>
-        {postsWithWeek.map(({ post, weekKey, weekLabel }, index) => (
-          <>
-            {isFirstOfWeek(postsWithWeek, index) && (
-              <WeekHeader weekKey={weekKey} weekLabel={weekLabel} index={index} />
-            )}
-            <PostCard
-              slug={post.slug}
-              date={post.data.date}
-              languages={post.data.languages}
-              description={post.data.description}
-              patterns={post.data.patterns}
-              project={project.id}
-              showProjectBadge={false}
-              showLeftBorder={false}
-              tagsPosition="header"
-              index={index}
-              weekKey={weekKey}
-              indicators={postsWithIndicators.get(post.slug)}
-            />
-          </>
-        ))}
-      </div>
-
-      <Pagination
-        totalPages={totalPages}
-        postsPerPage={POSTS_PER_PAGE}
-        containerId={containerId}
-      />
-    </>
+    <PostsList
+      postsWithWeek={postsWithWeek}
+      postsWithIndicators={postsWithIndicators}
+      totalPages={totalPages}
+      containerId={containerId}
+      showProjectBadge={false}
+      showLeftBorder={false}
+      tagsPosition="header"
+      projectId={project.id}
+    />
   )}
 </BaseLayout>
 
@@ -133,12 +108,6 @@ const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = a
   .empty {
     color: var(--text-muted);
     font-style: italic;
-  }
-
-  .posts-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
   }
 
   @media (max-width: 600px) {

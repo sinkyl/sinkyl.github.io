@@ -58,7 +58,27 @@ const hasAny = indicators && (indicators.hasImages || indicators.hasDiagrams || 
   }
 
   .indicator svg {
-    width: 14px;
-    height: 14px;
+    width: 17px;
+    height: 17px;
+  }
+
+  /* Touch devices can't hover, so show color by default */
+  @media (hover: none) {
+    .indicator {
+      opacity: 0.7;
+      color: var(--indicator-color, var(--text-muted));
+    }
   }
 </style>
+
+<script>
+  import { getRandomAccentColor } from '../lib/randomColor';
+
+  // Apply random color to indicators on touch devices
+  if (window.matchMedia('(hover: none)').matches) {
+    const color = getRandomAccentColor();
+    document.querySelectorAll('.content-indicators').forEach((container) => {
+      (container as HTMLElement).style.setProperty('--indicator-color', color);
+    });
+  }
+</script>

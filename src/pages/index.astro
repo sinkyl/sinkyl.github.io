@@ -6,6 +6,7 @@ import { getCollection } from 'astro:content';
 import { projects } from '../lib/projects';
 import { COLORS } from '../lib/theme';
 import { TECH_STACK } from '../lib/constants';
+import { formatDateCompact, formatDateISO } from '../lib/dateUtils';
 
 const allPosts = (await getCollection('blog'))
   .filter(post => !post.data.draft)
@@ -83,11 +84,8 @@ const philosophies = [
           {postProject && (
             <span class="latest-project">{postProject.name}</span>
           )}
-          <time datetime={latestPost.data.date.toISOString()}>
-            {latestPost.data.date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric'
-            })}
+          <time datetime={formatDateISO(latestPost.data.date)}>
+            {formatDateCompact(latestPost.data.date)}
           </time>
           <h3>{latestPost.data.title}</h3>
         </a>

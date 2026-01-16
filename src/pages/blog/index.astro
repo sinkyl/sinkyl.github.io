@@ -1,12 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlocksBackground from '../../components/BlocksBackground.astro';
-import PostCard from '../../components/PostCard.astro';
-import WeekHeader from '../../components/WeekHeader.astro';
-import Pagination from '../../components/Pagination.astro';
-import { isFirstOfWeek } from '../../lib/weekGrouping';
+import PostsList from '../../components/PostsList.astro';
 import { getPosts } from '../../lib/getPosts';
-import { POSTS_PER_PAGE } from '../../lib/constants';
 
 const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = await getPosts();
 ---
@@ -18,37 +14,15 @@ const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = a
   {posts.length === 0 ? (
     <p class="empty">No posts yet.</p>
   ) : (
-    <>
-      <div class="posts-container" id={containerId}>
-        {postsWithWeek.map(({ post, weekKey, weekLabel }, index) => (
-          <>
-            {isFirstOfWeek(postsWithWeek, index) && (
-              <WeekHeader weekKey={weekKey} weekLabel={weekLabel} index={index} />
-            )}
-            <PostCard
-              slug={post.slug}
-              date={post.data.date}
-              languages={post.data.languages}
-              description={post.data.description}
-              patterns={post.data.patterns}
-              project={post.data.project}
-              showProjectBadge={true}
-              showLeftBorder={true}
-              tagsPosition="bottom"
-              index={index}
-              weekKey={weekKey}
-              indicators={postsWithIndicators.get(post.slug)}
-            />
-          </>
-        ))}
-      </div>
-
-      <Pagination
-        totalPages={totalPages}
-        postsPerPage={POSTS_PER_PAGE}
-        containerId={containerId}
-      />
-    </>
+    <PostsList
+      postsWithWeek={postsWithWeek}
+      postsWithIndicators={postsWithIndicators}
+      totalPages={totalPages}
+      containerId={containerId}
+      showProjectBadge={true}
+      showLeftBorder={true}
+      tagsPosition="bottom"
+    />
   )}
 </BaseLayout>
 
@@ -59,12 +33,6 @@ const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = a
 
   .empty {
     color: var(--text-muted);
-  }
-
-  .posts-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
   }
 </style>
 

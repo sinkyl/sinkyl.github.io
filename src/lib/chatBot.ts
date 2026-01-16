@@ -30,17 +30,26 @@ export function initChatBot(config: ChatBotConfig) {
   const suggestionsToggle = document.getElementById('suggestions-toggle');
   const suggestionsPanel = document.getElementById('suggestions-panel');
   const chatPanel = document.getElementById('chat-panel');
+  const backdrop = widget?.querySelector('.chat-backdrop');
   const submitBtn = form?.querySelector('button[type="submit"]');
 
   if (!toggle || !widget || !form || !input || !messages) {
     return;
   }
 
+  // Close chat when clicking backdrop (mobile)
+  backdrop?.addEventListener('click', () => {
+    widget.classList.remove('open');
+  });
+
+  // Check if device is mobile/tablet (no auto-focus to avoid keyboard popup)
+  const isMobile = () => window.innerWidth <= 768;
+
   // Toggle chat panel
   toggle.addEventListener('click', (e) => {
     e.stopPropagation();
     widget.classList.toggle('open');
-    if (widget.classList.contains('open')) {
+    if (widget.classList.contains('open') && !isMobile()) {
       input.focus();
     }
   });

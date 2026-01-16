@@ -253,22 +253,26 @@
   }
 
   .prompt {
-    color: var(--color-green);
+    color: var(--color-green-dim);
     font-weight: bold;
   }
 
   .command {
-    color: var(--color-blue);
+    color: var(--color-blue-dim);
   }
 
   .terminal-output {
-    color: var(--text);
+    color: var(--color-white-dim);
     margin-bottom: 1.5rem;
     padding-left: 1rem;
   }
 
+  :global([data-theme="light"]) .terminal-output {
+    color: #7d838c;
+  }
+
   .terminal-output.ascii-art {
-    color: var(--color-purple);
+    color: var(--color-purple-dim);
     font-size: 0.65rem;
     line-height: 1.2;
     white-space: pre;
@@ -276,7 +280,7 @@
   }
 
   .terminal-output.philosophy {
-    color: var(--color-orange);
+    color: var(--color-orange-dim);
     font-style: italic;
     font-size: 1rem;
   }
@@ -286,7 +290,7 @@
   }
 
   .terminal-output .highlight {
-    color: var(--color-blue);
+    color: var(--color-blue-dim);
     font-weight: bold;
   }
 
@@ -295,13 +299,13 @@
   }
 
   .terminal-output.license {
-    border-left: 2px solid var(--color-red);
+    border-left: 2px solid var(--color-red-dim);
     padding-left: 1rem;
   }
 
   .license-badge {
     display: inline-block;
-    background: var(--color-red);
+    background: var(--color-red-dim);
     color: white;
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
@@ -315,7 +319,7 @@
   }
 
   .terminal-output.license a {
-    color: var(--color-blue);
+    color: var(--color-blue-dim);
     text-decoration: underline;
   }
 
@@ -330,7 +334,7 @@
     display: block;
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--color-blue);
+    color: var(--color-blue-dim);
   }
 
   .stat-label {
@@ -370,30 +374,7 @@
 </style>
 
 <script>
-  const modal = document.getElementById('about-modal');
-  const trigger = document.getElementById('footer-trigger');
-  const closeBtn = modal?.querySelector('.modal-close');
-  const backdrop = modal?.querySelector('.modal-backdrop');
+  import { initModal } from '../lib/modalManager';
 
-  function openModal() {
-    modal?.classList.add('open');
-    modal?.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal() {
-    modal?.classList.remove('open');
-    modal?.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-
-  trigger?.addEventListener('click', openModal);
-  closeBtn?.addEventListener('click', closeModal);
-  backdrop?.addEventListener('click', closeModal);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('open')) {
-      closeModal();
-    }
-  });
+  initModal('about-modal', 'footer-trigger');
 </script>
