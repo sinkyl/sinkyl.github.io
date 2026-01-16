@@ -18,7 +18,7 @@ const prevProject = prevPost?.data.project ? getProject(prevPost.data.project) :
 const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) : null;
 ---
 
-<BaseLayout title={title}>
+<BaseLayout title={title} preventZoom={false}>
   <article>
     <a href="#" class="back" id="back-link">&larr; Back</a>
     <header class="post-header">
@@ -145,6 +145,7 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
 
   .content :global(pre) {
     margin: 1.5rem 0;
+    filter: saturate(0.9);
   }
 
   .content :global(blockquote) {
