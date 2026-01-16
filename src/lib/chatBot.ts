@@ -37,9 +37,17 @@ export function initChatBot(config: ChatBotConfig) {
     return;
   }
 
+  // Disable body scroll on mobile when chat is open
+  function setBodyScroll(enable: boolean) {
+    if (isMobile()) {
+      document.body.style.overflow = enable ? '' : 'hidden';
+    }
+  }
+
   // Close chat when clicking backdrop (mobile)
   backdrop?.addEventListener('click', () => {
     widget.classList.remove('open');
+    setBodyScroll(true);
     // Reset panel styles
     if (chatPanel) {
       chatPanel.style.position = '';
@@ -133,6 +141,7 @@ export function initChatBot(config: ChatBotConfig) {
     widget.classList.toggle('open');
 
     if (widget.classList.contains('open')) {
+      setBodyScroll(false);
       if (!isMobile()) {
         input.focus();
       } else {
@@ -141,14 +150,17 @@ export function initChatBot(config: ChatBotConfig) {
           updatePanelPosition();
         });
       }
-    } else if (chatPanel) {
-      // Reset panel position when closing
-      chatPanel.style.position = '';
-      chatPanel.style.top = '';
-      chatPanel.style.bottom = '';
-      chatPanel.style.maxHeight = '';
-      const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-      if (messagesEl) messagesEl.style.maxHeight = '';
+    } else {
+      setBodyScroll(true);
+      if (chatPanel) {
+        // Reset panel position when closing
+        chatPanel.style.position = '';
+        chatPanel.style.top = '';
+        chatPanel.style.bottom = '';
+        chatPanel.style.maxHeight = '';
+        const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
+        if (messagesEl) messagesEl.style.maxHeight = '';
+      }
     }
   });
 
