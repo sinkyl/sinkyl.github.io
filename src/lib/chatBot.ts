@@ -106,18 +106,25 @@ export function initChatBot(config: ChatBotConfig) {
     chatPanel.style.top = `${panelTop}px`;
   }
 
+  // Debounced resize handler to wait for viewport to settle
+  let resizeTimeout: ReturnType<typeof setTimeout>;
+  function debouncedUpdate() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => updatePanelPosition(), 150);
+  }
+
   // Listen for viewport changes (keyboard show/hide)
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', updatePanelPosition);
-    window.visualViewport.addEventListener('scroll', updatePanelPosition);
+    window.visualViewport.addEventListener('resize', debouncedUpdate);
+    window.visualViewport.addEventListener('scroll', debouncedUpdate);
   }
 
   // Fallback for Firefox: detect keyboard via focus/blur
   input.addEventListener('focus', () => {
-    if (isMobile()) setTimeout(() => updatePanelPosition(true), 100);
+    if (isMobile()) setTimeout(() => updatePanelPosition(true), 200);
   });
   input.addEventListener('blur', () => {
-    if (isMobile()) setTimeout(() => updatePanelPosition(false), 100);
+    if (isMobile()) setTimeout(() => updatePanelPosition(false), 200);
   });
 
   // Toggle chat panel
