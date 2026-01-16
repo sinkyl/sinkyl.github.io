@@ -136,6 +136,11 @@ const currentPath = Astro.url.pathname;
     color: var(--text);
   }
 
+  /* Prevent pinch-zoom on mobile (when set) */
+  html[data-prevent-zoom] {
+    touch-action: pan-x pan-y;
+  }
+
   body {
     min-height: 100vh;
     display: flex;
@@ -431,6 +436,7 @@ const currentPath = Astro.url.pathname;
 
     if (preventZoom && isMobile) {
       viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      document.documentElement.setAttribute('data-prevent-zoom', '');
     }
   })();
 </script>
