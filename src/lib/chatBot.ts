@@ -68,8 +68,8 @@ export function initChatBot(config: ChatBotConfig) {
       keyboardVisible = forceKeyboard;
     }
 
-    // Panel takes 75% when keyboard shown, 85% when hidden
-    const panelRatio = keyboardVisible ? 0.75 : 0.85;
+    // Panel takes 85% when keyboard shown, 95% when hidden
+    const panelRatio = keyboardVisible ? 0.85 : 0.95;
     const panelMaxHeight = Math.floor(availableHeight * panelRatio);
     const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
 
