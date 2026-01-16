@@ -54,6 +54,7 @@ export function initChatBot(config: ChatBotConfig) {
       chatPanel.style.top = '';
       chatPanel.style.bottom = '';
       chatPanel.style.maxHeight = '';
+      chatPanel.style.height = '';
       const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
       if (messagesEl) messagesEl.style.maxHeight = '';
     }
@@ -64,6 +65,7 @@ export function initChatBot(config: ChatBotConfig) {
 
   // Center chat panel in available viewport space (accounts for keyboard)
   let keyboardVisible = false;
+  let wasKeyboardVisible = false;
 
   function updatePanelPosition(forceKeyboard?: boolean) {
     if (!isMobile() || !chatPanel || !widget.classList.contains('open')) return;
@@ -72,6 +74,7 @@ export function initChatBot(config: ChatBotConfig) {
     const availableHeight = viewport?.height || window.innerHeight;
 
     // Detect keyboard via viewport or forced state
+    wasKeyboardVisible = keyboardVisible;
     if (viewport) {
       const keyboardHeight = window.innerHeight - viewport.height;
       keyboardVisible = keyboardHeight > 100;
@@ -89,8 +92,8 @@ export function initChatBot(config: ChatBotConfig) {
     let panelTop: number;
 
     if (keyboardVisible) {
-      // Keyboard shown: panel takes full available space
-      panelMaxHeight = Math.floor(availableHeight);
+      // Keyboard shown: panel takes 100% of available space
+      panelMaxHeight = availableHeight;
       panelTop = (viewport?.offsetTop || 0);
     } else {
       // Keyboard hidden: 10% top, 80% panel, 10% bottom
@@ -98,15 +101,19 @@ export function initChatBot(config: ChatBotConfig) {
       panelTop = Math.floor(availableHeight * 0.10) + (viewport?.offsetTop || 0);
     }
 
-    const messagesMaxHeight = Math.floor(panelMaxHeight * 0.65);
+    const messagesMaxHeight = Math.floor(panelMaxHeight * 0.70);
 
     chatPanel.style.maxHeight = `${panelMaxHeight}px`;
+    chatPanel.style.height = `${panelMaxHeight}px`;
     if (messagesEl) {
       messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
-      // Scroll to bottom to show latest messages after resize
-      setTimeout(() => {
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      }, 50);
+
+      // Scroll to bottom when transitioning from stretched to shrink
+      if (keyboardVisible && !wasKeyboardVisible) {
+        setTimeout(() => {
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }, 350);
+      }
     }
 
     chatPanel.style.position = 'fixed';
@@ -158,6 +165,7 @@ export function initChatBot(config: ChatBotConfig) {
         chatPanel.style.top = '';
         chatPanel.style.bottom = '';
         chatPanel.style.maxHeight = '';
+        chatPanel.style.height = '';
         const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
         if (messagesEl) messagesEl.style.maxHeight = '';
       }
