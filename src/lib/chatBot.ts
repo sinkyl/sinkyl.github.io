@@ -52,33 +52,38 @@ export function initChatBot(config: ChatBotConfig) {
   const isMobile = () => window.innerWidth <= 768;
 
   // Center chat panel in available viewport space (accounts for keyboard)
-  function updatePanelPosition() {
+  let keyboardVisible = false;
+
+  function updatePanelPosition(forceKeyboard?: boolean) {
     if (!isMobile() || !chatPanel || !widget.classList.contains('open')) return;
 
     const viewport = window.visualViewport;
-    if (!viewport) return;
+    const availableHeight = viewport?.height || window.innerHeight;
 
-    try {
-      const availableHeight = viewport.height;
-
-      // Panel takes 70% of available viewport, messages take 60% of panel
-      const panelMaxHeight = Math.floor(availableHeight * 0.7);
-      const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
-
-      chatPanel.style.maxHeight = `${panelMaxHeight}px`;
-      const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-      if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
-
-      const panelHeight = chatPanel.offsetHeight;
-      const topOffset = (availableHeight - panelHeight) / 2 + viewport.offsetTop;
-      const panelTop = Math.max(topOffset, 10);
-
-      chatPanel.style.position = 'fixed';
-      chatPanel.style.bottom = 'auto';
-      chatPanel.style.top = `${panelTop}px`;
-    } catch (e) {
-      // Fallback - don't break if visualViewport has issues
+    // Detect keyboard via viewport or forced state
+    if (viewport) {
+      const keyboardHeight = window.innerHeight - viewport.height;
+      keyboardVisible = keyboardHeight > 100;
+    } else if (forceKeyboard !== undefined) {
+      keyboardVisible = forceKeyboard;
     }
+
+    // Panel takes 75% when keyboard shown, 85% when hidden
+    const panelRatio = keyboardVisible ? 0.75 : 0.85;
+    const panelMaxHeight = Math.floor(availableHeight * panelRatio);
+    const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
+
+    chatPanel.style.maxHeight = `${panelMaxHeight}px`;
+    const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
+    if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
+
+    const panelHeight = chatPanel.offsetHeight;
+    const topOffset = (availableHeight - panelHeight) / 2 + (viewport?.offsetTop || 0);
+    const panelTop = Math.max(topOffset, 10);
+
+    chatPanel.style.position = 'fixed';
+    chatPanel.style.bottom = 'auto';
+    chatPanel.style.top = `${panelTop}px`;
   }
 
   // Listen for viewport changes (keyboard show/hide)
@@ -86,6 +91,14 @@ export function initChatBot(config: ChatBotConfig) {
     window.visualViewport.addEventListener('resize', updatePanelPosition);
     window.visualViewport.addEventListener('scroll', updatePanelPosition);
   }
+
+  // Fallback for Firefox: detect keyboard via focus/blur
+  input.addEventListener('focus', () => {
+    if (isMobile()) setTimeout(() => updatePanelPosition(true), 100);
+  });
+  input.addEventListener('blur', () => {
+    if (isMobile()) setTimeout(() => updatePanelPosition(false), 100);
+  });
 
   // Toggle chat panel
   toggle.addEventListener('click', (e) => {
