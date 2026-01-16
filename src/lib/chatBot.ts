@@ -40,17 +40,69 @@ export function initChatBot(config: ChatBotConfig) {
   // Close chat when clicking backdrop (mobile)
   backdrop?.addEventListener('click', () => {
     widget.classList.remove('open');
+    // Reset positions
+    if (chatPanel) {
+      chatPanel.style.position = '';
+      chatPanel.style.top = '';
+      chatPanel.style.bottom = '';
+    }
+    if (toggle) {
+      toggle.style.top = '';
+    }
   });
 
   // Check if device is mobile/tablet (no auto-focus to avoid keyboard popup)
   const isMobile = () => window.innerWidth <= 768;
 
+  // Center chat panel in available viewport space (accounts for keyboard)
+  function updatePanelPosition() {
+    if (!isMobile() || !chatPanel) return;
+
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const availableHeight = viewport.height;
+    const panelHeight = chatPanel.offsetHeight;
+    const topOffset = (availableHeight - panelHeight) / 2 + viewport.offsetTop;
+    const panelTop = Math.max(topOffset, 10);
+
+    chatPanel.style.position = 'fixed';
+    chatPanel.style.bottom = 'auto';
+    chatPanel.style.top = `${panelTop}px`;
+
+    // Position close button at top-right of panel
+    if (toggle) {
+      toggle.style.top = `${panelTop + 8}px`;
+    }
+  }
+
+  // Listen for viewport changes (keyboard show/hide)
+  if (window.visualViewport && isMobile()) {
+    window.visualViewport.addEventListener('resize', updatePanelPosition);
+    window.visualViewport.addEventListener('scroll', updatePanelPosition);
+  }
+
   // Toggle chat panel
   toggle.addEventListener('click', (e) => {
     e.stopPropagation();
     widget.classList.toggle('open');
-    if (widget.classList.contains('open') && !isMobile()) {
-      input.focus();
+
+    if (widget.classList.contains('open')) {
+      if (!isMobile()) {
+        input.focus();
+      } else {
+        updatePanelPosition();
+      }
+    } else {
+      // Reset position when closing
+      if (chatPanel) {
+        chatPanel.style.position = '';
+        chatPanel.style.top = '';
+        chatPanel.style.bottom = '';
+      }
+      if (toggle) {
+        toggle.style.top = '';
+      }
     }
   });
 

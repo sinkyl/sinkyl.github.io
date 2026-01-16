@@ -744,17 +744,14 @@ const unknownResponses = [
       bottom: 0;
     }
 
-    .chat-panel {
-      bottom: 0;
-    }
-
     .chat-widget.open .chat-toggle {
-      position: absolute;
-      top: 0.75rem;
-      right: 1.75rem;
+      position: fixed;
+      top: auto;
+      bottom: auto;
+      right: 2rem;
       width: auto;
       height: auto;
-      z-index: 10;
+      z-index: 1001;
     }
 
     .chat-widget.open .chat-toggle .icon-close {
