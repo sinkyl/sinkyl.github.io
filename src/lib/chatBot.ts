@@ -40,11 +40,14 @@ export function initChatBot(config: ChatBotConfig) {
   // Close chat when clicking backdrop (mobile)
   backdrop?.addEventListener('click', () => {
     widget.classList.remove('open');
-    // Reset panel position
+    // Reset panel styles
     if (chatPanel) {
       chatPanel.style.position = '';
       chatPanel.style.top = '';
       chatPanel.style.bottom = '';
+      chatPanel.style.maxHeight = '';
+      const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
+      if (messagesEl) messagesEl.style.maxHeight = '';
     }
   });
 
@@ -70,17 +73,14 @@ export function initChatBot(config: ChatBotConfig) {
 
     const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
 
-    // Only adjust size when keyboard is visible, otherwise use CSS defaults
-    if (keyboardVisible) {
-      const panelMaxHeight = Math.floor(availableHeight * 0.85);
-      const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
-      chatPanel.style.maxHeight = `${panelMaxHeight}px`;
-      if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
-    } else {
-      // Reset to CSS defaults
-      chatPanel.style.maxHeight = '';
-      if (messagesEl) messagesEl.style.maxHeight = '';
-    }
+    // Size panel based on available viewport
+    // Keyboard shown: 90%, keyboard hidden: 95%
+    const panelRatio = keyboardVisible ? 0.90 : 0.95;
+    const panelMaxHeight = Math.floor(availableHeight * panelRatio);
+    const messagesMaxHeight = Math.floor(panelMaxHeight * 0.65);
+
+    chatPanel.style.maxHeight = `${panelMaxHeight}px`;
+    if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
 
     const panelHeight = chatPanel.offsetHeight;
     const topOffset = (availableHeight - panelHeight) / 2 + (viewport?.offsetTop || 0);
@@ -114,13 +114,19 @@ export function initChatBot(config: ChatBotConfig) {
       if (!isMobile()) {
         input.focus();
       } else {
-        updatePanelPosition();
+        // Delay to ensure panel is rendered before measuring
+        requestAnimationFrame(() => {
+          updatePanelPosition();
+        });
       }
     } else if (chatPanel) {
       // Reset panel position when closing
       chatPanel.style.position = '';
       chatPanel.style.top = '';
       chatPanel.style.bottom = '';
+      chatPanel.style.maxHeight = '';
+      const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
+      if (messagesEl) messagesEl.style.maxHeight = '';
     }
   });
 
