@@ -136,15 +136,6 @@ const currentPath = Astro.url.pathname;
     color: var(--text);
   }
 
-  /* Prevent all zoom on mobile (when set) */
-  html[data-prevent-zoom] {
-    touch-action: pan-x pan-y;
-  }
-
-  html[data-prevent-zoom] * {
-    touch-action: pan-x pan-y;
-  }
-
   body {
     min-height: 100vh;
     display: flex;
