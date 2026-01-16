@@ -68,14 +68,19 @@ export function initChatBot(config: ChatBotConfig) {
       keyboardVisible = forceKeyboard;
     }
 
-    // Panel takes 85% when keyboard shown, 95% when hidden
-    const panelRatio = keyboardVisible ? 0.85 : 0.95;
-    const panelMaxHeight = Math.floor(availableHeight * panelRatio);
-    const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
-
-    chatPanel.style.maxHeight = `${panelMaxHeight}px`;
     const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-    if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
+
+    // Only adjust size when keyboard is visible, otherwise use CSS defaults
+    if (keyboardVisible) {
+      const panelMaxHeight = Math.floor(availableHeight * 0.85);
+      const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
+      chatPanel.style.maxHeight = `${panelMaxHeight}px`;
+      if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
+    } else {
+      // Reset to CSS defaults
+      chatPanel.style.maxHeight = '';
+      if (messagesEl) messagesEl.style.maxHeight = '';
+    }
 
     const panelHeight = chatPanel.offsetHeight;
     const topOffset = (availableHeight - panelHeight) / 2 + (viewport?.offsetTop || 0);
