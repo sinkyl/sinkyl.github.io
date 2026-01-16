@@ -744,20 +744,9 @@ const unknownResponses = [
       bottom: 0;
     }
 
-    /* When open, panel is positioned via JS, toggle follows */
-    .chat-widget.open .chat-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 2rem;
-      width: auto;
-      height: auto;
-      z-index: 1001;
-    }
-
-    .chat-widget.open .chat-toggle .icon-close {
-      position: static;
-      bottom: auto;
-      left: auto;
+    .chat-toggle .icon-close {
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .chat-widget.open .chat-panel {
