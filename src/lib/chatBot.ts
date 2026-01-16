@@ -56,28 +56,32 @@ export function initChatBot(config: ChatBotConfig) {
 
   // Center chat panel in available viewport space (accounts for keyboard)
   function updatePanelPosition() {
-    if (!isMobile() || !chatPanel) return;
+    if (!isMobile() || !chatPanel || !widget.classList.contains('open')) return;
 
     const viewport = window.visualViewport;
     if (!viewport) return;
 
-    const availableHeight = viewport.height;
-    const panelHeight = chatPanel.offsetHeight;
-    const topOffset = (availableHeight - panelHeight) / 2 + viewport.offsetTop;
-    const panelTop = Math.max(topOffset, 10);
+    try {
+      const availableHeight = viewport.height;
+      const panelHeight = chatPanel.offsetHeight;
+      const topOffset = (availableHeight - panelHeight) / 2 + viewport.offsetTop;
+      const panelTop = Math.max(topOffset, 10);
 
-    chatPanel.style.position = 'fixed';
-    chatPanel.style.bottom = 'auto';
-    chatPanel.style.top = `${panelTop}px`;
+      chatPanel.style.position = 'fixed';
+      chatPanel.style.bottom = 'auto';
+      chatPanel.style.top = `${panelTop}px`;
 
-    // Position close button at top-right of panel
-    if (toggle) {
-      toggle.style.top = `${panelTop + 8}px`;
+      // Position close button at top-right of panel
+      if (toggle) {
+        toggle.style.top = `${panelTop + 8}px`;
+      }
+    } catch (e) {
+      // Fallback - don't break if visualViewport has issues
     }
   }
 
   // Listen for viewport changes (keyboard show/hide)
-  if (window.visualViewport && isMobile()) {
+  if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', updatePanelPosition);
     window.visualViewport.addEventListener('scroll', updatePanelPosition);
   }

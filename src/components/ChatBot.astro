@@ -744,10 +744,10 @@ const unknownResponses = [
       bottom: 0;
     }
 
+    /* When open, panel is positioned via JS, toggle follows */
     .chat-widget.open .chat-toggle {
       position: fixed;
-      top: auto;
-      bottom: auto;
+      top: 1rem;
       right: 2rem;
       width: auto;
       height: auto;
@@ -758,6 +758,12 @@ const unknownResponses = [
       position: static;
       bottom: auto;
       left: auto;
+    }
+
+    .chat-widget.open .chat-panel {
+      right: 1rem;
+      left: 1rem;
+      width: auto;
     }
   }
 
