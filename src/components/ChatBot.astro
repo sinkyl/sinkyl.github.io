@@ -732,9 +732,14 @@ const unknownResponses = [
     }
 
     .chat-widget.open .chat-panel {
-      right: 1rem;
-      left: 1rem;
-      width: auto;
+      right: 0;
+      left: 0;
+      width: 100%;
+      border-left: none;
+      border-right: none;
+      border-radius: 0;
+      margin: 0 2px;
+      width: calc(100% - 4px);
     }
   }
 

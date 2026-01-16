@@ -73,18 +73,27 @@ export function initChatBot(config: ChatBotConfig) {
 
     const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
 
-    // Size panel based on available viewport
-    // Keyboard shown: 90%, keyboard hidden: 95%
-    const panelRatio = keyboardVisible ? 0.90 : 0.95;
-    const panelMaxHeight = Math.floor(availableHeight * panelRatio);
+    // Enable smooth transition
+    chatPanel.style.transition = 'max-height 0.3s ease, top 0.3s ease';
+    if (messagesEl) messagesEl.style.transition = 'max-height 0.3s ease';
+
+    let panelMaxHeight: number;
+    let panelTop: number;
+
+    if (keyboardVisible) {
+      // Keyboard shown: panel near top, takes 90% of available space
+      panelMaxHeight = Math.floor(availableHeight * 0.90);
+      panelTop = 10 + (viewport?.offsetTop || 0);
+    } else {
+      // Keyboard hidden: 10% top, 80% panel, 10% bottom
+      panelMaxHeight = Math.floor(availableHeight * 0.80);
+      panelTop = Math.floor(availableHeight * 0.10) + (viewport?.offsetTop || 0);
+    }
+
     const messagesMaxHeight = Math.floor(panelMaxHeight * 0.65);
 
     chatPanel.style.maxHeight = `${panelMaxHeight}px`;
     if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
-
-    const panelHeight = chatPanel.offsetHeight;
-    const topOffset = (availableHeight - panelHeight) / 2 + (viewport?.offsetTop || 0);
-    const panelTop = Math.max(topOffset, 10);
 
     chatPanel.style.position = 'fixed';
     chatPanel.style.bottom = 'auto';
