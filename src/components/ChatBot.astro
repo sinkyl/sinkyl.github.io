@@ -741,6 +741,13 @@ const unknownResponses = [
       right: -0.5rem;
     }
   }
+
+  /* Prevent mobile browser auto-zoom on input focus */
+  @media (max-width: 768px) {
+    .chat-input-form input {
+      font-size: 16px;
+    }
+  }
 </style>
 
 <script define:vars={{ faqData, responses, unknownResponses }}>
