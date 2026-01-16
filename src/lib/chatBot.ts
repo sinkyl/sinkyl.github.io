@@ -81,9 +81,9 @@ export function initChatBot(config: ChatBotConfig) {
     let panelTop: number;
 
     if (keyboardVisible) {
-      // Keyboard shown: panel near top, takes 90% of available space
-      panelMaxHeight = Math.floor(availableHeight * 0.90);
-      panelTop = 10 + (viewport?.offsetTop || 0);
+      // Keyboard shown: panel takes full available space
+      panelMaxHeight = Math.floor(availableHeight);
+      panelTop = (viewport?.offsetTop || 0);
     } else {
       // Keyboard hidden: 10% top, 80% panel, 10% bottom
       panelMaxHeight = Math.floor(availableHeight * 0.80);
