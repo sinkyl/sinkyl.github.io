@@ -93,7 +93,13 @@ export function initChatBot(config: ChatBotConfig) {
     const messagesMaxHeight = Math.floor(panelMaxHeight * 0.65);
 
     chatPanel.style.maxHeight = `${panelMaxHeight}px`;
-    if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
+    if (messagesEl) {
+      messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
+      // Scroll to bottom to show latest messages after resize
+      setTimeout(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 50);
+    }
 
     chatPanel.style.position = 'fixed';
     chatPanel.style.bottom = 'auto';
