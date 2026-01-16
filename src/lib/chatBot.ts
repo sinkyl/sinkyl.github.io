@@ -59,24 +59,18 @@ export function initChatBot(config: ChatBotConfig) {
     if (!viewport) return;
 
     try {
-      const viewportHeight = viewport.height;
-      const windowHeight = window.innerHeight;
-      const keyboardHeight = windowHeight - viewportHeight;
-      const keyboardVisible = keyboardHeight > 100;
+      const availableHeight = viewport.height;
 
-      // Adjust panel size when keyboard is visible
-      if (keyboardVisible) {
-        chatPanel.style.maxHeight = '280px';
-        const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-        if (messagesEl) messagesEl.style.maxHeight = '130px';
-      } else {
-        chatPanel.style.maxHeight = '';
-        const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-        if (messagesEl) messagesEl.style.maxHeight = '';
-      }
+      // Panel takes 70% of available viewport, messages take 60% of panel
+      const panelMaxHeight = Math.floor(availableHeight * 0.7);
+      const messagesMaxHeight = Math.floor(panelMaxHeight * 0.6);
+
+      chatPanel.style.maxHeight = `${panelMaxHeight}px`;
+      const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
+      if (messagesEl) messagesEl.style.maxHeight = `${messagesMaxHeight}px`;
 
       const panelHeight = chatPanel.offsetHeight;
-      const topOffset = (viewportHeight - panelHeight) / 2 + viewport.offsetTop;
+      const topOffset = (availableHeight - panelHeight) / 2 + viewport.offsetTop;
       const panelTop = Math.max(topOffset, 10);
 
       chatPanel.style.position = 'fixed';
