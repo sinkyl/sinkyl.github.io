@@ -735,6 +735,35 @@ const unknownResponses = [
     filter: drop-shadow(-2px 2px 3px color-mix(in srgb, var(--color-purple) 50%, transparent));
   }
 
+  @media (max-width: 768px) {
+    .chat-widget {
+      bottom: 0.75rem;
+    }
+
+    .chat-widget.footer-hidden {
+      bottom: 0;
+    }
+
+    .chat-panel {
+      bottom: 0;
+    }
+
+    .chat-widget.open .chat-toggle {
+      position: absolute;
+      top: 0.75rem;
+      right: 1.75rem;
+      width: auto;
+      height: auto;
+      z-index: 10;
+    }
+
+    .chat-widget.open .chat-toggle .icon-close {
+      position: static;
+      bottom: auto;
+      left: auto;
+    }
+  }
+
   @media (max-width: 400px) {
     .chat-panel {
       width: calc(100vw - 2rem);
