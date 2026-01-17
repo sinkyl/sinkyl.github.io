@@ -144,6 +144,8 @@ export function initPagination(containerId: string) {
   pageIndicator?.addEventListener('click', () => {
     pageIndicator.readOnly = false;
     pageIndicator.value = String(currentPage);
+    // Explicit focus needed for mobile keyboard
+    pageIndicator.focus();
     pageIndicator.select();
   });
 

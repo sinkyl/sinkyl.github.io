@@ -650,32 +650,27 @@ const unknownResponses = [
       bottom: 0;
     }
 
-    .chat-panel {
-      max-height: 350px;
-    }
-
-    .chat-messages {
-      max-height: 200px;
-    }
-
     .chat-widget.open .chat-panel {
+      position: fixed;
+      top: auto;
+      bottom: 0;
       right: 0;
       left: 0;
       width: 100%;
+      max-height: 60vh;
       border-left: none;
       border-right: none;
-      border-radius: 0;
-      margin: 0 2px;
-      width: calc(100% - 4px);
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .chat-widget.open .chat-messages {
+      flex: 1;
+      max-height: none;
+      min-height: 0;
     }
   }
 
-  @media (max-width: 400px) {
-    .chat-panel {
-      width: calc(100vw - 2rem);
-      right: -0.5rem;
-    }
-  }
 
   /* Prevent mobile browser auto-zoom on input focus */
   @media (max-width: 768px) {

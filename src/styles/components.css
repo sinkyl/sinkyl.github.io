@@ -4,8 +4,8 @@
  */
 
 /* =============================================================================
-   CSS CUSTOM PROPERTIES (Theme Colors)
-   These should be set by the theme and referenced throughout
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   Single source of truth - responsive values adjust at mobile breakpoint
    ============================================================================= */
 
 :root {
@@ -54,6 +54,61 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
   --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  /* ==========================================================================
+     RESPONSIVE TOKENS - These change at mobile breakpoint
+     ========================================================================== */
+
+  /* Spacing tokens */
+  --spacing-page: 2rem;
+  --spacing-page-x: 2rem;
+  --spacing-section: 1.5rem;
+  --spacing-card: 1.5rem;
+  --spacing-stack: 1rem;
+
+  /* Layout tokens */
+  --content-max-width: 1000px;
+  --carousel-height: 40vh;
+  --carousel-image-height: 22vh;
+  --modal-max-height: 85vh;
+
+  /* Touch/interaction tokens */
+  --touch-target: 36px;
+  --icon-size: 18px;
+  --icon-size-sm: 14px;
+
+  /* Nav tokens */
+  --nav-padding: 0 2rem;
+  --nav-gap: 1.5rem;
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVE OVERRIDES (max-width: 600px)
+   ============================================================================= */
+
+@media (max-width: 600px) {
+  :root {
+    /* Spacing - tighter on mobile */
+    --spacing-page: 1.5rem;
+    --spacing-page-x: 1rem;
+    --spacing-section: 1rem;
+    --spacing-card: 1rem;
+    --spacing-stack: 0.75rem;
+
+    /* Layout - adjusted for smaller screens */
+    --carousel-height: 50vh;
+    --carousel-image-height: 18vh;
+    --modal-max-height: 90vh;
+
+    /* Touch targets - larger for fingers */
+    --touch-target: 44px;
+    --icon-size: 20px;
+    --icon-size-sm: 16px;
+
+    /* Nav */
+    --nav-padding: 0 1rem;
+    --nav-gap: 1rem;
+  }
 }
 
 /* =============================================================================

@@ -78,7 +78,7 @@
               <span class="stat-label">commits & counting</span>
             </div>
             <div class="stat">
-              <span class="stat-value">3</span>
+              <span class="stat-value">3 <span class="stat-hint">+ 2</span></span>
               <span class="stat-label">parallel obsessions</span>
             </div>
             <div class="stat">
@@ -340,6 +340,12 @@
     font-size: var(--font-sm);
     color: var(--text-muted);
     text-transform: uppercase;
+  }
+
+  .stat-hint {
+    font-size: 0.6em;
+    opacity: var(--opacity-soft);
+    font-weight: normal;
   }
 
   .terminal-line.blink .cursor {

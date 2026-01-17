@@ -149,7 +149,7 @@ const hasMultipleSlides = slides.length > 1;
 
   .carousel-track {
     position: relative;
-    height: 40vh;
+    height: var(--carousel-height);
     overflow: hidden;
     cursor: grab;
     user-select: none;
@@ -298,7 +298,7 @@ const hasMultipleSlides = slides.length > 1;
 
   .carousel-slide :global(.slide-figure img) {
     max-width: 100%;
-    max-height: 22vh;
+    max-height: var(--carousel-image-height);
     object-fit: contain;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
@@ -317,11 +317,7 @@ const hasMultipleSlides = slides.length > 1;
   @media (max-width: 600px) {
     .carousel-slide :global(.slide-with-media) {
       grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .carousel-slide :global(.slide-figure img) {
-      max-height: 18vh;
+      gap: var(--spacing-stack);
     }
   }
 
@@ -343,8 +339,8 @@ const hasMultipleSlides = slides.length > 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--bg-secondary);
@@ -364,8 +360,8 @@ const hasMultipleSlides = slides.length > 1;
   }
 
   .nav-arrow svg {
-    width: 14px;
-    height: 14px;
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
     color: var(--text);
   }
 
@@ -422,23 +418,8 @@ const hasMultipleSlides = slides.length > 1;
     height: 14px;
   }
 
-  /* Touch devices */
+  /* Touch devices - interaction states only (sizes handled by responsive tokens) */
   @media (hover: none) {
-    .nav-arrow {
-      width: 32px;
-      height: 32px;
-    }
-
-    .nav-arrow svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-    }
-
     .more-toggle:hover,
     .collapse-toggle:hover {
       opacity: var(--opacity-high);
