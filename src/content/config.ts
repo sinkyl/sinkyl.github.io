@@ -15,4 +15,12 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+// Project description/overview content for header carousel
+const projects = defineCollection({
+  type: 'content',
+  schema: z.object({
+    project: z.enum(['xtranodly', 'bazaar', 'spatium']),
+  }),
+});
+
+export const collections = { blog, projects };

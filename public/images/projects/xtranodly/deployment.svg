@@ -1,0 +1,13 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="200" fill="#1e2227"/>
+  <rect x="30" y="70" width="70" height="60" rx="8" fill="#61afef" opacity="0.8"/>
+  <text x="65" y="105" fill="#1e2227" font-family="system-ui" font-size="10" text-anchor="middle">Canvas</text>
+  <polygon points="130,100 160,85 160,115" fill="#98c379"/>
+  <rect x="180" y="70" width="70" height="60" rx="8" fill="#c678dd" opacity="0.8"/>
+  <text x="215" y="105" fill="#1e2227" font-family="system-ui" font-size="10" text-anchor="middle">Build</text>
+  <polygon points="280,100 310,85 310,115" fill="#98c379"/>
+  <rect x="330" y="70" width="50" height="60" rx="8" fill="#d19a66" opacity="0.8"/>
+  <text x="355" y="100" fill="#1e2227" font-family="system-ui" font-size="9" text-anchor="middle">Cloud</text>
+  <text x="355" y="112" fill="#1e2227" font-family="system-ui" font-size="9" text-anchor="middle">Deploy</text>
+  <text x="200" y="180" fill="#9ca3af" font-family="system-ui" font-size="12" text-anchor="middle">One-Click Deployment Pipeline</text>
+</svg>

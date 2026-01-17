@@ -1,0 +1,545 @@
+---
+import type { Project } from '../lib/projects';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: Project;
+  content?: CollectionEntry<'projects'>;
+}
+
+const { project, content } = Astro.props;
+
+// Parse slides from markdown content
+interface Slide {
+  html: string;
+  hasImage: boolean;
+}
+
+let slides: Slide[] = [];
+let firstSlideText = '';
+
+function parseMarkdownSection(section: string): { html: string; hasImage: boolean } {
+  let html = section.trim();
+  let hasImage = false;
+
+  // Check if section has an image
+  if (/!\[.*?\]\(.*?\)/.test(html)) {
+    hasImage = true;
+  }
+
+  // Convert ## headings to styled headers
+  html = html.replace(/^## (.+)$/gm, '<h3 class="slide-heading">$1</h3>');
+
+  // Convert ### subheadings
+  html = html.replace(/^### (.+)$/gm, '<h4 class="slide-subheading">$1</h4>');
+
+  // Convert bullet lists
+  const listRegex = /^((?:- .+\n?)+)/gm;
+  html = html.replace(listRegex, (match) => {
+    const items = match.split('\n')
+      .filter(l => l.trim().startsWith('- '))
+      .map(l => `<li>${l.replace(/^- /, '').trim()}</li>`)
+      .join('');
+    return `<ul class="slide-list">${items}</ul>`;
+  });
+
+  // Convert images: ![alt](src) -> figure with optional caption
+  // Look for image followed by italic text as caption
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)\n?\*([^*]+)\*/g, (_, alt, src, caption) => {
+    return `<figure class="slide-figure">
+      <img src="${src}" alt="${alt}" loading="lazy" />
+      <figcaption>${caption}</figcaption>
+    </figure>`;
+  });
+
+  // Convert remaining images without captions
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
+    return `<figure class="slide-figure">
+      <img src="${src}" alt="${alt}" loading="lazy" />
+    </figure>`;
+  });
+
+  // Convert **bold** text
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Convert *italic* text (but not already converted captions)
+  html = html.replace(/(?<!\<)\*([^*]+)\*(?!\>)/g, '<em>$1</em>');
+
+  // Convert remaining lines to paragraphs (skip already converted elements)
+  const lines = html.split('\n');
+  const processedLines = lines.map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('<')) return trimmed;
+    return `<p>${trimmed}</p>`;
+  });
+
+  html = processedLines.filter(l => l).join('\n');
+
+  return { html, hasImage };
+}
+
+if (content) {
+  const rawBody = content.body;
+  const sections = rawBody.split(/\n---\n/).filter(s => s.trim());
+
+  for (const section of sections) {
+    const { html, hasImage } = parseMarkdownSection(section);
+
+    // Wrap in appropriate container based on content
+    let slideHtml = '';
+    if (hasImage) {
+      slideHtml = `<div class="slide-content slide-with-media">${html}</div>`;
+    } else {
+      slideHtml = `<div class="slide-content slide-text-only">${html}</div>`;
+    }
+
+    slides.push({ html: slideHtml, hasImage });
+  }
+
+  // Extract first slide text for preview
+  if (slides.length > 0) {
+    const firstHtml = slides[0].html;
+    const textMatch = firstHtml.match(/<p>([^<]+)<\/p>/);
+    firstSlideText = textMatch ? textMatch[1] : '';
+  }
+}
+
+// Fallback to project description if no content
+if (!firstSlideText && project.description) {
+  firstSlideText = project.description;
+}
+
+const hasContent = slides.length > 0 || project.description;
+const hasMultipleSlides = slides.length > 1;
+---
+
+{hasContent && (
+  <div class="header-carousel" data-carousel style={`--project-color: ${project.color}`}>
+    <!-- Collapsed preview -->
+    <div class="carousel-preview" data-carousel-preview>
+      <p class="preview-text">
+        {firstSlideText}
+        {hasMultipleSlides && (
+          <button class="more-toggle" data-expand-trigger>...more</button>
+        )}
+      </p>
+    </div>
+
+    <!-- Expanded carousel -->
+    <div class="carousel-expanded" data-carousel-expanded>
+      <div class="carousel-track" data-carousel-track>
+        {slides.map((slide, index) => (
+          <div
+            class:list={['carousel-slide', { active: index === 0 }]}
+            data-slide-index={index}
+          >
+            <Fragment set:html={slide.html} />
+          </div>
+        ))}
+      </div>
+
+      <div class="carousel-footer">
+        {hasMultipleSlides && (
+          <div class="carousel-nav">
+            <button class="nav-arrow prev" data-carousel-prev aria-label="Previous" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <div class="carousel-dots" data-carousel-dots>
+              {slides.map((_, index) => (
+                <button
+                  class:list={['dot', { active: index === 0 }]}
+                  data-dot-index={index}
+                  aria-label={`Go to page ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button class="nav-arrow next" data-carousel-next aria-label="Next">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+        )}
+        <button class="collapse-toggle" data-collapse-trigger>
+          Collapse
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .header-carousel {
+    position: relative;
+    margin: 0.75rem 0;
+  }
+
+  /* Preview state (collapsed) */
+  .carousel-preview {
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+    transition: opacity 0.4s ease, visibility 0.4s ease, height 0.4s ease;
+  }
+
+  .preview-text {
+    color: var(--text-muted);
+    font-size: var(--font-base);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .more-toggle {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font: inherit;
+    font-size: var(--font-base);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.25rem;
+    opacity: var(--opacity-high);
+    transition: opacity 0.2s;
+  }
+
+  .more-toggle:hover {
+    opacity: 1;
+  }
+
+  /* Expanded state */
+  .carousel-expanded {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease, height 0.4s ease;
+  }
+
+  .header-carousel.expanded .carousel-preview {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .header-carousel.expanded .carousel-expanded {
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+  }
+
+  .carousel-track {
+    position: relative;
+    height: 40vh;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .carousel-slide {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .carousel-slide.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Slide animations for drag snap */
+  .carousel-slide.active.slide-from-left {
+    animation: snapFromLeft 0.2s ease-out forwards;
+  }
+
+  .carousel-slide.active.slide-from-right {
+    animation: snapFromRight 0.2s ease-out forwards;
+  }
+
+  @keyframes snapFromLeft {
+    from { transform: translateX(-20%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes snapFromRight {
+    from { transform: translateX(20%); }
+    to { transform: translateX(0); }
+  }
+
+  /* Slide content containers */
+  .carousel-slide :global(.slide-content) {
+    height: 100%;
+  }
+
+  /* Text-only slides */
+  .carousel-slide :global(.slide-text-only) {
+    max-width: 650px;
+  }
+
+  /* Slides with media - side by side layout */
+  .carousel-slide :global(.slide-with-media) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* Headings */
+  .carousel-slide :global(.slide-heading) {
+    font-size: var(--font-lg);
+    font-weight: 600;
+    color: var(--project-color, var(--accent));
+    margin: 0 0 0.75rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .carousel-slide :global(.slide-subheading) {
+    font-size: var(--font-md);
+    font-weight: 600;
+    color: var(--text);
+    margin: 0.75rem 0 0.5rem 0;
+  }
+
+  /* Paragraphs */
+  .carousel-slide :global(p) {
+    color: var(--text-muted);
+    font-size: var(--font-base);
+    line-height: 1.7;
+    margin: 0 0 0.6rem 0;
+  }
+
+  .carousel-slide :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .carousel-slide :global(strong) {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .carousel-slide :global(em) {
+    font-style: italic;
+    opacity: 0.9;
+  }
+
+  /* Bullet lists */
+  .carousel-slide :global(.slide-list) {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0;
+  }
+
+  .carousel-slide :global(.slide-list li) {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+    font-size: var(--font-base);
+    line-height: 1.5;
+  }
+
+  .carousel-slide :global(.slide-list li::before) {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    background: var(--project-color, var(--accent));
+    border-radius: 50%;
+    opacity: 0.8;
+  }
+
+  /* Figures (images with optional captions) */
+  .carousel-slide :global(.slide-figure) {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .carousel-slide :global(.slide-figure img) {
+    max-width: 100%;
+    max-height: 22vh;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+
+  .carousel-slide :global(.slide-figure figcaption) {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    opacity: 0.8;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Mobile: stack media slides vertically */
+  @media (max-width: 600px) {
+    .carousel-slide :global(.slide-with-media) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .carousel-slide :global(.slide-figure img) {
+      max-height: 18vh;
+    }
+  }
+
+  .carousel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: 0.75rem;
+  }
+
+  .carousel-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    transition: border-color 0.2s, opacity 0.2s;
+    opacity: var(--opacity-medium);
+  }
+
+  .nav-arrow:hover:not(:disabled) {
+    border-color: var(--project-color, var(--accent));
+    opacity: 1;
+  }
+
+  .nav-arrow:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+  }
+
+  .nav-arrow svg {
+    width: 14px;
+    height: 14px;
+    color: var(--text);
+  }
+
+  .carousel-dots {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: none;
+    background: var(--text-muted);
+    opacity: 0.3;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s, transform 0.2s, background 0.2s;
+  }
+
+  .dot:hover {
+    opacity: 0.6;
+  }
+
+  .dot.active {
+    opacity: 1;
+    transform: scale(1.3);
+    background: var(--project-color, var(--accent));
+  }
+
+  .collapse-toggle {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font: inherit;
+    font-size: var(--font-sm);
+    cursor: pointer;
+    padding: 0;
+    opacity: var(--opacity-high);
+    transition: opacity 0.2s;
+  }
+
+  .collapse-toggle:hover {
+    opacity: 1;
+  }
+
+  .collapse-toggle svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Touch devices */
+  @media (hover: none) {
+    .nav-arrow {
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-arrow svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    .more-toggle:hover,
+    .collapse-toggle:hover {
+      opacity: var(--opacity-high);
+    }
+
+    .more-toggle:active,
+    .collapse-toggle:active {
+      opacity: 1;
+    }
+
+    .nav-arrow:hover:not(:disabled) {
+      opacity: var(--opacity-medium);
+      border-color: var(--border);
+    }
+
+    .nav-arrow:active:not(:disabled) {
+      opacity: 1;
+      border-color: var(--project-color, var(--accent));
+    }
+  }
+</style>
+
+<script>
+  import { initHeaderCarousel } from '../lib/headerCarousel';
+
+  document.querySelectorAll('[data-carousel]').forEach(carousel => {
+    initHeaderCarousel(carousel as HTMLElement);
+  });
+</script>

@@ -1,0 +1,12 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="200" fill="#1e2227"/>
+  <rect x="20" y="40" width="80" height="50" rx="8" fill="#61afef" opacity="0.8"/>
+  <rect x="160" y="30" width="80" height="50" rx="8" fill="#c678dd" opacity="0.8"/>
+  <rect x="160" y="110" width="80" height="50" rx="8" fill="#c678dd" opacity="0.8"/>
+  <rect x="300" y="70" width="80" height="50" rx="8" fill="#98c379" opacity="0.8"/>
+  <line x1="100" y1="65" x2="160" y2="55" stroke="#61afef" stroke-width="2"/>
+  <line x1="100" y1="65" x2="160" y2="135" stroke="#61afef" stroke-width="2"/>
+  <line x1="240" y1="55" x2="300" y2="95" stroke="#c678dd" stroke-width="2"/>
+  <line x1="240" y1="135" x2="300" y2="95" stroke="#c678dd" stroke-width="2"/>
+  <text x="200" y="185" fill="#9ca3af" font-family="system-ui" font-size="12" text-anchor="middle">Node Editor Interface</text>
+</svg>

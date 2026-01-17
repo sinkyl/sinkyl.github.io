@@ -2,8 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlocksBackground from '../../components/BlocksBackground.astro';
 import PostsList from '../../components/PostsList.astro';
+import HeaderCarousel from '../../components/HeaderCarousel.astro';
 import { projects } from '../../lib/projects';
 import { getPosts } from '../../lib/getPosts';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   return projects.map(project => ({
@@ -14,21 +16,17 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = await getPosts(project.id);
+
+// Get project content from markdown file
+const projectContents = await getCollection('projects', ({ data }) => data.project === project.id);
+const projectContent = projectContents[0];
 ---
 
 <BaseLayout title={`${project.name} — sinkyl Devlog`}>
   <BlocksBackground />
-  <section class="header">
-    <h1 style={`--project-color: ${project.color}`}>{project.name}</h1>
-    <div class="description-container" id="description-container">
-      <p class="project-description">
-        <span class="description-preview"></span><span class="toggle-more">...more</span><span class="description-full"></span><span class="toggle-less">...less</span>
-      </p>
-      <script define:vars={{ description: project.description, extendedDescription: project.extendedDescription || '' }}>
-        window.__projectDescription = description;
-        window.__projectExtended = extendedDescription;
-      </script>
-    </div>
+  <section class="header" style={`--project-color: ${project.color}`}>
+    <h1>{project.name}</h1>
+    <HeaderCarousel project={project} content={projectContent} />
     <p class="count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
   </section>
 
@@ -59,50 +57,10 @@ const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = a
     color: var(--project-color);
   }
 
-  .description-container {
-    max-width: 600px;
-    margin: 1rem 0;
-    position: relative;
-  }
-
-  .project-description {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .toggle-more,
-  .toggle-less {
-    color: var(--accent);
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-  }
-
-  .toggle-more:hover,
-  .toggle-less:hover {
-    opacity: 1;
-  }
-
-  .description-full,
-  .toggle-less {
-    display: none;
-  }
-
-  .description-container.expanded .description-full,
-  .description-container.expanded .toggle-less {
-    display: inline;
-  }
-
-  .description-container.expanded .toggle-more {
-    display: none;
-  }
-
   .count {
     color: var(--text-muted);
-    font-size: 0.8rem;
-    opacity: 0.7;
+    font-size: var(--font-sm);
+    opacity: var(--opacity-medium);
   }
 
   .empty {
@@ -119,17 +77,7 @@ const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = a
 
 <script>
   import { initPagination } from '../../lib/paginationController';
-  import { initDescriptionToggle } from '../../lib/descriptionToggle';
   import { CONTAINER_IDS } from '../../lib/constants';
 
-  // Description toggle
-  const description = (window as any).__projectDescription || '';
-  const extended = (window as any).__projectExtended || '';
-  initDescriptionToggle('description-container', {
-    description,
-    extendedDescription: extended,
-  });
-
-  // Initialize pagination
   initPagination(CONTAINER_IDS.posts);
 </script>
