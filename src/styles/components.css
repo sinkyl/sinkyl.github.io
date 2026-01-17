@@ -41,6 +41,19 @@
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-full: 9999px;
+
+  /* Opacity tokens */
+  --opacity-disabled: 0.3;
+  --opacity-muted: 0.5;
+  --opacity-soft: 0.6;
+  --opacity-medium: 0.7;
+  --opacity-high: 0.8;
+
+  /* Shadow tokens */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 /* =============================================================================

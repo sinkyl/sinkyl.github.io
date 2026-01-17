@@ -1,0 +1,132 @@
+/**
+ * Shared Modal/Panel Styles
+ * Reusable modal backdrop, container, and overlay patterns
+ */
+
+/* =============================================================================
+   MODAL BACKDROP
+   ============================================================================= */
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+:global([data-theme="light"]) .modal-backdrop {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Mobile-only backdrop variant */
+.modal-backdrop-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .modal-backdrop-mobile {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: -1;
+  }
+
+  :global([data-theme="light"]) .modal-backdrop-mobile {
+    background: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* =============================================================================
+   MODAL CONTAINER
+   ============================================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-container {
+  position: relative;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s ease-out;
+}
+
+.modal-overlay.open .modal-container {
+  transform: translateY(0) scale(1);
+}
+
+/* =============================================================================
+   MODAL CLOSE BUTTON
+   ============================================================================= */
+
+.modal-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-close svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* =============================================================================
+   PANEL (Floating panels like chat)
+   ============================================================================= */
+
+.panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl, 16px);
+  box-shadow: var(--shadow-xl, 0 8px 32px rgba(0, 0, 0, 0.2));
+  overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.panel-header {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.panel-body {
+  padding: 1rem;
+}
+
+.panel-footer {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}

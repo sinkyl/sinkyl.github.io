@@ -29,6 +29,7 @@ export function createExpandCollapse(
 
   function collapse(): void {
     carousel.classList.remove('expanded');
+    track.classList.remove('dismissing');
     state.isScrollDismissing = false;
     track.style.height = '';
     // Scroll to top after layout settles (sticky navbar makes this cleaner)
@@ -46,11 +47,13 @@ export function createExpandCollapse(
     if (scrolled <= 0) {
       // Scrolled up or no scroll - reset
       track.style.height = '';
+      track.classList.remove('dismissing');
       state.isScrollDismissing = false;
       return;
     }
 
     state.isScrollDismissing = true;
+    track.classList.add('dismissing');
     const threshold = state.expandedTrackHeight / 2; // Mid of carousel-track
 
     if (scrolled >= threshold) {

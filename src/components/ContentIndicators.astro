@@ -53,7 +53,7 @@ const hasAny = indicators && (indicators.hasImages || indicators.hasDiagrams || 
     width: 20px;
     height: 20px;
     color: var(--text-muted);
-    opacity: 0.5;
+    opacity: var(--opacity-muted);
     transition: opacity 0.2s, color 0.2s;
   }
 
@@ -65,7 +65,7 @@ const hasAny = indicators && (indicators.hasImages || indicators.hasDiagrams || 
   /* Touch devices can't hover, so show color by default */
   @media (hover: none) {
     .indicator {
-      opacity: 0.7;
+      opacity: var(--opacity-medium);
       color: var(--indicator-color, var(--text-muted));
     }
   }

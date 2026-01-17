@@ -92,7 +92,7 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
     color: inherit;
     padding: 1.25rem;
     background: var(--bg-card);
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     transition: border-color 0.2s, transform 0.2s, background-color 0.3s ease;
   }
@@ -126,7 +126,7 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
     color: var(--project-color);
     padding: 0.2rem 0.5rem;
     background: color-mix(in srgb, var(--project-color) 10%, transparent);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
   }
 
   .tags {
