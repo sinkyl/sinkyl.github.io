@@ -121,15 +121,30 @@ export const SPACING = {
 // =============================================================================
 
 export const FONT_SIZE = {
-  xs: '0.65rem',
-  sm: '0.75rem',
-  base: '0.85rem',
-  md: '0.9rem',
-  lg: '1rem',
-  xl: '1.25rem',
-  '2xl': '1.5rem',
-  '3xl': '2rem',
-  '4xl': '2.5rem',
+  xs: '0.65rem',    // 10.4px - tiny labels
+  sm: '0.7rem',     // 11.2px - small labels, badges
+  'sm-md': '0.75rem', // 12px - slightly larger small text
+  base: '0.85rem',  // 13.6px - default body text
+  md: '0.9rem',     // 14.4px - emphasized text
+  'md-lg': '0.95rem', // 15.2px - descriptions, indicators
+  lg: '1rem',       // 16px - large text
+  xl: '1.25rem',    // 20px - h3
+  '2xl': '1.5rem',  // 24px - h2
+  '3xl': '2rem',    // 32px - h1
+  '4xl': '2.5rem',  // 40px - hero h1
+} as const;
+
+// =============================================================================
+// OPACITY
+// =============================================================================
+
+export const OPACITY = {
+  disabled: 0.3,    // Disabled states
+  muted: 0.5,       // Very muted content
+  soft: 0.6,        // Soft/subtle elements
+  medium: 0.7,      // Medium emphasis
+  high: 0.8,        // High emphasis but not full
+  full: 1,          // Full opacity
 } as const;
 
 // =============================================================================

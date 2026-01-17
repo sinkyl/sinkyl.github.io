@@ -15,7 +15,7 @@ const { weekKey, weekLabel, index } = Astro.props;
 
 <style>
   .week-header {
-    font-size: 0.85rem;
+    font-size: var(--font-base);
     color: var(--text-muted);
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
@@ -35,7 +35,7 @@ const { weekKey, weekLabel, index } = Astro.props;
 
   .week-label {
     color: var(--text-muted);
-    opacity: 0.6;
+    opacity: var(--opacity-soft);
     margin-right: 0.5rem;
   }
 </style>

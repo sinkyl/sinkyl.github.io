@@ -38,11 +38,6 @@ export function initPagination(containerId: string) {
   const nextBtn = document.getElementById(`next-btn-${containerId}`) as HTMLButtonElement;
   const pageIndicator = document.getElementById(`page-indicator-${containerId}`) as HTMLInputElement;
 
-  const paginationFloat = document.getElementById(`pagination-float-${containerId}`);
-  const prevBtnFloat = document.getElementById(`prev-btn-float-${containerId}`) as HTMLButtonElement;
-  const nextBtnFloat = document.getElementById(`next-btn-float-${containerId}`) as HTMLButtonElement;
-  const pageIndicatorFloat = document.getElementById(`page-indicator-float-${containerId}`);
-
   // Initialize from URL
   let currentPage = Math.min(getPageFromUrl(), totalPages);
 
@@ -108,10 +103,6 @@ export function initPagination(containerId: string) {
 
     pageIndicator.value = getIndicatorText();
     pageIndicator.readOnly = true;
-
-    if (prevBtnFloat) prevBtnFloat.disabled = currentPage === 1;
-    if (nextBtnFloat) nextBtnFloat.disabled = currentPage === totalPages;
-    if (pageIndicatorFloat) pageIndicatorFloat.textContent = getIndicatorText();
   }
 
   function goToPage(page: number, updateUrl = true) {
@@ -120,9 +111,11 @@ export function initPagination(containerId: string) {
       if (updateUrl) {
         setPageInUrl(currentPage);
       }
+      // Scroll to top of page first
+      window.scrollTo(0, 0);
       updatePagination();
-      // Scroll to top of container
-      container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Re-check float visibility after content changes
+      requestAnimationFrame(updateFloatVisibility);
     }
   }
 
@@ -134,6 +127,11 @@ export function initPagination(containerId: string) {
     goToPage(currentPage + 1);
   }
 
+  // Disable browser's automatic scroll restoration
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
   // Handle browser back/forward
   window.addEventListener('popstate', (e) => {
     const page = e.state?.page || getPageFromUrl();
@@ -142,8 +140,6 @@ export function initPagination(containerId: string) {
 
   prevBtn?.addEventListener('click', goToPrevPage);
   nextBtn?.addEventListener('click', goToNextPage);
-  prevBtnFloat?.addEventListener('click', goToPrevPage);
-  nextBtnFloat?.addEventListener('click', goToNextPage);
 
   pageIndicator?.addEventListener('click', () => {
     pageIndicator.readOnly = false;
@@ -172,15 +168,29 @@ export function initPagination(containerId: string) {
   });
 
   function updateFloatVisibility() {
-    if (!pagination || !paginationFloat) return;
-    const rect = pagination.getBoundingClientRect();
-    const paginationHeight = rect.height;
-    const viewportBottom = window.innerHeight;
+    if (!pagination || !container) return;
 
-    const visibleAmount = Math.min(rect.bottom, viewportBottom) - Math.max(rect.top, 0);
-    const isHalfVisible = visibleAmount > paginationHeight / 2;
+    const isFloating = pagination.classList.contains('floating');
+    const containerRect = container.getBoundingClientRect();
+    const containerBottom = containerRect.bottom;
+    const paginationHeight = pagination.offsetHeight;
 
-    paginationFloat.classList.toggle('visible', !isHalfVisible);
+    // Hysteresis: different thresholds for floating vs sticking
+    // Float when top-mid of pagination area goes below viewport
+    // Stick when bottom-mid of pagination area is visible
+    const topMidThreshold = containerBottom - paginationHeight / 2;
+    const bottomMidThreshold = containerBottom + paginationHeight / 2;
+
+    let shouldFloat: boolean;
+    if (isFloating) {
+      // Currently floating - stick when bottom-mid is visible
+      shouldFloat = bottomMidThreshold > window.innerHeight;
+    } else {
+      // Currently stuck - float when top-mid goes below viewport
+      shouldFloat = topMidThreshold > window.innerHeight;
+    }
+
+    pagination.classList.toggle('floating', shouldFloat);
   }
 
   window.addEventListener('scroll', updateFloatVisibility, { passive: true });

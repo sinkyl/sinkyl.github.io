@@ -1,4 +1,19 @@
 /**
+ * Check if current device is mobile/tablet based on viewport width
+ */
+export function isMobile(breakpoint: number = 768): boolean {
+  return window.innerWidth <= breakpoint;
+}
+
+/**
+ * Lock or unlock body scroll (useful for modals/overlays on mobile)
+ */
+export function setBodyScroll(enable: boolean, mobileOnly: boolean = true) {
+  if (mobileOnly && !isMobile()) return;
+  document.body.style.overflow = enable ? '' : 'hidden';
+}
+
+/**
  * Setup click-outside-to-close behavior for an element
  */
 export function setupClickOutside(

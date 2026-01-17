@@ -151,11 +151,11 @@ const philosophies = [
     position: absolute;
     top: 1rem;
     right: 1rem;
-    font-size: 0.65rem;
+    font-size: var(--font-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-muted);
-    opacity: 0.6;
+    opacity: var(--opacity-soft);
   }
 
   /* Hero Card */
@@ -192,7 +192,7 @@ const philosophies = [
 
   .hero p {
     color: var(--text-muted);
-    font-size: 1rem;
+    font-size: var(--font-lg);
     line-height: 1.7;
     max-width: 400px;
   }
@@ -203,12 +203,12 @@ const philosophies = [
 
   .hero-link {
     color: var(--accent);
-    font-size: 0.9rem;
+    font-size: var(--font-md);
     transition: opacity 0.2s;
   }
 
   .hero-link:hover {
-    opacity: 0.8;
+    opacity: var(--opacity-high);
   }
 
   /* Status Card */
@@ -235,13 +235,13 @@ const philosophies = [
   }
 
   .status-label {
-    font-size: 0.7rem;
+    font-size: var(--font-sm);
     color: var(--text-muted);
     margin-bottom: 0.15rem;
   }
 
   .status-project {
-    font-size: 0.95rem;
+    font-size: var(--font-md-lg);
     font-weight: 600;
   }
 
@@ -293,13 +293,13 @@ const philosophies = [
 
   .project-info h3 {
     color: var(--project-color);
-    font-size: 0.95rem;
+    font-size: var(--font-md-lg);
     margin-bottom: 0.2rem;
   }
 
   .project-info p {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: var(--font-sm-md);
   }
 
   .project-arrow {
@@ -330,20 +330,20 @@ const philosophies = [
   }
 
   .latest-project {
-    font-size: 0.7rem;
+    font-size: var(--font-sm);
     color: var(--project-color);
     margin-bottom: 0.25rem;
     display: block;
   }
 
   .latest time {
-    font-size: 0.65rem;
+    font-size: var(--font-xs);
     color: var(--text-muted);
     margin-bottom: 0.35rem;
   }
 
   .latest h3 {
-    font-size: 0.9rem;
+    font-size: var(--font-md);
     color: var(--text-muted);
     line-height: 1.4;
     font-weight: 500;
@@ -379,7 +379,7 @@ const philosophies = [
   }
 
   .quote blockquote {
-    font-size: 0.9rem;
+    font-size: var(--font-md);
     font-style: italic;
     background: linear-gradient(135deg,
       color-mix(in srgb, var(--grad-start) 70%, var(--text-muted)),
@@ -395,13 +395,11 @@ const philosophies = [
 
   /* Light mode shadows */
   :global([data-theme="light"]) .bento-card {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
   }
 
   :global([data-theme="light"]) .latest:hover {
-    box-shadow:
-      0 6px 16px rgba(0, 0, 0, 0.12),
-      0 12px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
   }
 
   /* Responsive */
@@ -451,10 +449,44 @@ const philosophies = [
       font-size: 1.8rem;
     }
 
+    .bento-card {
+      padding: 1.25rem;
+    }
+
     .hide-mobile {
       display: none;
     }
   }
+
+  /* Touch devices: use active states instead of hover */
+  @media (hover: none) {
+    .project-item:hover {
+      transform: none;
+    }
+
+    .project-item:active {
+      background: color-mix(in srgb, var(--text) 6%, transparent);
+      border-color: var(--project-color);
+    }
+
+    .project-arrow {
+      opacity: var(--opacity-soft);
+    }
+
+    .project-item:hover .project-arrow {
+      transform: none;
+    }
+
+    .latest:hover {
+      transform: none;
+    }
+
+    .latest:active {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 5%, var(--bg-card));
+    }
+  }
+
 </style>
 
 <script>

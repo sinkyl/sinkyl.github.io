@@ -2,7 +2,7 @@
  * FAQ ChatBot functionality
  */
 
-import { setupClickOutside } from './domUtils';
+import { setupClickOutside, setBodyScroll, isMobile } from './domUtils';
 
 export interface FAQData {
   [category: string]: string[];
@@ -37,31 +37,24 @@ export function initChatBot(config: ChatBotConfig) {
     return;
   }
 
-  // Disable body scroll on mobile when chat is open
-  function setBodyScroll(enable: boolean) {
-    if (isMobile()) {
-      document.body.style.overflow = enable ? '' : 'hidden';
-    }
+  // Reset panel styles to default (used when closing chat)
+  function resetPanelStyles() {
+    if (!chatPanel) return;
+    chatPanel.style.position = '';
+    chatPanel.style.top = '';
+    chatPanel.style.bottom = '';
+    chatPanel.style.maxHeight = '';
+    chatPanel.style.height = '';
+    const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
+    if (messagesEl) messagesEl.style.maxHeight = '';
   }
 
   // Close chat when clicking backdrop (mobile)
   backdrop?.addEventListener('click', () => {
     widget.classList.remove('open');
     setBodyScroll(true);
-    // Reset panel styles
-    if (chatPanel) {
-      chatPanel.style.position = '';
-      chatPanel.style.top = '';
-      chatPanel.style.bottom = '';
-      chatPanel.style.maxHeight = '';
-      chatPanel.style.height = '';
-      const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-      if (messagesEl) messagesEl.style.maxHeight = '';
-    }
+    resetPanelStyles();
   });
-
-  // Check if device is mobile/tablet (no auto-focus to avoid keyboard popup)
-  const isMobile = () => window.innerWidth <= 768;
 
   // Center chat panel in available viewport space (accounts for keyboard)
   let keyboardVisible = false;
@@ -159,16 +152,7 @@ export function initChatBot(config: ChatBotConfig) {
       }
     } else {
       setBodyScroll(true);
-      if (chatPanel) {
-        // Reset panel position when closing
-        chatPanel.style.position = '';
-        chatPanel.style.top = '';
-        chatPanel.style.bottom = '';
-        chatPanel.style.maxHeight = '';
-        chatPanel.style.height = '';
-        const messagesEl = chatPanel.querySelector('.chat-messages') as HTMLElement;
-        if (messagesEl) messagesEl.style.maxHeight = '';
-      }
+      resetPanelStyles();
     }
   });
 
@@ -205,6 +189,7 @@ export function initChatBot(config: ChatBotConfig) {
   }
 
   messages.addEventListener('click', handleSuggestionClick);
+  suggestionsPanel?.addEventListener('click', handleSuggestionClick);
 
   // Find matching response
   function findResponse(query: string): string {

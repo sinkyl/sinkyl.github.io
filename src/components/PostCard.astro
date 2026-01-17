@@ -121,7 +121,7 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
   }
 
   .project-badge {
-    font-size: 0.7rem;
+    font-size: var(--font-sm);
     font-weight: 600;
     color: var(--project-color);
     padding: 0.2rem 0.5rem;
@@ -147,20 +147,20 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
   }
 
   .post-item a:hover :global(.indicator) {
-    opacity: 0.8;
+    opacity: var(--opacity-high);
     color: var(--project-color, var(--accent));
   }
 
   .post-date {
-    font-size: 0.75rem;
+    font-size: var(--font-sm-md);
     color: var(--text-muted);
-    opacity: 0.7;
+    opacity: var(--opacity-medium);
     margin-left: auto;
   }
 
   .preview {
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: var(--font-base);
     line-height: 1.5;
   }
 
@@ -173,6 +173,27 @@ const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
 
     .post-date {
       margin-left: 0;
+    }
+  }
+
+  /* Touch devices: use active state instead of hover */
+  @media (hover: none) {
+    .post-item a:hover {
+      transform: none;
+    }
+
+    .post-item a:active {
+      border-color: var(--project-color, var(--accent));
+      background: color-mix(in srgb, var(--project-color, var(--accent)) 5%, var(--bg-card));
+    }
+
+    .post-item.with-left-border a:active {
+      border-left-color: var(--project-color, var(--accent));
+    }
+
+    .post-item a:active :global(.indicator) {
+      opacity: var(--opacity-high);
+      color: var(--project-color, var(--accent));
     }
   }
 </style>

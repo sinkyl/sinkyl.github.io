@@ -15,42 +15,25 @@ const { totalPages, postsPerPage, containerId } = Astro.props;
 </script>
 
 {totalPages > 1 && (
-  <>
-    <nav class="pagination" id={`pagination-${containerId}`}>
-      <button class="page-btn prev" id={`prev-btn-${containerId}`} disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
-      </button>
-      <input
-        type="text"
-        class="page-indicator"
-        id={`page-indicator-${containerId}`}
-        value={`1 . . ${totalPages}`}
-        readonly
-      />
-      <button class="page-btn next" id={`next-btn-${containerId}`}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 18l6-6-6-6"/>
-        </svg>
-      </button>
-    </nav>
-    <nav class="pagination-float" id={`pagination-float-${containerId}`}>
-      <button class="page-btn prev" id={`prev-btn-float-${containerId}`}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
-      </button>
-      <span class="page-indicator-float" id={`page-indicator-float-${containerId}`}>
-        1 . . {totalPages}
-      </span>
-      <button class="page-btn next" id={`next-btn-float-${containerId}`}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 18l6-6-6-6"/>
-        </svg>
-      </button>
-    </nav>
-  </>
+  <nav class="pagination" id={`pagination-${containerId}`}>
+    <button class="page-btn prev" id={`prev-btn-${containerId}`} disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <input
+      type="text"
+      class="page-indicator"
+      id={`page-indicator-${containerId}`}
+      value={`1 . . ${totalPages}`}
+      readonly
+    />
+    <button class="page-btn next" id={`next-btn-${containerId}`}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </nav>
 )}
 
 <style>
@@ -61,6 +44,21 @@ const { totalPages, postsPerPage, containerId } = Astro.props;
     gap: 0.5rem;
     margin-top: 2rem;
     padding: 1rem 0;
+  }
+
+  /* Floating state */
+  .pagination.floating {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
   }
 
   .page-btn {
@@ -76,13 +74,36 @@ const { totalPages, postsPerPage, containerId } = Astro.props;
     transition: border-color 0.2s, background 0.2s, opacity 0.2s;
   }
 
+  .pagination.floating .page-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Mobile: ensure good touch targets */
+  @media (max-width: 600px) {
+    .pagination.floating {
+      bottom: 1rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .pagination.floating .page-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .pagination.floating .page-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
   .page-btn:hover:not(:disabled) {
     border-color: var(--accent);
     background: var(--bg-secondary);
   }
 
   .page-btn:disabled {
-    opacity: 0.3;
+    opacity: var(--opacity-disabled);
     cursor: not-allowed;
   }
 
@@ -93,9 +114,9 @@ const { totalPages, postsPerPage, containerId } = Astro.props;
   }
 
   .page-indicator {
-    font-size: 1.1rem;
+    font-size: var(--font-md-lg);
     color: var(--text-muted);
-    width: 70px;
+    width: 65px;
     text-align: center;
     background: transparent;
     border: 1px solid transparent;
@@ -116,39 +137,7 @@ const { totalPages, postsPerPage, containerId } = Astro.props;
     cursor: text;
   }
 
-  .pagination-float {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    visibility: hidden;
-    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
-    z-index: 50;
-  }
-
-  .pagination-float.visible {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .pagination-float .page-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .page-indicator-float {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    padding: 0 0.25rem;
+  .pagination.floating .page-indicator:focus {
+    background: var(--bg-secondary);
   }
 </style>

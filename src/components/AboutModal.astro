@@ -268,12 +268,12 @@
   }
 
   :global([data-theme="light"]) .terminal-output {
-    color: #7d838c;
+    color: var(--text-muted);
   }
 
   .terminal-output.ascii-art {
     color: var(--color-purple-dim);
-    font-size: 0.65rem;
+    font-size: var(--font-xs);
     line-height: 1.2;
     white-space: pre;
     overflow-x: auto;
@@ -282,7 +282,6 @@
   .terminal-output.philosophy {
     color: var(--color-orange-dim);
     font-style: italic;
-    font-size: 1rem;
   }
 
   .terminal-output.story p {
@@ -309,7 +308,7 @@
     color: white;
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: var(--font-sm-md);
     font-weight: bold;
     margin-bottom: 0.5rem;
   }
@@ -332,13 +331,13 @@
 
   .stat-value {
     display: block;
-    font-size: 1.5rem;
+    font-size: var(--font-2xl);
     font-weight: bold;
     color: var(--color-blue-dim);
   }
 
   .stat-label {
-    font-size: 0.7rem;
+    font-size: var(--font-sm);
     color: var(--text-muted);
     text-transform: uppercase;
   }
@@ -354,12 +353,12 @@
 
   @media (max-width: 600px) {
     .terminal-body {
-      font-size: 0.75rem;
+      font-size: var(--font-sm-md);
       padding: 1rem;
     }
 
     .terminal-output.ascii-art {
-      font-size: 0.5rem;
+      font-size: 0.55rem;
     }
 
     .stat-grid {
@@ -368,7 +367,7 @@
     }
 
     .stat-value {
-      font-size: 1.25rem;
+      font-size: var(--font-xl);
     }
   }
 </style>

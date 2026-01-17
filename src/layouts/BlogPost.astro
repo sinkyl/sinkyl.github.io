@@ -85,7 +85,7 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
   }
 
   .back {
-    font-size: 0.85rem;
+    font-size: var(--font-base);
     color: var(--text-muted);
     margin-bottom: 1rem;
     display: inline-block;
@@ -103,14 +103,14 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: var(--font-4xl);
     margin-bottom: 0.5rem;
     line-height: 1.2;
   }
 
   time {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: var(--font-md);
   }
 
   .content {
@@ -120,13 +120,13 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
   .content :global(h2) {
     margin-top: 2rem;
     margin-bottom: 1rem;
-    font-size: 1.5rem;
+    font-size: var(--font-2xl);
   }
 
   .content :global(h3) {
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
-    font-size: 1.25rem;
+    font-size: var(--font-xl);
   }
 
   .content :global(p) {
@@ -223,7 +223,7 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
     align-items: center;
     gap: 0.25rem;
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: var(--font-base);
     transition: color 0.2s;
   }
 
@@ -242,7 +242,7 @@ const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) :
 
   .nav-info {
     color: var(--text-muted);
-    opacity: 0.8;
+    opacity: var(--opacity-high);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
