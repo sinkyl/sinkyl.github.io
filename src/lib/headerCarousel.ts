@@ -65,14 +65,59 @@ export function initHeaderCarousel(carousel: HTMLElement) {
   }
 
   // Expand/collapse functions
+  let scrollStartY = 0;
+  let isScrollDismissing = false;
+  let expandedTrackHeight = 0;
+  const expandedSection = carousel.querySelector('.carousel-expanded') as HTMLElement;
+
   function expand() {
     carousel.classList.add('expanded');
     goToSlide(0);
+    scrollStartY = window.scrollY;
+    isScrollDismissing = false;
+    track.style.height = '';
+    // Capture height after expansion
+    requestAnimationFrame(() => {
+      expandedTrackHeight = track.offsetHeight;
+    });
   }
 
   function collapse() {
     carousel.classList.remove('expanded');
+    isScrollDismissing = false;
+    track.style.height = '';
   }
+
+  // Scroll-to-dismiss: shrink carousel-track as user scrolls
+  function handleScrollDismiss() {
+    if (!carousel.classList.contains('expanded')) return;
+    if (!expandedTrackHeight) return;
+
+    const scrolled = window.scrollY - scrollStartY;
+    if (scrolled <= 0) {
+      // Scrolled up or no scroll - reset
+      track.style.height = '';
+      isScrollDismissing = false;
+      return;
+    }
+
+    isScrollDismissing = true;
+    const threshold = expandedTrackHeight / 2; // Mid of carousel-track
+
+    if (scrolled >= threshold) {
+      // Reached mid - collapse completely and scroll back
+      track.style.height = '';
+      window.scrollTo({ top: scrollStartY, behavior: 'instant' });
+      collapse();
+      return;
+    }
+
+    // Reduce height proportionally
+    const newHeight = expandedTrackHeight - scrolled;
+    track.style.height = `${newHeight}px`;
+  }
+
+  window.addEventListener('scroll', handleScrollDismiss, { passive: true });
 
   // Handle expand trigger
   expandTrigger?.addEventListener('click', (e) => {
@@ -360,6 +405,38 @@ export function initHeaderCarousel(carousel: HTMLElement) {
   track.addEventListener('touchend', () => {
     handleDragEnd();
   });
+
+  // Mouse wheel navigation (only in expanded section)
+  // One scroll gesture = one slide
+  let lastWheelTime = 0;
+  const gestureGap = 200; // ms between gestures
+
+  expandedSection?.addEventListener('wheel', (e) => {
+    if (!carousel.classList.contains('expanded')) return;
+
+    const now = Date.now();
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+
+    const canGoNext = currentIndex < slideCount - 1;
+    const canGoPrev = currentIndex > 0;
+
+    // At boundary - allow page scroll
+    if ((delta > 0 && !canGoNext) || (delta < 0 && !canGoPrev)) {
+      return;
+    }
+
+    e.preventDefault();
+
+    // Only respond to first event of a new gesture
+    if (now - lastWheelTime < gestureGap) return;
+    lastWheelTime = now;
+
+    if (delta > 0 && canGoNext) {
+      goToSlide(currentIndex + 1, 'left');
+    } else if (delta < 0 && canGoPrev) {
+      goToSlide(currentIndex - 1, 'right');
+    }
+  }, { passive: false });
 
   carousel.setAttribute('tabindex', '0');
   updateArrows();
