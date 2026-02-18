@@ -1,0 +1,323 @@
+---
+// Bazaar infrastructure visualization SVG - Kubernetes cluster structure
+---
+
+<svg class="bazaar-infra-svg" viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- Region container -->
+  <rect x="8" y="2" width="704" height="276" rx="10" class="region-box"/>
+  <text x="22" y="17" class="region-label">Region</text>
+  <text x="698" y="17" class="region-tech">Kubernetes · .NET Aspire</text>
+
+  <!-- ===== IDENTITY CLUSTER ===== -->
+  <g class="cluster identity-cluster">
+    <rect x="20" y="26" width="325" height="86" rx="6" class="cluster-box"/>
+    <text x="30" y="41" class="cluster-title">Identity Cluster</text>
+
+    <!-- Pods -->
+    <g class="pod">
+      <rect x="30" y="49" width="62" height="17" rx="3"/>
+      <text x="61" y="61">Auth API</text>
+    </g>
+    <g class="pod">
+      <rect x="98" y="49" width="82" height="17" rx="3"/>
+      <text x="139" y="61">Token Service</text>
+    </g>
+    <g class="pod infra-inline">
+      <rect x="186" y="49" width="44" height="17" rx="3"/>
+      <text x="208" y="61">Redis</text>
+    </g>
+
+    <text x="30" y="82" class="cluster-info">OpenIddict · OIDC</text>
+    <text x="335" y="82" class="cluster-scale">× 2 · fixed</text>
+  </g>
+
+  <!-- ===== MARKETPLACE CLUSTER ===== -->
+  <g class="cluster marketplace-cluster">
+    <rect x="355" y="26" width="345" height="86" rx="6" class="cluster-box"/>
+    <text x="365" y="41" class="cluster-title">Marketplace Cluster</text>
+
+    <!-- Pods -->
+    <g class="pod">
+      <rect x="365" y="49" width="60" height="17" rx="3"/>
+      <text x="395" y="61">Gateway</text>
+    </g>
+    <g class="pod">
+      <rect x="431" y="49" width="52" height="17" rx="3"/>
+      <text x="457" y="61">Search</text>
+    </g>
+    <g class="pod">
+      <rect x="489" y="49" width="38" height="17" rx="3"/>
+      <text x="508" y="61">Cart</text>
+    </g>
+    <g class="pod">
+      <rect x="533" y="49" width="64" height="17" rx="3"/>
+      <text x="565" y="61">Checkout</text>
+    </g>
+    <g class="pod infra-inline">
+      <rect x="603" y="49" width="44" height="17" rx="3"/>
+      <text x="625" y="61">Redis</text>
+    </g>
+
+    <text x="365" y="82" class="cluster-info">ElasticSearch · YARP</text>
+    <text x="690" y="82" class="cluster-scale">× 2–10 · auto</text>
+  </g>
+
+  <!-- ===== PAYMENT CLUSTER ===== -->
+  <g class="cluster payment-cluster">
+    <rect x="20" y="122" width="325" height="86" rx="6" class="cluster-box"/>
+    <text x="30" y="137" class="cluster-title">Payment Cluster</text>
+
+    <!-- Pods -->
+    <g class="pod">
+      <rect x="30" y="145" width="78" height="17" rx="3"/>
+      <text x="69" y="157">Payment API</text>
+    </g>
+    <g class="pod">
+      <rect x="114" y="145" width="72" height="17" rx="3"/>
+      <text x="150" y="157">Settlement</text>
+    </g>
+
+    <text x="30" y="178" class="cluster-info">PCI-DSS boundary</text>
+    <text x="335" y="178" class="cluster-scale">× 2 · network isolated</text>
+  </g>
+
+  <!-- ===== STORE CLUSTERS ===== -->
+  <g class="cluster store-clusters">
+    <rect x="355" y="122" width="345" height="86" rx="6" class="cluster-box dashed"/>
+    <text x="365" y="137" class="cluster-title">Store Clusters ×N</text>
+
+    <!-- Pods -->
+    <g class="pod">
+      <rect x="365" y="145" width="58" height="17" rx="3"/>
+      <text x="394" y="157">Gateway</text>
+    </g>
+    <g class="pod">
+      <rect x="429" y="145" width="58" height="17" rx="3"/>
+      <text x="458" y="157">Products</text>
+    </g>
+    <g class="pod">
+      <rect x="493" y="145" width="50" height="17" rx="3"/>
+      <text x="518" y="157">Orders</text>
+    </g>
+    <g class="pod">
+      <rect x="549" y="145" width="60" height="17" rx="3"/>
+      <text x="579" y="157">Inventory</text>
+    </g>
+    <g class="pod infra-inline">
+      <rect x="615" y="145" width="44" height="17" rx="3"/>
+      <text x="637" y="157">Redis</text>
+    </g>
+
+    <text x="365" y="178" class="cluster-info">per store · own gateway</text>
+    <text x="690" y="178" class="cluster-scale">× 1–5 · scale-to-0</text>
+  </g>
+
+  <!-- ===== SHARED INFRASTRUCTURE ===== -->
+  <line x1="20" y1="218" x2="700" y2="218" class="infra-separator"/>
+
+  <text x="22" y="232" class="infra-label">Shared</text>
+
+  <!-- Infra pods -->
+  <g class="infra-pod">
+    <rect x="75" y="222" width="72" height="17" rx="3"/>
+    <text x="111" y="234">RabbitMQ</text>
+  </g>
+  <g class="infra-pod">
+    <rect x="153" y="222" width="74" height="17" rx="3"/>
+    <text x="190" y="234">SQL Server</text>
+  </g>
+
+  <!-- Tech stack line -->
+  <text x="360" y="260" class="tech-line">.NET 10 · ASP.NET Core · Docker</text>
+</svg>
+
+<style is:global>
+  .bazaar-infra-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Region container */
+  .bazaar-infra-svg .region-box {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--border, #2e3339);
+    stroke-width: 2;
+  }
+
+  .bazaar-infra-svg .region-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    fill: var(--text-muted, #9ca3af);
+  }
+
+  .bazaar-infra-svg .region-tech {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: end;
+    opacity: 0.7;
+  }
+
+  /* Cluster boxes */
+  .bazaar-infra-svg .cluster-box {
+    fill: var(--bg, #181a1f);
+    stroke-width: 1.5;
+  }
+
+  .bazaar-infra-svg .cluster-box.dashed {
+    stroke-dasharray: 5 3;
+  }
+
+  .bazaar-infra-svg .identity-cluster .cluster-box {
+    stroke: var(--color-blue, #61afef);
+  }
+
+  .bazaar-infra-svg .marketplace-cluster .cluster-box {
+    stroke: var(--color-orange, #d19a66);
+  }
+
+  .bazaar-infra-svg .payment-cluster .cluster-box {
+    stroke: var(--color-green, #98c379);
+  }
+
+  .bazaar-infra-svg .store-clusters .cluster-box {
+    stroke: var(--color-purple, #c678dd);
+  }
+
+  /* Cluster titles */
+  .bazaar-infra-svg .cluster-title {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3);
+  }
+
+  .bazaar-infra-svg .identity-cluster .cluster-title {
+    fill: var(--color-blue, #61afef);
+  }
+
+  .bazaar-infra-svg .marketplace-cluster .cluster-title {
+    fill: var(--color-orange, #d19a66);
+  }
+
+  .bazaar-infra-svg .payment-cluster .cluster-title {
+    fill: var(--color-green, #98c379);
+  }
+
+  .bazaar-infra-svg .store-clusters .cluster-title {
+    fill: var(--color-purple, #c678dd);
+  }
+
+  /* Pod containers */
+  .bazaar-infra-svg .pod rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke-width: 1;
+    opacity: 0.9;
+  }
+
+  .bazaar-infra-svg .pod text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  /* Inline infra pods (Redis) - dashed border to distinguish from service pods */
+  .bazaar-infra-svg .infra-inline rect {
+    stroke-dasharray: 3 2;
+    opacity: 0.7;
+  }
+
+  .bazaar-infra-svg .infra-inline text {
+    opacity: 0.8;
+  }
+
+  /* Pod border colors match parent cluster */
+  .bazaar-infra-svg .identity-cluster .pod rect {
+    stroke: var(--color-blue, #61afef);
+  }
+
+  .bazaar-infra-svg .marketplace-cluster .pod rect {
+    stroke: var(--color-orange, #d19a66);
+  }
+
+  .bazaar-infra-svg .payment-cluster .pod rect {
+    stroke: var(--color-green, #98c379);
+  }
+
+  .bazaar-infra-svg .store-clusters .pod rect {
+    stroke: var(--color-purple, #c678dd);
+  }
+
+  /* Cluster info & scale */
+  .bazaar-infra-svg .cluster-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    opacity: 0.8;
+  }
+
+  .bazaar-infra-svg .cluster-scale {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--accent, #c87038);
+    text-anchor: end;
+    opacity: 0.8;
+  }
+
+  /* Shared infrastructure */
+  .bazaar-infra-svg .infra-separator {
+    stroke: var(--border, #2e3339);
+    stroke-width: 1;
+    stroke-dasharray: 3 2;
+  }
+
+  .bazaar-infra-svg .infra-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    fill: var(--text-muted, #9ca3af);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .bazaar-infra-svg .infra-pod rect {
+    fill: var(--bg, #181a1f);
+    stroke: var(--border, #2e3339);
+    stroke-width: 1;
+  }
+
+  .bazaar-infra-svg .infra-pod text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  /* Tech stack line */
+  .bazaar-infra-svg .tech-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+    opacity: 0.6;
+  }
+
+  /* Light mode */
+  [data-theme="light"] .bazaar-infra-svg .region-box {
+    fill: var(--bg-secondary, #fdfcfa);
+  }
+
+  [data-theme="light"] .bazaar-infra-svg .cluster-box {
+    fill: var(--bg, #f8f7f4);
+  }
+
+  [data-theme="light"] .bazaar-infra-svg .pod rect {
+    fill: var(--bg-secondary, #fdfcfa);
+  }
+
+  [data-theme="light"] .bazaar-infra-svg .infra-pod rect {
+    fill: var(--bg, #f8f7f4);
+  }
+</style>

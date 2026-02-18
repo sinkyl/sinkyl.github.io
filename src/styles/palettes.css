@@ -1,0 +1,157 @@
+/**
+ * Color Palettes
+ * Switch palettes using data-palette attribute on <html>
+ * Works with both dark and light themes (data-theme)
+ *
+ * Palettes only change accent and semantic colors (not backgrounds/text)
+ * Colors are muted/matte for comfortable reading
+ */
+
+/* ===========================================
+   ONEDARK PALETTE - Muted One Dark inspired
+   =========================================== */
+
+/* Dark + OneDark */
+:root[data-palette="onedark"] {
+  --accent: #61afef;
+  --accent-hover: #8ac5f0;
+  --accent-muted: #4d8fcc;
+  --color-red: #e06c75;
+  --color-green: #98c379;
+  --color-yellow: #e5c07b;
+  --color-blue: #61afef;
+  --color-purple: #c678dd;
+  --color-cyan: #56b6c2;
+  --color-orange: #d19a66;
+}
+
+/* Light + OneDark */
+[data-theme="light"][data-palette="onedark"] {
+  --accent: #0969da;
+  --accent-hover: #0550ae;
+  --accent-muted: #218bff;
+  --color-red: #cf222e;
+  --color-green: #1a7f37;
+  --color-yellow: #9a6700;
+  --color-blue: #0969da;
+  --color-purple: #8250df;
+  --color-cyan: #0891b2;
+  --color-orange: #bc4c00;
+}
+
+/* ===========================================
+   CIRCUIT PALETTE - PCB Green
+   Circuit board green, copper traces, gold contacts
+   =========================================== */
+
+/* Dark + Circuit */
+:root[data-palette="circuit"] {
+  --accent: #50b868;
+  --accent-hover: #68c878;
+  --accent-muted: #409850;
+  --color-red: #d87860;
+  --color-green: #50b868;
+  --color-yellow: #d4a840;
+  --color-blue: #5898b0;
+  --color-purple: #9878a8;
+  --color-cyan: #58a898;
+  --color-orange: #c88850;
+}
+
+/* Light + Circuit */
+[data-theme="light"][data-palette="circuit"] {
+  --accent: #308848;
+  --accent-hover: #206830;
+  --accent-muted: #40a058;
+  --color-red: #b85040;
+  --color-green: #308848;
+  --color-yellow: #a07818;
+  --color-blue: #386880;
+  --color-purple: #685080;
+  --color-cyan: #388070;
+  --color-orange: #986830;
+}
+
+/* ===========================================
+   LAHMACUN PALETTE (DEFAULT) - Warm Spice Market
+   Earthy terracotta, paprika, olive, turmeric
+   =========================================== */
+
+/* Dark + Lahmacun (default) */
+:root[data-palette="lahmacun"],
+:root:not([data-palette]) {
+  --accent: #c86830;
+  --accent-hover: #d87840;
+  --accent-muted: #a85820;
+  --color-red: #b84028;
+  --color-green: #788850;
+  --color-yellow: #b89038;
+  --color-blue: #a07058;
+  --color-purple: #7a4535;
+  --color-cyan: #988860;
+  --color-orange: #c87038;
+}
+
+/* Light + Lahmacun (default) */
+[data-theme="light"][data-palette="lahmacun"],
+[data-theme="light"]:not([data-palette]) {
+  --accent: #a04818;
+  --accent-hover: #883810;
+  --accent-muted: #b85820;
+  --color-red: #901808;
+  --color-green: #485820;
+  --color-yellow: #886010;
+  --color-blue: #704828;
+  --color-purple: #803038;
+  --color-cyan: #686030;
+  --color-orange: #a05018;
+}
+
+/* ===========================================
+   SUSHI PALETTE - Fresh Sushi
+   Nori green, salmon pink, rice cream, wasabi, ocean
+   =========================================== */
+
+/* Dark + Sushi */
+:root[data-palette="sushi"] {
+  --accent: #48a890;
+  --accent-hover: #58b8a0;
+  --accent-muted: #389078;
+  --color-red: #e88898;
+  --color-green: #2a5848;
+  --color-yellow: #c8c0a8;
+  --color-blue: #4890a8;
+  --color-purple: #d898a8;
+  --color-cyan: #48a890;
+  --color-orange: #78c858;
+}
+
+/* Light + Sushi */
+[data-theme="light"][data-palette="sushi"] {
+  --accent: #287868;
+  --accent-hover: #186050;
+  --accent-muted: #389078;
+  --color-red: #c86070;
+  --color-green: #183828;
+  --color-yellow: #989078;
+  --color-blue: #286878;
+  --color-purple: #a86878;
+  --color-cyan: #287868;
+  --color-orange: #488828;
+}
+
+/* ===========================================
+   SEMANTIC COLOR ALIASES (dimmed versions)
+   Used for terminal, code, and UI elements
+   =========================================== */
+
+:root {
+  --color-red-dim: var(--color-red);
+  --color-green-dim: var(--color-green);
+  --color-yellow-dim: var(--color-yellow);
+  --color-blue-dim: var(--color-blue);
+  --color-purple-dim: var(--color-purple);
+  --color-cyan-dim: var(--color-cyan);
+  --color-orange-dim: var(--color-orange);
+  --color-white-dim: var(--text-muted);
+}

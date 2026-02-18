@@ -1,0 +1,625 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ChatBot from '../components/ChatBot.astro';
+import Tag from '../components/Tag.astro';
+import { getCollection } from 'astro:content';
+import { projects } from '../lib/projects';
+import { COLORS } from '../lib/theme';
+import { TECH_STACK } from '../lib/constants';
+import { formatDateCompact, formatDateISO } from '../lib/dateUtils';
+
+const allPosts = (await getCollection('blog'))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const latestPost = allPosts[0];
+
+const currentProject = projects[Math.floor(Date.now() / 86400000) % 3];
+
+// Philosophy quotes with palette color references (CSS variable keys)
+const philosophies = [
+  { text: "Detail matters.", gradientKeys: ['red', 'orange'] },
+  { text: "Ship fast, learn faster.", gradientKeys: ['blue', 'purple'] },
+  { text: "Humans dream, machines iterate.", gradientKeys: ['purple', 'blue'] },
+  { text: "Between intent and execution lies code.", gradientKeys: ['green', 'blue'] },
+];
+---
+
+<BaseLayout title="sinkyl Devlog">
+  <canvas id="circuit-bg"></canvas>
+
+  <div class="hero-cube-container">
+    <div class="hero-cube" id="hero-cube">
+      <div class="cube-face front"></div>
+      <div class="cube-face back"></div>
+      <div class="cube-face right"></div>
+      <div class="cube-face left"></div>
+      <div class="cube-face top"></div>
+      <div class="cube-face bottom"></div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+    <!-- Hero / About -->
+    <div class="bento-card hero" style="--delay: 0">
+      <span class="label">About</span>
+      <h1><span class="gradient-text">Hey, I'm Sinan</span></h1>
+      <p>
+        Building three ambitious projects in parallel. This devlog captures the journey —
+        the wins, the bugs, the architectural decisions, and everything in between.
+      </p>
+      <div class="hero-links">
+        <a href="/blog" class="hero-link">Read the blog &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Status Widget -->
+    <div class="bento-card status" style="--delay: 1" data-color={currentProject.colorKey}>
+      <span class="label">Now</span>
+      <div class="status-content">
+        <span class="status-dot"></span>
+        <div>
+          <p class="status-label">Currently building</p>
+          <p class="status-project">{currentProject.name}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quote 1 -->
+    <div class="bento-card quote" style="--delay: 2" data-grad-start={philosophies[0].gradientKeys[0]} data-grad-end={philosophies[0].gradientKeys[1]}>
+      <blockquote>{philosophies[0].text}</blockquote>
+    </div>
+
+    <!-- Projects Block -->
+    <div class="bento-card projects-block" style="--delay: 3">
+      <span class="label">Projects</span>
+      <div class="projects-list">
+        {projects.map(project => (
+          <a href={`/projects/${project.id}`} class="project-item" data-color={project.colorKey}>
+            <span class="project-icon">{project.icon}</span>
+            <div class="project-info">
+              <h3>{project.name}</h3>
+              <p>{project.shortDescription}</p>
+            </div>
+            <span class="project-arrow">&rarr;</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Latest Post -->
+    {latestPost && (() => {
+      const postProject = projects.find(p => p.id === latestPost.data.project);
+      return (
+        <a href={`/blog/${latestPost.id}`} class="bento-card latest" style="--delay: 5" data-color={postProject?.colorKey}>
+          <span class="label">Latest</span>
+          {postProject && (
+            <span class="latest-project">{postProject.name}</span>
+          )}
+          <time datetime={formatDateISO(latestPost.data.date)}>
+            {formatDateCompact(latestPost.data.date)}
+          </time>
+          <h3>{latestPost.data.title}</h3>
+        </a>
+      );
+    })()}
+
+    <!-- Tech Stack -->
+    <div class="bento-card stack" style="--delay: 6">
+      <span class="label">Stack</span>
+      <div class="stack-items">
+        {TECH_STACK.map(tech => (
+          <Tag label={tech} size="md" />
+        ))}
+      </div>
+    </div>
+
+    <!-- Quote 3 -->
+    <div class="bento-card quote wide" style="--delay: 7" data-grad-start={philosophies[2].gradientKeys[0]} data-grad-end={philosophies[2].gradientKeys[1]}>
+      <blockquote>{philosophies[2].text}</blockquote>
+    </div>
+
+  </div>
+
+  <ChatBot />
+</BaseLayout>
+
+<style>
+  /* ===========================================
+     Color mappings from data attributes to CSS variables
+     =========================================== */
+  [data-color="red"] { --item-color: var(--color-red); }
+  [data-color="green"] { --item-color: var(--color-green); }
+  [data-color="yellow"] { --item-color: var(--color-yellow); }
+  [data-color="blue"] { --item-color: var(--color-blue); }
+  [data-color="purple"] { --item-color: var(--color-purple); }
+  [data-color="cyan"] { --item-color: var(--color-cyan); }
+  [data-color="orange"] { --item-color: var(--color-orange); }
+
+  /* Quote gradient mappings */
+  [data-grad-start="red"] { --grad-start: var(--color-red); }
+  [data-grad-start="green"] { --grad-start: var(--color-green); }
+  [data-grad-start="yellow"] { --grad-start: var(--color-yellow); }
+  [data-grad-start="blue"] { --grad-start: var(--color-blue); }
+  [data-grad-start="purple"] { --grad-start: var(--color-purple); }
+  [data-grad-start="cyan"] { --grad-start: var(--color-cyan); }
+  [data-grad-start="orange"] { --grad-start: var(--color-orange); }
+
+  [data-grad-end="red"] { --grad-end: var(--color-red); }
+  [data-grad-end="green"] { --grad-end: var(--color-green); }
+  [data-grad-end="yellow"] { --grad-end: var(--color-yellow); }
+  [data-grad-end="blue"] { --grad-end: var(--color-blue); }
+  [data-grad-end="purple"] { --grad-end: var(--color-purple); }
+  [data-grad-end="cyan"] { --grad-end: var(--color-cyan); }
+  [data-grad-end="orange"] { --grad-end: var(--color-orange); }
+
+  #circuit-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  /* Hero Cube - Black Hole Effect */
+  .hero-cube-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0 0;
+    perspective: 600px;
+    position: relative;
+    height: 160px;
+  }
+
+  .hero-cube {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(-20deg) rotateY(-20deg);
+  }
+
+  .cube-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #0c0d0f;
+    border-radius: 6px;
+    backface-visibility: visible;
+  }
+
+  :global([data-theme="light"]) .cube-face {
+    background: #2a2a2a;
+  }
+
+  .cube-face {}
+
+  .cube-face.front  { transform: translateZ(50px); }
+  .cube-face.back   { transform: translateZ(-50px) rotateY(180deg); }
+  .cube-face.right  { transform: translateX(50px) rotateY(90deg); }
+  .cube-face.left   { transform: translateX(-50px) rotateY(-90deg); }
+  .cube-face.top    { transform: translateY(-50px) rotateX(90deg); }
+  .cube-face.bottom { transform: translateY(50px) rotateX(-90deg); }
+
+  @media (max-width: 600px) {
+    .hero-cube-container {
+      padding: 1.5rem 0 0;
+      perspective: 400px;
+      height: 120px;
+    }
+
+    .hero-cube {
+      width: 70px;
+      height: 70px;
+    }
+
+    .cube-face.front  { transform: translateZ(35px); }
+    .cube-face.back   { transform: translateZ(-35px) rotateY(180deg); }
+    .cube-face.right  { transform: translateX(35px) rotateY(90deg); }
+    .cube-face.left   { transform: translateX(-35px) rotateY(-90deg); }
+    .cube-face.top    { transform: translateY(-35px) rotateX(90deg); }
+    .cube-face.bottom { transform: translateY(35px) rotateX(-90deg); }
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(100px, auto);
+    grid-auto-flow: dense;
+    gap: 1rem;
+    padding: 3rem 0;
+  }
+
+  .bento-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    animation: fadeSlideIn 0.5s ease-out forwards;
+    animation-delay: calc(var(--delay) * 0.08s);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .label {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: var(--font-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    opacity: var(--opacity-soft);
+  }
+
+  /* Hero Card */
+  .hero {
+    grid-column: span 2;
+    grid-row: span 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      var(--text-muted),
+      var(--color-blue),
+      var(--color-orange),
+      var(--color-green),
+      var(--color-blue),
+      var(--text-muted)
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 10s ease infinite;
+  }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: var(--font-lg);
+    line-height: 1.7;
+    max-width: 400px;
+  }
+
+  .hero-links {
+    margin-top: 1.5rem;
+  }
+
+  .hero-link {
+    color: var(--accent);
+    font-size: var(--font-md);
+    transition: opacity 0.2s;
+  }
+
+  .hero-link:hover {
+    opacity: var(--opacity-high);
+  }
+
+  /* Status Card */
+  .status {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .status-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--item-color);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 12px var(--item-color);
+    flex-shrink: 0;
+  }
+
+  .status-label {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .status-project {
+    font-size: var(--font-md-lg);
+    font-weight: 600;
+    color: var(--item-color);
+  }
+
+  /* Projects Block */
+  .projects-block {
+    grid-column: span 2;
+    grid-row: span 2;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .project-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--text) 3%, transparent);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .project-item:hover {
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+    border-color: var(--item-color);
+    transform: translateX(4px);
+  }
+
+  .project-icon {
+    font-size: 1.3rem;
+    color: var(--item-color);
+    flex-shrink: 0;
+  }
+
+  .project-info {
+    flex: 1;
+  }
+
+  .project-info h3 {
+    color: var(--item-color);
+    font-size: var(--font-md-lg);
+    margin-bottom: 0.2rem;
+  }
+
+  .project-info p {
+    color: var(--text-muted);
+    font-size: var(--font-sm-md);
+  }
+
+  .project-arrow {
+    color: var(--item-color);
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .project-item:hover .project-arrow {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+
+  /* Latest Post */
+  .latest {
+    grid-column: span 2;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .latest:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .latest-project {
+    font-size: var(--font-sm);
+    color: var(--item-color);
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  .latest time {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .latest h3 {
+    font-size: var(--font-md);
+    color: var(--text-muted);
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .latest:hover h3 {
+    color: var(--text);
+  }
+
+  /* Stack Card */
+  .stack {
+    grid-column: span 2;
+  }
+
+  .stack-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Quote Cards */
+  .quote {
+    grid-column: span 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-color: color-mix(in srgb, var(--grad-start) 15%, var(--border));
+  }
+
+  .quote.wide {
+    grid-column: span 2;
+  }
+
+  .quote blockquote {
+    font-size: var(--font-md);
+    font-style: italic;
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--grad-start) 70%, var(--text-muted)),
+      color-mix(in srgb, var(--grad-end) 70%, var(--text-muted))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* Light mode shadows */
+  :global([data-theme="light"]) .bento-card {
+    box-shadow: var(--shadow-sm);
+  }
+
+  :global([data-theme="light"]) .latest:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero {
+      grid-column: span 2;
+    }
+
+    .projects-block {
+      grid-column: span 2;
+      grid-row: span 1;
+    }
+
+    .latest {
+      grid-column: span 2;
+    }
+
+    .stack {
+      grid-column: span 2;
+    }
+
+    .quote.wide {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero,
+    .status,
+    .projects-block,
+    .latest,
+    .stack,
+    .quote,
+    .quote.wide {
+      grid-column: span 1;
+    }
+
+    .hero h1 {
+      font-size: 1.8rem;
+    }
+
+    .bento-card {
+      padding: 1.25rem;
+    }
+
+    .hide-mobile {
+      display: none;
+    }
+  }
+
+  /* Touch devices: use active states instead of hover */
+  @media (hover: none) {
+    .project-item:hover {
+      transform: none;
+    }
+
+    .project-item:active {
+      background: color-mix(in srgb, var(--text) 6%, transparent);
+      border-color: var(--item-color);
+    }
+
+    .project-arrow {
+      opacity: var(--opacity-soft);
+    }
+
+    .project-item:hover .project-arrow {
+      transform: none;
+    }
+
+    .latest:hover {
+      transform: none;
+    }
+
+    .latest:active {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 5%, var(--bg-card));
+    }
+  }
+
+</style>
+
+<script>
+  import { initCircuitBackground } from '../lib/circuitBackground';
+  initCircuitBackground();
+
+  // Rotating cube - constant speed, direction based on mouse quadrant
+  const cube = document.getElementById('hero-cube');
+  if (cube) {
+    let rotX = -20;
+    let rotY = -20;
+    const SPEED = 0.4;
+
+    let dirX = 1;
+    let dirY = 1;
+
+    document.addEventListener('mousemove', (e) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      dirY = e.clientX > centerX ? 1 : -1;
+      dirX = e.clientY > centerY ? -1 : 1;
+    });
+
+    function animate() {
+      rotX += SPEED * dirX;
+      rotY += SPEED * dirY;
+
+      cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+</script>

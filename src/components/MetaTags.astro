@@ -1,0 +1,95 @@
+---
+/**
+ * Reusable metadata tags component for blog posts
+ * Displays languages, patterns, architectures, and tags with consistent styling
+ */
+
+interface Props {
+  languages?: string[];
+  patterns?: string[];
+  architectures?: string[];
+  tags?: string[];
+}
+
+const {
+  languages = [],
+  patterns = [],
+  architectures = [],
+  tags = [],
+} = Astro.props;
+
+const hasAny = languages.length > 0 || patterns.length > 0 || architectures.length > 0 || tags.length > 0;
+---
+
+{hasAny && (
+  <div class="meta">
+    {languages.length > 0 && (
+      <div class="meta-group">
+        <span class="meta-label">Languages:</span>
+        {languages.map(lang => <span class="tag lang">{lang}</span>)}
+      </div>
+    )}
+    {patterns.length > 0 && (
+      <div class="meta-group">
+        <span class="meta-label">Patterns:</span>
+        {patterns.map(p => <span class="tag pattern">{p}</span>)}
+      </div>
+    )}
+    {architectures.length > 0 && (
+      <div class="meta-group">
+        <span class="meta-label">Architecture:</span>
+        {architectures.map(a => <span class="tag arch">{a}</span>)}
+      </div>
+    )}
+    {tags.length > 0 && (
+      <div class="meta-group">
+        <span class="meta-label">Tags:</span>
+        {tags.map(tag => <span class="tag">{tag}</span>)}
+      </div>
+    )}
+  </div>
+)}
+
+<style>
+  .meta {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .meta-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .meta-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .tag {
+    background: var(--bg-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-xs);
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+  }
+
+  .tag.lang {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+  }
+
+  .tag.pattern {
+    border-color: var(--color-purple);
+    color: var(--color-purple);
+  }
+
+  .tag.arch {
+    border-color: var(--color-green);
+    color: var(--color-green);
+  }
+</style>

@@ -1,0 +1,21 @@
+{
+  "name": "devlog-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "collect-commits": "bash scripts/devlog/collect_commits.sh",
+    "generate-post": "node scripts/devlog/generate_weekly_post.js"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/rss": "^4.0.15",
+    "astro": "^5.17.1"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.0"
+  }
+}

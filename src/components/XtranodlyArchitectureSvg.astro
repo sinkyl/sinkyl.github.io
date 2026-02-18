@@ -1,0 +1,364 @@
+---
+// Xtranodly slide 1 SVG — editor view with contexts, floating/detached windows, bridge nodes
+// Nodes have input/output port circles; edges are bezier noodles connecting ports
+---
+
+<svg class="xtranodly-arch-svg" viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ===== MAIN GRAPH WINDOW ===== -->
+  <g class="win main-win">
+    <!-- Window frame -->
+    <rect x="5" y="5" width="420" height="290" rx="8" class="win-frame"/>
+    <rect x="5" y="5" width="420" height="22" rx="8" class="win-titlebar"/>
+    <rect x="5" y="19" width="420" height="8" class="win-titlebar"/>
+    <circle cx="19" cy="16" r="3.5" class="win-dot dot-close"/>
+    <circle cx="31" cy="16" r="3.5" class="win-dot dot-min"/>
+    <circle cx="43" cy="16" r="3.5" class="win-dot dot-max"/>
+    <text x="215" y="19" class="win-title">Main Graph</text>
+
+    <!-- ── NodeA (compute, two outputs) ── -->
+    <g class="node compute-node">
+      <rect x="20" y="40" width="78" height="32" rx="6"/>
+      <text x="59" y="60" class="node-name">NodeA</text>
+      <circle cx="98" cy="49" r="5" class="port port-out"/>
+      <circle cx="98" cy="63" r="5" class="port port-out"/>
+    </g>
+
+    <!-- ── Bridge: to Ctx1 (input side, in main graph) ── -->
+    <g class="node bridge-node">
+      <rect x="148" y="40" width="105" height="32" rx="5"/>
+      <text x="200" y="60" class="bridge-label">to Ctx1 ▸</text>
+      <circle cx="148" cy="56" r="5" class="port port-in"/>
+    </g>
+
+    <!-- Noodle: NodeA out1 → to Ctx1 in -->
+    <path d="M 103,49 C 122,49 130,56 143,56" class="noodle"/>
+
+    <!-- ── Context Node 1 (minimized — circle) ── -->
+    <g class="ctx-mini">
+      <circle cx="358" cy="56" r="22" class="ctx-mini-circle"/>
+      <text x="358" y="60" class="ctx-mini-label">Ctx-x</text>
+    </g>
+
+    <!-- Noodle: NodeA out2 → Accum (drawn BEFORE ctx-float so it passes behind) -->
+    <path d="M 103,63 C 103,120 15,150 15,197 C 15,207 40,203 50,203" class="noodle"/>
+
+    <!-- ── Context1: floating inside main (has bg fill to mask the noodle behind) ── -->
+    <g class="ctx-float">
+      <rect x="18" y="100" width="398" height="68" rx="6" class="ctx-frame"/>
+      <text x="30" y="116" class="ctx-title">Context Node 1</text>
+      <text x="155" y="116" class="ctx-mode">floating</text>
+
+      <!-- Bridge output: from Main -->
+      <g class="node bridge-node">
+        <rect x="32" y="126" width="100" height="28" rx="5"/>
+        <text x="82" y="144" class="bridge-label">◂ from Main</text>
+        <circle cx="132" cy="140" r="5" class="port port-out"/>
+      </g>
+
+      <!-- Proc1 -->
+      <g class="node inner-node">
+        <rect x="160" y="126" width="68" height="28" rx="5"/>
+        <text x="194" y="144" class="node-name">Proc1</text>
+        <circle cx="160" cy="140" r="5" class="port port-in"/>
+        <circle cx="228" cy="140" r="5" class="port port-out"/>
+      </g>
+
+      <!-- Proc2 -->
+      <g class="node inner-node">
+        <rect x="252" y="126" width="68" height="28" rx="5"/>
+        <text x="286" y="144" class="node-name">Proc2</text>
+        <circle cx="252" cy="140" r="5" class="port port-in"/>
+        <circle cx="320" cy="140" r="5" class="port port-out"/>
+      </g>
+
+      <!-- Bridge input: to Ctx2 -->
+      <g class="node bridge-node">
+        <rect x="342" y="126" width="66" height="28" rx="5"/>
+        <text x="375" y="144" class="bridge-label">to Ctx2 ▸</text>
+        <circle cx="342" cy="140" r="5" class="port port-in"/>
+      </g>
+
+      <!-- Noodles inside Context1 -->
+      <path d="M 136,140 C 145,140 151,140 156,140" class="noodle"/>
+      <path d="M 232,140 C 240,140 244,140 248,140" class="noodle"/>
+      <path d="M 324,140 C 331,140 335,140 338,140" class="noodle"/>
+    </g>
+
+    <!-- ── Bottom section: Accum → fan-out ── -->
+
+    <!-- Accum node -->
+    <g class="node compute-node">
+      <rect x="55" y="190" width="72" height="26" rx="5"/>
+      <text x="91" y="207" class="node-name">Accum</text>
+      <circle cx="55" cy="203" r="5" class="port port-in"/>
+      <circle cx="127" cy="197" r="5" class="port port-out"/>
+      <circle cx="127" cy="209" r="5" class="port port-out"/>
+    </g>
+
+    <!-- Scale node -->
+    <g class="node compute-node">
+      <rect x="188" y="184" width="65" height="24" rx="5"/>
+      <text x="220" y="200" class="node-name">Scale</text>
+      <circle cx="188" cy="196" r="5" class="port port-in"/>
+      <circle cx="253" cy="196" r="5" class="port port-out"/>
+    </g>
+
+    <!-- Monitor node (visual output — mini line chart) -->
+    <g class="node visual-node">
+      <rect x="188" y="218" width="160" height="32" rx="4"/>
+      <text x="200" y="238" class="visual-label">▸</text>
+      <!-- Mini sparkline chart -->
+      <polyline points="214,244 222,232 230,238 238,228 246,234 254,224 262,230 270,226 278,220 286,228 294,222 302,230 310,224 318,220 326,226 334,222" class="mini-chart"/>
+      <circle cx="188" cy="234" r="5" class="port port-in"/>
+    </g>
+
+    <!-- Noodle: Accum out1 → Scale in -->
+    <path d="M 132,197 C 155,197 168,196 183,196" class="noodle"/>
+    <!-- Noodle: Accum out2 → Monitor in -->
+    <path d="M 132,209 C 150,209 170,234 183,234" class="noodle"/>
+  </g>
+
+  <!-- ===== DETACHED CONTEXT2 WINDOW ===== -->
+  <g class="win detached-win">
+    <rect x="445" y="25" width="270" height="250" rx="8" class="win-frame"/>
+    <rect x="445" y="25" width="270" height="22" rx="8" class="win-titlebar"/>
+    <rect x="445" y="39" width="270" height="8" class="win-titlebar"/>
+    <circle cx="459" cy="36" r="3.5" class="win-dot dot-close"/>
+    <circle cx="471" cy="36" r="3.5" class="win-dot dot-min"/>
+    <circle cx="483" cy="36" r="3.5" class="win-dot dot-max"/>
+    <text x="580" y="39" class="win-title">Context Node 2</text>
+
+    <!-- Bridge output: from Ctx1 -->
+    <g class="node bridge-node">
+      <rect x="468" y="65" width="108" height="30" rx="5"/>
+      <text x="522" y="84" class="bridge-label">◂ from Ctx1</text>
+      <circle cx="522" cy="95" r="5" class="port port-out"/>
+    </g>
+
+    <!-- Filter -->
+    <g class="node inner-node">
+      <rect x="468" y="135" width="82" height="30" rx="5"/>
+      <text x="509" y="154" class="node-name">Filter</text>
+      <circle cx="509" cy="135" r="5" class="port port-in"/>
+      <circle cx="550" cy="150" r="5" class="port port-out"/>
+    </g>
+
+    <!-- Output -->
+    <g class="node inner-node">
+      <rect x="598" y="135" width="82" height="30" rx="5"/>
+      <text x="639" y="154" class="node-name">Output</text>
+      <circle cx="598" cy="150" r="5" class="port port-in"/>
+    </g>
+
+    <!-- Noodle: bridge → Filter (vertical curve) -->
+    <path d="M 522,99 C 522,114 509,120 509,131" class="noodle"/>
+    <!-- Noodle: Filter → Output -->
+    <path d="M 554,150 C 570,150 582,150 594,150" class="noodle"/>
+
+    <!-- Ctx-n circle -->
+    <g class="ctx-mini">
+      <circle cx="580" cy="210" r="22" class="ctx-mini-circle"/>
+      <text x="580" y="214" class="ctx-mini-label">Ctx-n</text>
+    </g>
+
+    <!-- Annotation -->
+    <text x="580" y="250" class="detach-note">opened in separate window</text>
+    <text x="580" y="264" class="detach-note">e.g. another monitor</text>
+  </g>
+
+</svg>
+
+<style is:global>
+  .xtranodly-arch-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===== Window chrome ===== */
+  .xtranodly-arch-svg .win-frame {
+    fill: var(--bg, #181a1f);
+    stroke: var(--border, #2e3339);
+    stroke-width: 1.5;
+  }
+
+  .xtranodly-arch-svg .win-titlebar {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: none;
+  }
+
+  .xtranodly-arch-svg .win-dot { stroke: none; }
+  .xtranodly-arch-svg .dot-close { fill: var(--color-red, #e06c75); opacity: 0.7; }
+  .xtranodly-arch-svg .dot-min   { fill: var(--color-yellow, #e5c07b); opacity: 0.7; }
+  .xtranodly-arch-svg .dot-max   { fill: var(--color-green, #98c379); opacity: 0.7; }
+
+  .xtranodly-arch-svg .win-title {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  .xtranodly-arch-svg .detached-win .win-frame {
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 2;
+  }
+
+  /* ===== Nodes ===== */
+  .xtranodly-arch-svg .node rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke-width: 1.5;
+  }
+
+  .xtranodly-arch-svg .compute-node rect { stroke: var(--color-blue, #61afef); }
+  .xtranodly-arch-svg .inner-node rect   { stroke: var(--color-blue, #61afef); }
+
+  .xtranodly-arch-svg .node-name {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  .xtranodly-arch-svg .bridge-node rect {
+    stroke: var(--color-orange, #d19a66);
+    fill: var(--bg-secondary, #1e2227);
+  }
+
+  .xtranodly-arch-svg .bridge-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    fill: var(--color-orange, #d19a66);
+    text-anchor: middle;
+  }
+
+  /* ===== Port circles (connectors) ===== */
+  .xtranodly-arch-svg .port-out {
+    fill: var(--color-green, #98c379) !important;
+    stroke: var(--color-green, #98c379) !important;
+    stroke-width: 2 !important;
+  }
+
+  .xtranodly-arch-svg .port-in {
+    fill: var(--bg-secondary, #1e2227) !important;
+    stroke: var(--color-green, #98c379) !important;
+    stroke-width: 2 !important;
+  }
+
+  /* Bridge node ports use orange */
+  .xtranodly-arch-svg .bridge-node .port-out {
+    fill: var(--color-orange, #d19a66) !important;
+    stroke: var(--color-orange, #d19a66) !important;
+  }
+
+  .xtranodly-arch-svg .bridge-node .port-in {
+    fill: var(--bg-secondary, #1e2227) !important;
+    stroke: var(--color-orange, #d19a66) !important;
+  }
+
+  /* ===== Visual / Monitor node ===== */
+  .xtranodly-arch-svg .visual-node rect {
+    stroke: var(--color-cyan, #56b6c2);
+    fill: var(--bg-secondary, #1e2227);
+  }
+
+  .xtranodly-arch-svg .visual-label {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--color-cyan, #56b6c2);
+    text-anchor: start;
+  }
+
+  .xtranodly-arch-svg .mini-chart {
+    fill: none;
+    stroke: var(--color-cyan, #56b6c2);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  /* ===== Noodles (bezier edges) ===== */
+  .xtranodly-arch-svg .noodle {
+    fill: none !important;
+    stroke: var(--color-green, #98c379) !important;
+    stroke-width: 2 !important;
+  }
+
+  /* ===== Context node minimized — circle ===== */
+  .xtranodly-arch-svg .ctx-mini-circle {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 2;
+  }
+
+  .xtranodly-arch-svg .ctx-mini-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    fill: var(--color-purple, #c678dd);
+    text-anchor: middle;
+  }
+
+  /* ===== Context floating panel ===== */
+  .xtranodly-arch-svg .ctx-frame {
+    fill: var(--bg, #181a1f);
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 3;
+  }
+
+  .xtranodly-arch-svg .ctx-title {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--color-purple, #c678dd);
+    text-anchor: start;
+  }
+
+  .xtranodly-arch-svg .ctx-mode {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: start;
+    opacity: 0.7;
+  }
+
+  /* ===== Annotations ===== */
+  .xtranodly-arch-svg .detach-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* ===== Light mode ===== */
+  [data-theme="light"] .xtranodly-arch-svg .win-frame {
+    fill: var(--bg, #f8f7f4);
+  }
+
+  [data-theme="light"] .xtranodly-arch-svg .win-titlebar {
+    fill: var(--bg-secondary, #fdfcfa);
+  }
+
+  [data-theme="light"] .xtranodly-arch-svg .ctx-frame {
+    fill: var(--bg, #f8f7f4);
+  }
+
+  [data-theme="light"] .xtranodly-arch-svg .node rect,
+  [data-theme="light"] .xtranodly-arch-svg .bridge-node rect,
+  [data-theme="light"] .xtranodly-arch-svg .visual-node rect,
+  [data-theme="light"] .xtranodly-arch-svg .ctx-mini-circle {
+    fill: var(--bg-secondary, #fdfcfa);
+  }
+
+  [data-theme="light"] .xtranodly-arch-svg .port-in,
+  [data-theme="light"] .xtranodly-arch-svg .bridge-node .port-in {
+    fill: var(--bg, #f8f7f4);
+  }
+</style>

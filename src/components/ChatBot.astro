@@ -1,0 +1,721 @@
+---
+// Simple FAQ Chat Bot - No AI, just pattern matching
+import { TECH_STACK } from '../lib/constants';
+
+const faqData = {
+  greetings: ['hi', 'hello', 'hey', 'howdy', 'hola'],
+  about: ['who', 'about', 'sinan', 'yourself', 'introduce'],
+  projects: ['project', 'working', 'building', 'xtranodly', 'bazaar', 'spatium'],
+  stack: ['stack', 'tech', 'language', 'tool', 'use', 'code'],
+  experience: ['experience', 'background', 'career', 'work'],
+  contact: ['contact', 'reach', 'email', 'hire', 'connect'],
+  blog: ['blog', 'devlog', 'post', 'write', 'article'],
+};
+
+// Generate stack response from centralized TECH_STACK
+const stackList = TECH_STACK.map(tech => `• **${tech}**`).join('\n');
+
+const responses = {
+  greetings: "Hey there! I'm a simple bot here to answer questions about Sinan. Ask me about his projects, tech stack, or background!",
+  about: "Sinan is a **Senior Full-stack Developer** who taught himself to code, then studied electrical engineering just to understand what happens beneath the abstractions. That hardware-meets-software mindset shapes everything he builds — high-performance distributed systems in **C#/.NET**, **Rust**, and **Python**.\n\nWhen not debugging microservices or optimizing queries, he's either at the gym or on a bike — because complex systems need a clear head.",
+  projects: "Sinan is currently building three projects:\n\n◈ <a href=\"/projects/xtranodly#expanded\" target=\"_blank\">xtranodly.ai</a> — A visual node-based graph system for AI workflows and automation\n\n◉ <a href=\"/projects/bazaar#expanded\" target=\"_blank\">Bazaar.Shop</a> — A multi-tenant marketplace with PCI-DSS compliant payments and SSO\n\n◎ <a href=\"/projects/spatium#expanded\" target=\"_blank\">Spatium.ai</a> — Spatial computing for immersive 3D experiences",
+  stack: `Sinan's tech stack includes:\n\n${stackList}`,
+  experience: "Sinan has experience building complex distributed systems, marketplace platforms, and developer tools. His focus is on clean architecture, performance, and shipping quality software.",
+  contact: "You can explore Sinan's work through this devlog. Check out the projects section or read the blog posts to see what he's building!",
+  blog: "Most devs build in silence and only show the wins. This blog is the opposite — a **public accountability experiment**. Three ambitious projects, documented weekly, with zero filter.\n\nArchitectural decisions, bugs that took hours to find, lessons learned the hard way. If it ships, it's here. If it fails, it's here too.\n\nNo stealth mode. No polished PR. Just the raw journey. Check out <a href=\"/blog\">/blog</a>!",
+};
+
+const unknownResponses = [
+  "¯\\_(ツ)_/¯\n\nMy database is just a potato with dreams. Try asking about projects, stack, or the blog!",
+  "🤖 I'm an excellent listener... not so great at answering that one.\n\nI know stuff about: projects, tech stack, or who Sinan is!",
+  "🔮 *consults crystal ball*\n\n...it says \"404: Answer not found\"\n\nTry: projects, stack, experience, or blog!",
+];
+---
+
+<div id="chat-widget" class="chat-widget">
+  <div class="chat-backdrop"></div>
+  <button id="chat-toggle" class="chat-toggle" aria-label="Open chat">
+    <svg class="icon-chat" viewBox="0 -4 40 36" fill="none" stroke-width="1">
+      <!-- UFO ship -->
+      <g class="ufo" stroke="#7a8590">
+        <!-- Dome -->
+        <path d="M15 14 Q20 8 25 14" stroke-width="0.8" fill="none"/>
+        <!-- Body -->
+        <ellipse cx="20" cy="16" rx="12" ry="4" stroke-width="0.8"/>
+        <!-- Bottom detail -->
+        <ellipse cx="20" cy="17" rx="6" ry="1.5" stroke-width="0.5"/>
+        <!-- Lights -->
+        <circle cx="12" cy="16" r="1" fill="#7a8590" stroke="none" class="ufo-light light-1"/>
+        <circle cx="20" cy="17.5" r="1" fill="#7a8590" stroke="none" class="ufo-light light-2"/>
+        <circle cx="28" cy="16" r="1" fill="#7a8590" stroke="none" class="ufo-light light-3"/>
+        <!-- Alien eyes in dome -->
+        <circle cx="18" cy="12" r="0.8" fill="#7a8590" stroke="none"/>
+        <circle cx="22" cy="12" r="0.8" fill="#7a8590" stroke="none"/>
+      </g>
+      <!-- Chat bubble (small, follows ship) -->
+      <g class="chat-shape" stroke="currentColor">
+        <path d="M24 -3h9a1.2 1.2 0 0 1 1.2 1.2v5a1.2 1.2 0 0 1-1.2 1.2h-5l-2 2v-2h-2a1.2 1.2 0 0 1-1.2-1.2v-5a1.2 1.2 0 0 1 1.2-1.2z" stroke-width="0.6"/>
+        <!-- Typing text lines -->
+        <line class="text-line line-1" x1="25" y1="-1" x2="32" y2="-1" stroke-width="0.5" stroke-linecap="round"/>
+        <line class="text-line line-2" x1="25" y1="1" x2="30" y2="1" stroke-width="0.5" stroke-linecap="round"/>
+        <line class="text-line line-3" x1="25" y1="3" x2="28" y2="3" stroke-width="0.5" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </button>
+
+  <div id="chat-panel" class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <span class="chat-avatar">
+          <div class="slinky small">
+            <span class="slinky-ring ring-1"></span>
+            <span class="slinky-ring ring-2"></span>
+            <span class="slinky-ring ring-3"></span>
+            <span class="slinky-dot"></span>
+          </div>
+        </span>
+        <div>
+          <h3>Ask About Sinan</h3>
+          <span class="chat-status">FAQ Bot</span>
+        </div>
+      </div>
+      <button id="suggestions-toggle" class="suggestions-toggle" aria-label="Show suggestions">?</button>
+      <div id="suggestions-panel" class="suggestions-panel">
+        <span class="suggestions-label">Try asking:</span>
+        <div class="suggestions-list">
+          <button class="suggestion-btn" data-question="Who is Sinan?">Who is Sinan?</button>
+          <button class="suggestion-btn" data-question="What projects is he building?">What projects?</button>
+          <button class="suggestion-btn" data-question="What's his tech stack?">Tech stack?</button>
+          <button class="suggestion-btn" data-question="What is this devlog?">About the blog?</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="chat-messages" class="chat-messages">
+      <div class="message bot">
+        <span class="message-label">Bot</span>
+        <div class="message-content">
+          Hey! I'm here to answer questions about Sinan. Try asking:
+          <ul>
+            <li><button class="inline-suggestion" data-question="Who is Sinan?">Who is Sinan?</button></li>
+            <li><button class="inline-suggestion" data-question="What projects is he building?">What projects is he building?</button></li>
+            <li><button class="inline-suggestion" data-question="What's his tech stack?">What's his tech stack?</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <form id="chat-form" class="chat-input-form">
+      <input
+        type="text"
+        id="chat-input"
+        placeholder="Ask a question..."
+        autocomplete="off"
+        enterkeyhint="send"
+      />
+      <button type="submit" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .chat-widget {
+    position: fixed;
+    bottom: 2rem;
+    right: 1.5rem;
+    z-index: 1000;
+    font-family: inherit;
+    transition: bottom 0.3s ease;
+  }
+
+  .chat-widget.footer-hidden {
+    bottom: 0;
+  }
+
+  /* Mobile backdrop blur */
+  .chat-backdrop {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .chat-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      z-index: -1;
+    }
+
+    :global([data-theme="light"]) .chat-backdrop {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .chat-widget.open .chat-backdrop {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .chat-toggle {
+    width: 112px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    position: relative;
+  }
+
+  .chat-toggle:hover {
+    transform: scale(1.05);
+  }
+
+  .chat-toggle .icon-chat {
+    height: 112px;
+    color: var(--color-blue);
+    transition: opacity 0.2s;
+  }
+
+  :global([data-theme="light"]) .chat-toggle .icon-chat {
+    color: var(--accent);
+  }
+
+  /* Typing text effect */
+  .chat-toggle .icon-chat .text-line {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 10;
+    opacity: 0.7;
+  }
+
+  .chat-toggle .icon-chat .line-1 {
+    animation: typeLine 4s ease-in-out infinite, lineColor 6s ease-in-out infinite;
+  }
+
+  .chat-toggle .icon-chat .line-2 {
+    animation: typeLine 4s ease-in-out infinite, lineColor 6s ease-in-out infinite;
+    animation-delay: 0.15s, 2s;
+  }
+
+  .chat-toggle .icon-chat .line-3 {
+    animation: typeLine 4s ease-in-out infinite, lineColor 6s ease-in-out infinite;
+    animation-delay: 0.3s, 4s;
+  }
+
+  @keyframes lineColor {
+    0%, 100% { stroke: var(--color-blue); }
+    33% { stroke: var(--color-orange); }
+    66% { stroke: var(--color-purple); }
+  }
+
+  /* UFO animations */
+  .chat-toggle .icon-chat .ufo,
+  .chat-toggle .icon-chat .chat-shape {
+    animation: ufoHover 3s ease-in-out infinite;
+  }
+
+  .chat-toggle .icon-chat .ufo-light {
+    animation: ufoLights 1.5s ease-in-out infinite;
+  }
+
+  .chat-toggle .icon-chat .light-2 {
+    animation-delay: 0.5s;
+  }
+
+  .chat-toggle .icon-chat .light-3 {
+    animation-delay: 1s;
+  }
+
+  @keyframes ufoHover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  @keyframes ufoLights {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes typeLine {
+    0% {
+      stroke-dashoffset: 10;
+      opacity: 0.7;
+    }
+    15%, 50% {
+      stroke-dashoffset: 0;
+      opacity: 0.7;
+    }
+    60% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+    90% {
+      stroke-dashoffset: 10;
+      opacity: 0;
+    }
+    100% {
+      stroke-dashoffset: 10;
+      opacity: 0.7;
+    }
+  }
+
+
+  .chat-widget.open .chat-toggle .icon-chat {
+    display: none;
+  }
+
+  /* Chat header slinky (small) */
+  .slinky {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slinky.small {
+    width: 32px;
+    height: 32px;
+  }
+
+  .slinky .slinky-ring {
+    position: absolute;
+    border: 2px solid #2a2d31;
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  :global([data-theme="light"]) .slinky .slinky-ring {
+    border-color: #d8d5d0;
+  }
+
+  .slinky .ring-1 {
+    width: 100%;
+    height: 100%;
+    animation: slinkyOut 4s ease-in-out infinite, slinkyRingColor 12s ease-in-out infinite;
+  }
+
+  .slinky .ring-2 {
+    width: 70%;
+    height: 70%;
+    animation: slinkyOut 4s ease-in-out infinite, slinkyRingColor 12s ease-in-out infinite;
+    animation-delay: 0.3s, 4s;
+  }
+
+  .slinky .ring-3 {
+    width: 40%;
+    height: 40%;
+    animation: slinkyOut 4s ease-in-out infinite, slinkyRingColor 12s ease-in-out infinite;
+    animation-delay: 0.6s, 8s;
+  }
+
+  .slinky .slinky-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-blue);
+    border-radius: 50%;
+    animation: slinkyDot 4s ease-in-out infinite, slinkyColorDark 16s ease-in-out infinite;
+  }
+
+  .slinky.small .slinky-dot {
+    width: 4px;
+    height: 4px;
+  }
+
+  :global([data-theme="light"]) .slinky .slinky-dot {
+    animation: slinkyDot 4s ease-in-out infinite, slinkyColorLight 16s ease-in-out infinite;
+  }
+
+  /* Slinky keyframes are in animations.css */
+
+  .chat-panel {
+    position: absolute;
+    bottom: 70px;
+    right: 1rem;
+    width: 340px;
+    max-height: 450px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.25s ease-out;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .chat-widget.open .chat-panel {
+    display: flex;
+  }
+
+  .chat-header {
+    position: relative;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-header h3 {
+    font-size: var(--font-md);
+    margin: 0;
+    color: var(--text);
+  }
+
+  .chat-status {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 300px;
+  }
+
+  #chat-messages :global(.message) {
+    max-width: 85%;
+    animation: fadeIn 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  #chat-messages :global(.message.bot) {
+    align-self: flex-start;
+    align-items: flex-start;
+  }
+
+  #chat-messages :global(.message.user) {
+    align-self: flex-end;
+    align-items: flex-end;
+  }
+
+  #chat-messages :global(.message-label) {
+    font-size: var(--font-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    padding: 0 0.5rem;
+  }
+
+  #chat-messages :global(.message.bot .message-label) {
+    color: var(--color-blue);
+  }
+
+  #chat-messages :global(.message.user .message-label) {
+    color: var(--guest-color, #7a6580);
+  }
+
+  #chat-messages :global(.message-content) {
+    padding: 0.75rem 1rem;
+    font-size: var(--font-base);
+    line-height: 1.5;
+  }
+
+  #chat-messages :global(.message.bot .message-content) {
+    background: color-mix(in srgb, var(--color-blue) 15%, var(--bg-secondary));
+    border: 1px solid color-mix(in srgb, var(--color-blue) 30%, var(--border));
+    color: var(--text);
+    border-radius: 4px 16px 16px 16px;
+  }
+
+  #chat-messages :global(.message.user .message-content) {
+    background: color-mix(in srgb, var(--guest-color, #7a6580) 15%, var(--bg-secondary));
+    border: 1px solid color-mix(in srgb, var(--guest-color, #7a6580) 30%, var(--border));
+    color: var(--text);
+    border-radius: 16px 4px 16px 16px;
+  }
+
+  #chat-messages :global(.message.bot .message-content a) {
+    color: var(--color-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  #chat-messages :global(.message.bot .message-content a:hover) {
+    color: var(--color-purple);
+    text-decoration: underline;
+  }
+
+  #chat-messages :global(.message-content ul) {
+    margin: 0.5rem 0 0 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  #chat-messages :global(.message-content li) {
+    margin: 0.25rem 0;
+  }
+
+  #chat-messages :global(.inline-suggestion) {
+    background: none;
+    border: none;
+    color: var(--color-blue);
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0.25rem 0.1rem;
+    text-align: left;
+    transition: color 0.2s;
+  }
+
+  #chat-messages :global(.inline-suggestion:hover),
+  #chat-messages :global(.inline-suggestion:active) {
+    color: var(--color-purple);
+    text-decoration: underline;
+  }
+
+  /* Suggestions Toggle */
+  .suggestions-toggle {
+    position: absolute;
+    bottom: 0.25rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-blue) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-blue) 30%, transparent);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--color-blue);
+  }
+
+  .suggestions-toggle:hover {
+    background: color-mix(in srgb, var(--color-blue) 20%, transparent);
+    border-color: var(--color-blue);
+  }
+
+  .suggestions-toggle.active {
+    background: var(--color-red);
+    border-color: transparent;
+    color: white;
+  }
+
+  /* Suggestions Panel */
+  .suggestions-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0.5rem;
+    right: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    z-index: 10;
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .suggestions-panel.show {
+    display: block;
+  }
+
+  .suggestions-label {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .suggestions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .suggestion-btn {
+    font-size: var(--font-sm-md);
+    padding: 0.4rem 0.7rem;
+    background: color-mix(in srgb, var(--color-blue) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-blue) 25%, transparent);
+    border-radius: 15px;
+    color: var(--color-blue);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .suggestion-btn:hover {
+    background: color-mix(in srgb, var(--color-blue) 20%, transparent);
+    border-color: var(--color-blue);
+    transform: translateY(-1px);
+  }
+
+  .chat-input-form {
+    display: flex;
+    padding: 0.75rem;
+    gap: 0.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .chat-input-form input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: var(--font-base);
+    outline: none;
+    transition: border-color 0.2s, background-color 0.3s ease;
+  }
+
+  .chat-input-form input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .chat-input-form input:focus {
+    border-color: var(--color-blue);
+  }
+
+  .chat-input-form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .chat-input-form button svg {
+    width: 22px;
+    height: 22px;
+    color: var(--color-purple);
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+
+  .chat-input-form button:hover svg {
+    transform: translate(3px, -3px) rotate(-12deg);
+    filter: drop-shadow(-2px 2px 3px rgba(198, 120, 221, 0.5));
+    animation: sendPulse 0.6s ease-in-out infinite;
+  }
+
+  .chat-input-form button.sending svg {
+    animation: sendLaunch 0.4s ease-out forwards;
+  }
+
+  :global([data-theme="light"]) .chat-input-form button svg {
+    color: var(--color-purple);
+  }
+
+  :global([data-theme="light"]) .chat-input-form button:hover svg {
+    filter: drop-shadow(-2px 2px 3px color-mix(in srgb, var(--color-purple) 50%, transparent));
+  }
+
+  @media (max-width: 768px) {
+    .chat-widget {
+      bottom: 0.75rem;
+    }
+
+    .chat-widget.footer-hidden {
+      bottom: 0;
+    }
+
+    .chat-widget.open .chat-panel {
+      position: fixed;
+      top: auto;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      max-height: 60vh;
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .chat-widget.open .chat-messages {
+      flex: 1;
+      max-height: none;
+      min-height: 0;
+    }
+  }
+
+
+  /* Prevent mobile browser auto-zoom on input focus */
+  @media (max-width: 768px) {
+    .chat-input-form input {
+      font-size: 16px;
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+      -moz-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+  }
+</style>
+
+<script define:vars={{ faqData, responses, unknownResponses }}>
+  window.__chatBotConfig = { faqData, responses, unknownResponses };
+</script>
+
+<script>
+  import { initChatBot } from '../lib/chatBot';
+
+  const config = (window as any).__chatBotConfig;
+  if (config) {
+    initChatBot(config);
+  }
+
+  // Random color for chat icon and guest bubble (muted)
+  import { getRandomAccentColor } from '../lib/randomColor';
+
+  const chatWidget = document.getElementById('chat-widget');
+  if (chatWidget) {
+    const randomColor = getRandomAccentColor();
+    chatWidget.style.setProperty('--guest-color', randomColor);
+  }
+
+  // Move chat widget closer to bottom when footer is not visible
+  const footer = document.querySelector('footer');
+  if (footer && chatWidget) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          chatWidget.classList.toggle('footer-hidden', !entry.isIntersecting);
+        });
+      },
+      { threshold: 0 }
+    );
+    observer.observe(footer);
+  }
+</script>

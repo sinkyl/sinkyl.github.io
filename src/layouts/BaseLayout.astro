@@ -1,0 +1,514 @@
+---
+import { projects } from '../lib/projects';
+import { COLORS } from '../lib/theme';
+import '../styles/animations.css';
+import '../styles/components.css';
+import '../styles/palettes.css';
+import '../styles/carousel.css';
+import '../styles/carousel-projects.css';
+import '../styles/mermaid.css';
+import AboutModal from '../components/AboutModal.astro';
+import PaletteSwitcher from '../components/PaletteSwitcher.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  preventZoom?: boolean;
+}
+
+const { title, description = 'sinkyl Devlog', preventZoom = false } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="viewport-meta" data-prevent-zoom={preventZoom} />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="nav-links">
+          <a href="/" class:list={['nav-link', { active: currentPath === '/' }]}>
+            <span class="nav-text">Home<span class="link-indicator"></span></span>
+          </a>
+          <a href="/blog" class:list={['nav-link', { active: currentPath.startsWith('/blog') }]}>
+            <span class="nav-text">Blog<span class="link-indicator"></span></span>
+          </a>
+          <div class="nav-dropdown" id="projects-dropdown">
+            <button type="button" class:list={['nav-link', 'dropdown-toggle', { active: currentPath.startsWith('/projects') }]}>
+              <span class="nav-text">Projects<span class="link-indicator"></span></span>
+              <svg class="dropdown-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path class="arrow-up" d="M3 8l3-3 3 3"/>
+                <path class="arrow-down" d="M3 5l3 3 3-3"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              {projects.map(project => (
+                <a href={`/projects/${project.id}`} class="dropdown-item" data-color={project.colorKey}>
+                  <span class="dropdown-dot"></span>
+                  {project.name}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div class="nav-controls">
+          <PaletteSwitcher />
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <AboutModal />
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* Dark theme (default) */
+    --bg: #151719;
+    --bg-secondary: #1e2227;
+    --bg-card: rgba(30, 34, 39, 0.85);
+    --text: #e6edf3;
+    --text-muted: #9ca3af;
+    --border: #2e3339;
+
+    /* Font families */
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-code: Consolas, 'Fira Code', 'JetBrains Mono', monospace;
+
+    /* Mermaid mode-only colors (dark) */
+    --mermaid-node-bg: #3a4a5c;
+    --mermaid-node-border: #4d6580;
+    --mermaid-node-text: #cdd4dc;
+    --mermaid-edge: #5a7a9c;
+
+    /* Font size tokens */
+    --font-xs: 0.65rem;
+    --font-sm: 0.7rem;
+    --font-sm-md: 0.75rem;
+    --font-base: 0.85rem;
+    --font-md: 0.9rem;
+    --font-md-lg: 0.95rem;
+    --font-lg: 1rem;
+    --font-xl: 1.25rem;
+    --font-2xl: 1.5rem;
+    --font-3xl: 2rem;
+    --font-4xl: 2.5rem;
+  }
+
+  [data-theme="light"] {
+    /* Light theme */
+    --bg: #f8f7f4;
+    --bg-secondary: #fdfcfa;
+    --bg-card: rgba(253, 252, 250, 0.85);
+    --text: #1f2328;
+    --text-muted: #656d76;
+    --border: #e0ddd8;
+
+    /* Mermaid mode-only colors (light) */
+    --mermaid-node-bg: #6b8bad;
+    --mermaid-node-border: #5a7a9c;
+    --mermaid-node-text: #f0f0f0;
+    --mermaid-edge: #4a6a8c;
+  }
+
+  /* Color mappings from data attributes to palette CSS variables */
+  [data-color="red"] { --item-color: var(--color-red); }
+  [data-color="green"] { --item-color: var(--color-green); }
+  [data-color="yellow"] { --item-color: var(--color-yellow); }
+  [data-color="blue"] { --item-color: var(--color-blue); }
+  [data-color="purple"] { --item-color: var(--color-purple); }
+  [data-color="cyan"] { --item-color: var(--color-cyan); }
+  [data-color="orange"] { --item-color: var(--color-orange); }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  header {
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  header.is-sticky {
+    border-bottom-color: var(--border);
+  }
+
+  header:has(nav) {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--nav-gap);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-page-x);
+  }
+
+  .nav-links {
+    position: relative;
+    display: flex;
+    gap: 1.2rem;
+    align-items: stretch;
+  }
+
+  .nav-link {
+    position: relative;
+    color: var(--text);
+    text-decoration: none;
+    padding: 1rem 0.3rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .nav-text {
+    position: relative;
+  }
+
+  .nav-link.active {
+    color: var(--accent);
+  }
+
+  .link-indicator {
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  /* Touch devices: use active states, no hover-dependent effects */
+  @media (hover: none) {
+    .nav-link.active .link-indicator {
+      width: 100%;
+    }
+
+    .nav-cube-link:hover .nav-cube {
+      animation-play-state: running;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--border);
+      background: none;
+    }
+
+    .theme-toggle:active {
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+    }
+
+    .dropdown-item:hover {
+      background: none;
+      color: var(--text);
+    }
+
+    .dropdown-item:hover .dropdown-dot {
+      opacity: 0.7;
+    }
+
+    .dropdown-item:active {
+      background: var(--bg);
+      color: var(--project-color);
+    }
+
+    .dropdown-item:active .dropdown-dot {
+      opacity: 1;
+    }
+  }
+
+
+  .nav-dropdown {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .nav-dropdown .nav-link {
+    gap: 0.3rem;
+  }
+
+  .dropdown-toggle {
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .dropdown-arrow {
+    width: 12px;
+    height: 12px;
+    margin-top: 0.33em;
+  }
+
+  .dropdown-arrow .arrow-up {
+    display: block;
+  }
+
+  .dropdown-arrow .arrow-down {
+    display: none;
+  }
+
+  .nav-dropdown.open .dropdown-arrow .arrow-up {
+    display: none;
+  }
+
+  .nav-dropdown.open .dropdown-arrow .arrow-down {
+    display: block;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    min-width: 160px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-dropdown.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+  }
+
+  .dropdown-item:hover {
+    background: var(--bg-secondary);
+    color: var(--item-color);
+  }
+
+  .dropdown-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--item-color);
+    opacity: 0.7;
+  }
+
+  .dropdown-item:hover .dropdown-dot {
+    opacity: 1;
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    background: var(--bg-secondary);
+  }
+
+  .theme-toggle svg {
+    width: 18px;
+    height: 18px;
+    color: var(--text);
+  }
+
+  .theme-toggle .icon-moon {
+    display: none;
+  }
+
+  [data-theme="light"] .theme-toggle .icon-sun {
+    display: none;
+  }
+
+  [data-theme="light"] .theme-toggle .icon-moon {
+    display: block;
+  }
+
+  main {
+    flex: 1;
+    padding: var(--spacing-page) var(--spacing-page-x);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1rem 2rem;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  a {
+    color: var(--accent);
+  }
+
+  pre {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  code {
+    font-family: var(--font-code);
+  }
+
+  /* Card utilities - additional styles not in components.css */
+  .card-base {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s, background-color 0.3s ease;
+  }
+
+  /* Text utilities */
+  .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 600px) {
+    .nav-links {
+      gap: 0.8rem;
+    }
+
+    footer {
+      padding: var(--spacing-page-x);
+    }
+  }
+</style>
+
+<script is:inline>
+  // Theme toggle - runs immediately to prevent flash
+  (function() {
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = stored || (prefersDark ? 'dark' : 'light');
+
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+
+  // Palette - runs immediately to prevent flash
+  (function() {
+    const stored = localStorage.getItem('palette');
+    if (stored) {
+      document.documentElement.setAttribute('data-palette', stored);
+    }
+  })();
+
+  // Prevent zoom on mobile (except where allowed)
+  (function() {
+    const viewport = document.getElementById('viewport-meta');
+    const preventZoom = viewport?.dataset.preventZoom === 'true';
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (preventZoom && isMobile) {
+      viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      document.documentElement.setAttribute('data-prevent-zoom', '');
+    }
+  })();
+</script>
+
+<script>
+  import { initThemeToggle, initDropdown } from '../lib/domUtils';
+  import { initNavIndicator } from '../lib/navIndicator';
+
+  initThemeToggle();
+  initDropdown('projects-dropdown');
+  initNavIndicator();
+
+  // Toggle header border on scroll
+  const header = document.querySelector('header');
+  if (header) {
+    const updateStickyState = () => {
+      header.classList.toggle('is-sticky', window.scrollY > 0);
+    };
+    updateStickyState();
+    window.addEventListener('scroll', updateStickyState, { passive: true });
+  }
+</script>

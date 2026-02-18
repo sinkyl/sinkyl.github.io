@@ -1,0 +1,291 @@
+---
+// Bazaar flow visualization SVG - shows client and store owner journeys
+---
+
+<svg class="bazaar-flow-svg" viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- ===== CLIENT JOURNEY ===== -->
+
+  <!-- Entry: Marketplace -->
+  <g class="flow-box entry-marketplace">
+    <rect x="15" y="12" width="122" height="38" rx="6"/>
+    <text x="76" y="28" class="box-title">Marketplace</text>
+    <text x="76" y="42" class="box-detail">browse stores</text>
+  </g>
+
+  <!-- Entry: Store Domain -->
+  <g class="flow-box entry-store">
+    <rect x="15" y="60" width="122" height="38" rx="6"/>
+    <text x="76" y="76" class="box-title">store.xyz</text>
+    <text x="76" y="90" class="box-detail">own domain · paid</text>
+  </g>
+
+  <!-- Merge arrows → Identity -->
+  <g class="arrow">
+    <path d="M 137 31 H 155 V 55" class="arrow-line"/>
+    <path d="M 137 79 H 155 V 55" class="arrow-line"/>
+    <path d="M 155 55 H 192" class="arrow-line"/>
+    <polygon points="192,55 185,51 185,59" class="arrow-head"/>
+  </g>
+
+  <!-- Identity SSO -->
+  <g class="flow-box step-identity">
+    <rect x="197" y="30" width="105" height="50" rx="6"/>
+    <text x="249" y="50" class="box-title">Identity</text>
+    <text x="249" y="66" class="box-subtitle">SSO · OIDC</text>
+  </g>
+
+  <!-- Arrow → Checkout -->
+  <g class="arrow">
+    <path d="M 302 55 H 372" class="arrow-line"/>
+    <polygon points="372,55 365,51 365,59" class="arrow-head"/>
+  </g>
+
+  <!-- Marketplace Checkout -->
+  <g class="flow-box step-checkout">
+    <rect x="377" y="25" width="138" height="60" rx="6"/>
+    <text x="446" y="47" class="box-title">Marketplace</text>
+    <text x="446" y="63" class="box-title">Checkout</text>
+    <text x="446" y="78" class="box-micro">both paths converge</text>
+  </g>
+
+  <!-- Arrow → Payment -->
+  <g class="arrow">
+    <path d="M 515 55 H 575" class="arrow-line"/>
+    <polygon points="575,55 568,51 568,59" class="arrow-head"/>
+  </g>
+
+  <!-- Payment -->
+  <g class="flow-box step-payment">
+    <rect x="580" y="30" width="110" height="50" rx="6"/>
+    <text x="635" y="50" class="box-title">Payment</text>
+    <text x="635" y="66" class="box-subtitle">PCI-DSS</text>
+  </g>
+
+  <!-- Annotations below flow boxes -->
+  <text x="249" y="97" class="flow-annotation">sign in once →</text>
+  <text x="249" y="109" class="flow-annotation">access all stores</text>
+
+  <text x="446" y="97" class="flow-annotation">store checkout</text>
+  <text x="446" y="109" class="flow-annotation">→ redirects here</text>
+
+  <text x="635" y="97" class="flow-annotation">only called by</text>
+  <text x="635" y="109" class="flow-annotation">Marketplace</text>
+
+  <!-- ===== SEPARATOR ===== -->
+  <line x1="15" y1="125" x2="705" y2="125" class="flow-separator"/>
+
+  <!-- ===== STORE OWNER ===== -->
+
+  <text x="20" y="145" class="section-label">Store Owner</text>
+
+  <!-- Column 1: Store Deployment -->
+  <g class="flow-box owner-store">
+    <rect x="15" y="155" width="110" height="32" rx="6"/>
+    <text x="70" y="175" class="box-title">Open a Store</text>
+  </g>
+
+  <!-- Fork arrows to options -->
+  <g class="arrow">
+    <path d="M 125 168 H 142 V 160 H 162" class="arrow-line"/>
+    <polygon points="162,160 155,156 155,164" class="arrow-head"/>
+    <path d="M 142 168 V 180 H 162" class="arrow-line"/>
+    <polygon points="162,180 155,176 155,184" class="arrow-head"/>
+  </g>
+
+  <!-- Default: Marketplace listing -->
+  <g class="option default-option">
+    <rect x="167" y="151" width="200" height="18" rx="4"/>
+    <text x="182" y="163" class="option-text">Listed in Marketplace</text>
+    <text x="362" y="163" class="badge badge-default">default</text>
+  </g>
+
+  <!-- Paid: Dedicated domain -->
+  <g class="option paid-option">
+    <rect x="167" y="172" width="200" height="18" rx="4"/>
+    <text x="182" y="184" class="option-text">Dedicated domain</text>
+    <text x="362" y="184" class="badge badge-paid">paid service</text>
+  </g>
+
+  <!-- Column 2: Store Management -->
+  <g class="flow-box owner-platform">
+    <rect x="420" y="153" width="125" height="38" rx="6"/>
+    <text x="482" y="170" class="box-title">StorePlatform</text>
+    <text x="482" y="184" class="box-detail">Desktop App</text>
+  </g>
+
+  <!-- Arrow to management items -->
+  <g class="arrow">
+    <path d="M 545 172 H 570" class="arrow-line"/>
+    <polygon points="570,172 563,168 563,176" class="arrow-head"/>
+  </g>
+
+  <!-- Management items -->
+  <text x="580" y="164" class="mgmt-item">Stock</text>
+  <text x="640" y="164" class="mgmt-item">Marketing</text>
+  <text x="580" y="180" class="mgmt-item">Resources</text>
+  <text x="640" y="180" class="mgmt-item">Analytics</text>
+  <text x="580" y="197" class="mgmt-note">cross-platform</text>
+</svg>
+
+<style is:global>
+  .bazaar-flow-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Flow boxes - base */
+  .bazaar-flow-svg .flow-box rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--accent, #c87038);
+    stroke-width: 1.5;
+  }
+
+  /* Entry box colors */
+  .bazaar-flow-svg .entry-marketplace rect {
+    stroke: var(--color-orange, #d19a66);
+  }
+
+  .bazaar-flow-svg .entry-store rect {
+    stroke: var(--color-purple, #c678dd);
+  }
+
+  /* Step box colors */
+  .bazaar-flow-svg .step-identity rect {
+    stroke: var(--color-blue, #61afef);
+  }
+
+  .bazaar-flow-svg .step-checkout rect {
+    stroke: var(--color-orange, #d19a66);
+  }
+
+  .bazaar-flow-svg .step-payment rect {
+    stroke: var(--color-green, #98c379);
+  }
+
+  /* Owner box colors */
+  .bazaar-flow-svg .owner-store rect {
+    stroke: var(--accent, #c87038);
+  }
+
+  .bazaar-flow-svg .owner-platform rect {
+    stroke: var(--color-cyan, #56b6c2);
+  }
+
+  /* Text styles */
+  .bazaar-flow-svg .box-title {
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  .bazaar-flow-svg .box-subtitle {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  .bazaar-flow-svg .box-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  .bazaar-flow-svg .box-micro {
+    font-family: system-ui, sans-serif;
+    font-size: 8px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+    opacity: 0.7;
+  }
+
+  /* Arrows */
+  .bazaar-flow-svg .arrow-line {
+    fill: none;
+    stroke: var(--text-muted, #9ca3af);
+    stroke-width: 1.5;
+  }
+
+  .bazaar-flow-svg .arrow-head {
+    fill: var(--text-muted, #9ca3af);
+  }
+
+  /* Annotations */
+  .bazaar-flow-svg .flow-annotation {
+    font-family: system-ui, sans-serif;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+    opacity: 0.7;
+  }
+
+  /* Section label */
+  .bazaar-flow-svg .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    fill: var(--text-muted, #9ca3af);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Separator */
+  .bazaar-flow-svg .flow-separator {
+    stroke: var(--border, #2e3339);
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+  }
+
+  /* Option boxes */
+  .bazaar-flow-svg .option rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--border, #2e3339);
+    stroke-width: 1;
+  }
+
+  .bazaar-flow-svg .option-text {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--text, #e6edf3);
+    text-anchor: start;
+  }
+
+  .bazaar-flow-svg .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    text-anchor: end;
+  }
+
+  .bazaar-flow-svg .badge-default {
+    fill: var(--color-green, #98c379);
+  }
+
+  .bazaar-flow-svg .badge-paid {
+    fill: var(--color-orange, #d19a66);
+  }
+
+  /* Management items */
+  .bazaar-flow-svg .mgmt-item {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: start;
+  }
+
+  .bazaar-flow-svg .mgmt-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--text-muted, #9ca3af);
+    opacity: 0.6;
+    text-anchor: start;
+  }
+
+  /* Light mode */
+  [data-theme="light"] .bazaar-flow-svg .flow-box rect,
+  [data-theme="light"] .bazaar-flow-svg .option rect {
+    fill: var(--bg, #f8f7f4);
+  }
+</style>

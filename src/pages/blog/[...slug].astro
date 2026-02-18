@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export async function getStaticPaths() {
+  const allPosts = (await getCollection('blog'))
+    .filter(post => !post.data.draft)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  return allPosts.map((post) => {
+    // Global prev/next (all posts)
+    const globalIndex = allPosts.indexOf(post);
+
+    // Project-scoped prev/next (only if post belongs to a project)
+    const projectPosts = post.data.project
+      ? allPosts.filter(p => p.data.project === post.data.project)
+      : null;
+    const projectIndex = projectPosts?.indexOf(post) ?? -1;
+
+    return {
+      params: { slug: post.id },
+      props: {
+        post,
+        prevPost: allPosts[globalIndex + 1] || null,
+        nextPost: allPosts[globalIndex - 1] || null,
+        prevProjectPost: projectPosts?.[projectIndex + 1] || null,
+        nextProjectPost: projectPosts?.[projectIndex - 1] || null,
+      },
+    };
+  });
+}
+
+const { post, prevPost, nextPost, prevProjectPost, nextProjectPost } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogPost
+  post={post}
+  prevPost={prevPost}
+  nextPost={nextPost}
+  prevProjectPost={prevProjectPost}
+  nextProjectPost={nextProjectPost}
+>
+  <Content />
+</BlogPost>

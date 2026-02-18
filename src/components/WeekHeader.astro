@@ -1,0 +1,41 @@
+---
+interface Props {
+  weekKey: string;
+  weekLabel: string;
+  index: number;
+}
+
+const { weekKey, weekLabel, index } = Astro.props;
+---
+
+<h2 class="week-header" data-week={weekKey} data-index={index}>
+  <span class="week-label">Week of</span>
+  {weekLabel}
+</h2>
+
+<style>
+  .week-header {
+    font-size: var(--font-base);
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+    display: none;
+  }
+
+  .week-header.first-visible {
+    margin-top: 0;
+  }
+
+  .week-header.visible {
+    display: block;
+  }
+
+  .week-label {
+    color: var(--text-muted);
+    opacity: var(--opacity-soft);
+    margin-right: 0.5rem;
+  }
+</style>

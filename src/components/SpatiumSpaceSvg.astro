@@ -1,0 +1,255 @@
+---
+// Spatium space visualization SVG - uses CSS variables for theming
+---
+
+<svg class="spatium-space-svg" viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Resonating cube (bright) - fallback to lahmacun colors -->
+    <linearGradient id="resonateTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color: var(--accent-hover, #d87840); stop-opacity: 1"/>
+      <stop offset="100%" style="stop-color: var(--accent, #c86830); stop-opacity: 1"/>
+    </linearGradient>
+    <linearGradient id="resonateLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: var(--accent, #c86830); stop-opacity: 1"/>
+      <stop offset="100%" style="stop-color: var(--accent-muted, #a85820); stop-opacity: 1"/>
+    </linearGradient>
+    <linearGradient id="resonateRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: var(--accent-hover, #d87840); stop-opacity: 1"/>
+      <stop offset="100%" style="stop-color: var(--accent, #c86830); stop-opacity: 1"/>
+    </linearGradient>
+
+    <!-- Activated cube (normal) -->
+    <linearGradient id="activeTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color: var(--accent, #c86830); stop-opacity: 0.9"/>
+      <stop offset="100%" style="stop-color: var(--accent-muted, #a85820); stop-opacity: 0.9"/>
+    </linearGradient>
+    <linearGradient id="activeLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: var(--accent-muted, #a85820); stop-opacity: 0.8"/>
+      <stop offset="100%" style="stop-color: var(--accent-muted, #a85820); stop-opacity: 0.65"/>
+    </linearGradient>
+    <linearGradient id="activeRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: var(--accent, #c86830); stop-opacity: 0.85"/>
+      <stop offset="100%" style="stop-color: var(--accent-muted, #a85820); stop-opacity: 0.85"/>
+    </linearGradient>
+
+    <!-- Silent cube (dim) -->
+    <linearGradient id="silentTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color: var(--text-muted, #888); stop-opacity: 0.4"/>
+      <stop offset="100%" style="stop-color: var(--text-muted, #888); stop-opacity: 0.35"/>
+    </linearGradient>
+    <linearGradient id="silentLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: var(--text-muted, #888); stop-opacity: 0.3"/>
+      <stop offset="100%" style="stop-color: var(--text-muted, #888); stop-opacity: 0.25"/>
+    </linearGradient>
+    <linearGradient id="silentRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: var(--text-muted, #888); stop-opacity: 0.35"/>
+      <stop offset="100%" style="stop-color: var(--text-muted, #888); stop-opacity: 0.3"/>
+    </linearGradient>
+
+    <!-- Glow filter for resonating cubes -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 2D Space background -->
+  <rect x="20" y="20" width="660" height="240" rx="8" ry="8" class="space-bg"/>
+
+  <!-- Wavy lines converging toward resonating cubes -->
+  <g class="waves" fill="none">
+    <!-- Waves toward Resonating Cube 1 (center-left) -->
+    <path d="M 110 90 Q 120 82, 130 90 T 150 90 T 170 90 T 190 90 T 210 90 T 230 90 T 250 90 T 270 90"/>
+    <path d="M 298 180 Q 290 170, 298 160 T 298 140 T 298 120 T 298 105"/>
+    <path d="M 500 95 Q 490 87, 480 95 T 460 95 T 440 95 T 420 95 T 400 95 T 380 95 T 360 95"/>
+
+    <!-- Waves toward Resonating Cube 2 (bottom-center) -->
+    <path d="M 185 200 Q 195 192, 205 200 T 225 200 T 245 200 T 265 200 T 285 200 T 305 200 T 325 200 T 345 200 T 365 200 T 385 200"/>
+    <path d="M 420 140 Q 412 150, 420 160 T 420 180 T 420 195"/>
+    <path d="M 570 215 Q 560 207, 550 215 T 530 215 T 510 215 T 490 215 T 470 215 T 450 215"/>
+
+    <!-- Wave passing by silent cube (doesn't connect) -->
+    <path d="M 555 75 Q 565 67, 575 75 T 595 75 T 615 75 T 635 75 T 655 75" class="wave-faint"/>
+    <path d="M 115 175 Q 107 185, 115 195 T 115 215 T 115 235 T 115 255" class="wave-faint"/>
+  </g>
+
+  <!-- Resonance rings at resonating cubes -->
+  <g class="resonance-rings" fill="none">
+    <!-- Around Resonating Cube 1 -->
+    <circle cx="298" cy="95" r="35" stroke-width="1"/>
+    <circle cx="298" cy="95" r="50" stroke-width="0.7"/>
+    <circle cx="298" cy="95" r="65" stroke-width="0.4"/>
+
+    <!-- Around Resonating Cube 2 -->
+    <circle cx="420" cy="195" r="30" stroke-width="1"/>
+    <circle cx="420" cy="195" r="45" stroke-width="0.7"/>
+    <circle cx="420" cy="195" r="60" stroke-width="0.4"/>
+  </g>
+
+  <!-- Silent Cube 1 (left, dim) -->
+  <g transform="translate(60, 55)">
+    <polygon points="0,20 25,7 50,20 25,33" fill="url(#silentTop)"/>
+    <polygon points="0,20 0,58 25,71 25,33" fill="url(#silentLeft)"/>
+    <polygon points="25,33 25,71 50,58 50,20" fill="url(#silentRight)"/>
+  </g>
+
+  <!-- Activated Cube 1 (sends wave to resonating) -->
+  <g transform="translate(140, 165)">
+    <polygon points="0,18 22,6 44,18 22,30" fill="url(#activeTop)"/>
+    <polygon points="0,18 0,52 22,64 22,30" fill="url(#activeLeft)"/>
+    <polygon points="22,30 22,64 44,52 44,18" fill="url(#activeRight)"/>
+  </g>
+
+  <!-- RESONATING Cube 1 (center-left, bright + glow) -->
+  <g transform="translate(270, 60)" filter="url(#glow)" class="resonating-cube">
+    <polygon points="0,22 28,8 56,22 28,36" fill="url(#resonateTop)"/>
+    <polygon points="0,22 0,65 28,79 28,36" fill="url(#resonateLeft)"/>
+    <polygon points="28,36 28,79 56,65 56,22" fill="url(#resonateRight)"/>
+  </g>
+
+  <!-- Activated Cube 2 (sends wave) -->
+  <g transform="translate(510, 55)">
+    <polygon points="0,20 25,7 50,20 25,33" fill="url(#activeTop)"/>
+    <polygon points="0,20 0,58 25,71 25,33" fill="url(#activeLeft)"/>
+    <polygon points="25,33 25,71 50,58 50,20" fill="url(#activeRight)"/>
+  </g>
+
+  <!-- Silent Cube 2 (right, dim) -->
+  <g transform="translate(590, 50)">
+    <polygon points="0,18 22,6 44,18 22,30" fill="url(#silentTop)"/>
+    <polygon points="0,18 0,50 22,62 22,30" fill="url(#silentLeft)"/>
+    <polygon points="22,30 22,62 44,50 44,18" fill="url(#silentRight)"/>
+  </g>
+
+  <!-- RESONATING Cube 2 (bottom-center, bright + glow) -->
+  <g transform="translate(395, 160)" filter="url(#glow)" class="resonating-cube resonating-cube-2">
+    <polygon points="0,20 25,7 50,20 25,33" fill="url(#resonateTop)"/>
+    <polygon points="0,20 0,55 25,68 25,33" fill="url(#resonateLeft)"/>
+    <polygon points="25,33 25,68 50,55 50,20" fill="url(#resonateRight)"/>
+  </g>
+
+  <!-- Silent Cube 3 (bottom-right, dim) -->
+  <g transform="translate(560, 185)">
+    <polygon points="0,18 22,6 44,18 22,30" fill="url(#silentTop)"/>
+    <polygon points="0,18 0,48 22,60 22,30" fill="url(#silentLeft)"/>
+    <polygon points="22,30 22,60 44,48 44,18" fill="url(#silentRight)"/>
+  </g>
+</svg>
+
+<style is:global>
+  .spatium-space-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .spatium-space-svg .space-bg {
+    fill: var(--bg-secondary, #1a1a1a);
+    fill-opacity: 0.6;
+    stroke: var(--border, #444);
+    stroke-width: 1.5;
+  }
+
+  .spatium-space-svg .waves {
+    stroke: var(--accent, #61afef);
+    stroke-width: 1.5;
+    opacity: 0.6;
+  }
+
+  .spatium-space-svg .waves path {
+    stroke-dasharray: 8 4;
+    animation: waveFlow 2s linear infinite;
+  }
+
+  .spatium-space-svg .wave-faint {
+    opacity: 0.3;
+    animation: waveFlow 3s linear infinite;
+  }
+
+  @keyframes waveFlow {
+    from { stroke-dashoffset: 24; }
+    to { stroke-dashoffset: 0; }
+  }
+
+  .spatium-space-svg .resonance-rings {
+    stroke: var(--accent-hover, #d87840);
+    opacity: 0.5;
+  }
+
+  .spatium-space-svg .resonance-rings circle {
+    animation: ringPulse 2s ease-in-out infinite;
+  }
+
+  .spatium-space-svg .resonance-rings circle:nth-child(2) { animation-delay: 0.3s; }
+  .spatium-space-svg .resonance-rings circle:nth-child(3) { animation-delay: 0.6s; }
+  .spatium-space-svg .resonance-rings circle:nth-child(5) { animation-delay: 0.15s; }
+  .spatium-space-svg .resonance-rings circle:nth-child(6) { animation-delay: 0.45s; }
+
+  @keyframes ringPulse {
+    0%, 100% { opacity: 0.5; transform-origin: center; }
+    50% { opacity: 0.8; }
+  }
+
+  .spatium-space-svg .resonating-cube {
+    animation: cubeGlow 2s ease-in-out infinite;
+  }
+
+  .spatium-space-svg .resonating-cube-2 {
+    animation-delay: 1s;
+  }
+
+  @keyframes cubeGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+  }
+
+  /* Light mode adjustments */
+  [data-theme="light"] .spatium-space-svg .space-bg {
+    fill: var(--bg-secondary, #f5f5f5);
+    fill-opacity: 0.5;
+    stroke: var(--border, #ddd);
+  }
+
+  [data-theme="light"] .spatium-space-svg .waves {
+    stroke: var(--accent, #a04818);
+    opacity: 0.9;
+    stroke-width: 2.5;
+  }
+
+  [data-theme="light"] .spatium-space-svg .resonance-rings {
+    stroke: var(--accent-hover, #883810);
+    opacity: 0.8;
+  }
+
+  /* Override cube fills in light mode with palette colors */
+  [data-theme="light"] .spatium-space-svg .resonating-cube polygon:nth-child(1) {
+    fill: var(--accent-hover, #883810);
+  }
+  [data-theme="light"] .spatium-space-svg .resonating-cube polygon:nth-child(2) {
+    fill: var(--accent-muted, #b85820);
+  }
+  [data-theme="light"] .spatium-space-svg .resonating-cube polygon:nth-child(3) {
+    fill: var(--accent, #a04818);
+  }
+
+  /* Activated cubes in light mode */
+  [data-theme="light"] .spatium-space-svg g:not(.resonating-cube) > polygon[fill="url(#activeTop)"] {
+    fill: var(--accent, #a04818) !important;
+  }
+  [data-theme="light"] .spatium-space-svg g:not(.resonating-cube) > polygon[fill="url(#activeLeft)"] {
+    fill: var(--accent-muted, #b85820) !important;
+  }
+  [data-theme="light"] .spatium-space-svg g:not(.resonating-cube) > polygon[fill="url(#activeRight)"] {
+    fill: var(--accent, #a04818) !important;
+  }
+
+  /* Silent cubes in light mode */
+  [data-theme="light"] .spatium-space-svg polygon[fill="url(#silentTop)"],
+  [data-theme="light"] .spatium-space-svg polygon[fill="url(#silentLeft)"],
+  [data-theme="light"] .spatium-space-svg polygon[fill="url(#silentRight)"] {
+    fill: var(--text-muted, #888) !important;
+    opacity: 0.5;
+  }
+</style>

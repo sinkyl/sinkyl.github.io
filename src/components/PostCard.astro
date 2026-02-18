@@ -1,0 +1,199 @@
+---
+import Tag from './Tag.astro';
+import ContentIndicators from './ContentIndicators.astro';
+import { projectColors } from '../lib/projects';
+import { formatDateShort } from '../lib/dateUtils';
+import type { ContentIndicators as ContentIndicatorsType } from '../lib/contentIndicators';
+
+interface Props {
+  slug: string;
+  date: Date;
+  languages?: string[];
+  description?: string;
+  patterns?: string[];
+  project?: string;
+  showProjectBadge?: boolean;
+  showLeftBorder?: boolean;
+  tagsPosition?: 'header' | 'bottom';
+  index?: number;
+  weekKey?: string;
+  indicators?: ContentIndicatorsType;
+}
+
+const {
+  slug,
+  date,
+  languages = [],
+  description,
+  patterns,
+  project,
+  showProjectBadge = false,
+  showLeftBorder = true,
+  tagsPosition = 'bottom',
+  index,
+  weekKey,
+  indicators
+} = Astro.props;
+
+const projectData = project ? projectColors[project] : null;
+const projectColorKey = projectData?.colorKey;
+const preview = description || patterns?.slice(0, 3).join(' • ') || '';
+const showTagsInHeader = tagsPosition === 'header' && languages.length > 0;
+const showTagsAtBottom = tagsPosition === 'bottom' && languages.length > 0;
+---
+
+<article
+  class:list={['post-item', { 'with-left-border': showLeftBorder }]}
+  data-index={index}
+  data-week={weekKey}
+>
+  <a href={`/blog/${slug}`} data-color={projectColorKey}>
+    <div class:list={['post-header', { 'with-preview': preview }]}>
+      {showProjectBadge && projectData && (
+        <span class="project-badge">{projectData.name}</span>
+      )}
+      {showTagsInHeader && (
+        <div class="tags">
+          {languages.slice(0, 3).map(lang => (
+            <Tag label={lang} />
+          ))}
+        </div>
+      )}
+      <span class="post-date">{formatDateShort(date)}</span>
+    </div>
+    {preview && (
+      <p class="preview">{preview}</p>
+    )}
+    <div class="post-footer">
+      {showTagsAtBottom && (
+        <div class="tags tags-bottom">
+          {languages.slice(0, 3).map(lang => (
+            <Tag label={lang} />
+          ))}
+        </div>
+      )}
+      <ContentIndicators indicators={indicators} />
+    </div>
+  </a>
+</article>
+
+<style>
+  .post-item {
+    display: none;
+  }
+
+  .post-item.visible {
+    display: block;
+  }
+
+  .post-item a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.25rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, transform 0.2s, background-color 0.3s ease;
+  }
+
+  .post-item.with-left-border a {
+    border-left: 3px solid var(--item-color, var(--border));
+  }
+
+  .post-item a:hover {
+    border-color: var(--item-color, var(--accent));
+    transform: translateX(4px);
+  }
+
+  .post-item.with-left-border a:hover {
+    border-left-color: var(--item-color, var(--accent));
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .post-header.with-preview {
+    margin-bottom: 0.5rem;
+  }
+
+  .project-badge {
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--item-color);
+    padding: 0.2rem 0.5rem;
+    background: color-mix(in srgb, var(--item-color) 10%, transparent);
+    border-radius: var(--radius-xs);
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .post-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .tags-bottom {
+    margin-top: 0;
+  }
+
+  .post-item a:hover :global(.indicator) {
+    opacity: var(--opacity-high);
+    color: var(--item-color, var(--accent));
+  }
+
+  .post-date {
+    font-size: var(--font-sm-md);
+    color: var(--text-muted);
+    opacity: var(--opacity-medium);
+    margin-left: auto;
+  }
+
+  .preview {
+    color: var(--text-muted);
+    font-size: var(--font-base);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .post-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .post-date {
+      margin-left: 0;
+    }
+  }
+
+  /* Touch devices: use active state instead of hover */
+  @media (hover: none) {
+    .post-item a:hover {
+      transform: none;
+    }
+
+    .post-item a:active {
+      border-color: var(--item-color, var(--accent));
+      background: color-mix(in srgb, var(--item-color, var(--accent)) 5%, var(--bg-card));
+    }
+
+    .post-item.with-left-border a:active {
+      border-left-color: var(--item-color, var(--accent));
+    }
+
+    .post-item a:active :global(.indicator) {
+      opacity: var(--opacity-high);
+      color: var(--item-color, var(--accent));
+    }
+  }
+</style>

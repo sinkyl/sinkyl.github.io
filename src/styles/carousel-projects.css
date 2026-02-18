@@ -1,0 +1,724 @@
+/**
+ * Carousel Project-Specific Styles
+ * Custom slide layouts for individual projects
+ */
+
+/* ===========================================
+   BAZAAR PROJECT SLIDES
+   =========================================== */
+
+/* BAZAAR SLIDE 1: Architecture Overview */
+.carousel-slide .bazaar-slide1 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+}
+
+.carousel-slide .bazaar-slide1 .bazaar-intro {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .bazaar-slide1 .bazaar-intro strong {
+  color: var(--text);
+}
+
+.carousel-slide .bazaar-slide1 .bazaar-arch-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* BAZAAR SLIDE 2: Core Clusters */
+.carousel-slide .bazaar-slide2 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.4rem;
+}
+
+.carousel-slide .bazaar-slide2 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-clusters-intro {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-clusters-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-left: 3px solid var(--border);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="identity"] {
+  border-left-color: var(--color-blue, #61afef);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="marketplace"] {
+  border-left-color: var(--color-orange, #d19a66);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="payment"] {
+  border-left-color: var(--color-green, #98c379);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="stores"] {
+  border-left-color: var(--color-purple, #c678dd);
+}
+
+.carousel-slide .bazaar-slide2 .cluster-card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="identity"] .cluster-card-name {
+  color: var(--color-blue, #61afef);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="marketplace"] .cluster-card-name {
+  color: var(--color-orange, #d19a66);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="payment"] .cluster-card-name {
+  color: var(--color-green, #98c379);
+}
+
+.carousel-slide .bazaar-slide2 .bazaar-cluster-card[data-cluster="stores"] .cluster-card-name {
+  color: var(--color-purple, #c678dd);
+}
+
+.carousel-slide .bazaar-slide2 .cluster-card-role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.carousel-slide .bazaar-slide2 .cluster-card-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0.15rem 0 0 0;
+}
+
+.carousel-slide .bazaar-slide2 .cluster-card-desc strong {
+  color: var(--text);
+}
+
+/* BAZAAR SLIDE 3: The Flow */
+.carousel-slide .bazaar-slide3 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.25rem;
+}
+
+.carousel-slide .bazaar-slide3 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .bazaar-slide3 .bazaar-flow-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* BAZAAR SLIDE 4: Infrastructure */
+.carousel-slide .bazaar-slide4 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.25rem;
+}
+
+.carousel-slide .bazaar-slide4 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .bazaar-slide4 .bazaar-infra-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .carousel-slide .bazaar-slide2 .bazaar-clusters-grid {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .carousel-slide .bazaar-slide2 .bazaar-cluster-card {
+    padding: 0.4rem 0.6rem;
+    gap: 0.1rem;
+  }
+
+  .carousel-slide .bazaar-slide2 .cluster-card-desc {
+    font-size: 0.75rem;
+  }
+
+  .carousel-slide .bazaar-slide3 > .slide-list {
+    columns: 1;
+  }
+}
+
+/* ===========================================
+   SPATIUM PROJECT SLIDES
+   =========================================== */
+
+/* SPATIUM SLIDE 1: Overview/Vision */
+.carousel-slide .spatium-slide1 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  gap: 0.4rem;
+}
+
+.carousel-slide .spatium-slide1 .spatium-hook {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.carousel-slide .spatium-slide1 .spatium-hook strong {
+  color: var(--text);
+}
+
+.carousel-slide .spatium-slide1 .spatium-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .spatium-slide1 .spatium-resonance-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .carousel-slide .spatium-slide1 .spatium-hook {
+    font-size: 1rem;
+  }
+}
+
+/* SPATIUM SLIDE 2: The Unit */
+.carousel-slide .spatium-slide2 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.35rem;
+}
+
+.carousel-slide .spatium-slide2 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .spatium-slide2 .spatium-unit-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .spatium-slide2 .spatium-unit-desc strong {
+  color: var(--text);
+}
+
+.carousel-slide .spatium-slide2 .spatium-unit-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* SPATIUM SLIDE 3: Emergence */
+.carousel-slide .spatium-slide3 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.35rem;
+}
+
+.carousel-slide .spatium-slide3 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .spatium-slide3 .spatium-emerge-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .spatium-slide3 .spatium-emerge-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* SPATIUM SLIDE 4: Space visualization */
+.carousel-slide .spatium-slide4 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  gap: 0.75rem;
+}
+
+.carousel-slide .spatium-slide4 .spatium-space-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.carousel-slide .spatium-slide4 .spatium-research-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 600px;
+  margin: 0;
+}
+
+.carousel-slide .spatium-slide4 .spatium-research-note a.xtranodly-link {
+  color: var(--color-blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.carousel-slide .spatium-slide4 .spatium-research-note a.xtranodly-link:hover {
+  text-decoration: underline;
+}
+
+/* SPATIUM SLIDE 5: The Structure (legacy) */
+.carousel-slide .spatium-slide5 {
+  text-align: center;
+}
+
+.carousel-slide .spatium-slide5 .slide-heading {
+  border-bottom: none;
+  margin-bottom: 0.25rem;
+}
+
+.carousel-slide .spatium-slide5 p {
+  max-width: 500px;
+  margin: 0 auto 0.75rem;
+  font-size: 0.95rem;
+}
+
+.carousel-slide .spatium-slide5 .slide-diagram-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SPATIUM SLIDE 6: Status (legacy) */
+.carousel-slide .spatium-slide6 {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.carousel-slide .spatium-slide6 .slide-heading {
+  border-bottom: none;
+  margin-bottom: 0.75rem;
+}
+
+.carousel-slide .spatium-slide6 p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  max-width: 550px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .carousel-slide .spatium-slide6 {
+    padding: 1rem;
+  }
+}
+
+/* ===========================================
+   XTRANODLY PROJECT SLIDES
+   =========================================== */
+
+/* XTRANODLY SLIDE 1: Architecture Overview */
+.carousel-slide .xtranodly-slide1 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+}
+
+.carousel-slide .xtranodly-slide1 .xtranodly-intro {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .xtranodly-slide1 .xtranodly-intro strong {
+  color: var(--text);
+}
+
+.carousel-slide .xtranodly-slide1 .xtranodly-arch-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* XTRANODLY SLIDE 2: Components (Graph, Node, Edge) */
+.carousel-slide .xtranodly-slide2 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.4rem;
+}
+
+.carousel-slide .xtranodly-slide2 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Stacked layout: Graph → Node → Edge */
+.carousel-slide .xtranodly-slide2 .xtranodly-components {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Component cards — shared style */
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border-left: 3px solid var(--border);
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Color-coded left borders per component */
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card[data-comp="node"] {
+  border-left-color: var(--color-blue, #61afef);
+}
+
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card[data-comp="graph"] {
+  border-left-color: var(--color-purple, #c678dd);
+}
+
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card[data-comp="edge"] {
+  border-left-color: var(--color-green, #98c379);
+}
+
+/* Component name */
+.carousel-slide .xtranodly-slide2 .comp-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card[data-comp="node"] .comp-name {
+  color: var(--color-blue, #61afef);
+}
+
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card[data-comp="graph"] .comp-name {
+  color: var(--color-purple, #c678dd);
+}
+
+.carousel-slide .xtranodly-slide2 .xtranodly-comp-card[data-comp="edge"] .comp-name {
+  color: var(--color-green, #98c379);
+}
+
+/* Component description */
+.carousel-slide .xtranodly-slide2 .comp-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.carousel-slide .xtranodly-slide2 .comp-desc strong {
+  color: var(--text);
+}
+
+/* Node types list inside the Node card */
+.carousel-slide .xtranodly-slide2 .node-types-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.2rem;
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  padding: 0.15rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item:first-child {
+  border-top: none;
+}
+
+.carousel-slide .xtranodly-slide2 .nt-name {
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+}
+
+.carousel-slide .xtranodly-slide2 .nt-desc {
+  color: var(--text-muted);
+}
+
+/* Node type name colors */
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="compute"] .nt-name {
+  color: var(--color-blue, #61afef);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="register"] .nt-name {
+  color: var(--color-orange, #d19a66);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="context"] .nt-name {
+  color: var(--color-purple, #c678dd);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="boundary"] .nt-name {
+  color: var(--color-red, #e06c75);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="bridge"] .nt-name {
+  color: var(--color-orange, #d19a66);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="fanout"] .nt-name {
+  color: var(--color-green, #98c379);
+}
+
+.carousel-slide .xtranodly-slide2 .node-type-item[data-type="relay"] .nt-name {
+  color: var(--color-cyan, #56b6c2);
+}
+
+/* XTRANODLY SLIDE 3: Tick Execution */
+.carousel-slide .xtranodly-slide3 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.35rem;
+}
+
+.carousel-slide .xtranodly-slide3 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .xtranodly-slide3 .xtranodly-exec-intro {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .xtranodly-slide3 .xtranodly-exec-intro strong {
+  color: var(--text);
+}
+
+.carousel-slide .xtranodly-slide3 .xtranodly-exec-svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* XTRANODLY SLIDE 4: Why xtranodly */
+.carousel-slide .xtranodly-slide4 {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem;
+  gap: 0.4rem;
+}
+
+.carousel-slide .xtranodly-slide4 .slide-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text);
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.carousel-slide .xtranodly-slide4 .xtranodly-why-lead {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .xtranodly-slide4 .xtranodly-why-lead strong {
+  color: var(--text);
+}
+
+.carousel-slide .xtranodly-slide4 .xtranodly-why-points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.carousel-slide .xtranodly-slide4 .why-point {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.carousel-slide .xtranodly-slide4 .why-icon {
+  color: var(--color-blue, #61afef);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.carousel-slide .xtranodly-slide4 .why-point p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.carousel-slide .xtranodly-slide4 .why-point p strong {
+  color: var(--text);
+}
+
+.carousel-slide .xtranodly-slide4 .xtranodly-why-closing {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+  padding-top: 0.15rem;
+  border-top: 1px solid var(--border);
+  font-style: italic;
+}
+
+.carousel-slide .xtranodly-slide4 .xtranodly-why-closing strong {
+  color: var(--text);
+  font-style: normal;
+}
+
+/* Logo */
+.carousel-slide .xtranodly-slide4 .xtranodly-logo {
+  display: flex;
+  justify-content: center;
+  margin-top: 5rem;
+  padding-top: 0.25rem;
+}
+
+.carousel-slide .xtranodly-slide4 .xtranodly-logo-svg {
+  width: 240px;
+  height: 48px;
+}
+
+.carousel-slide .xtranodly-slide4 .logo-box {
+  fill: none;
+  stroke: var(--color-blue, #61afef);
+  stroke-width: 1.5;
+}
+
+.carousel-slide .xtranodly-slide4 .logo-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  fill: var(--text, #e6edf3);
+  text-anchor: start;
+}
+
+.carousel-slide .xtranodly-slide4 .logo-text-ai {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  fill: var(--color-blue, #61afef);
+  text-anchor: start;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .carousel-slide .xtranodly-slide2 .xtranodly-comp-card {
+    padding: 0.4rem 0.6rem;
+    gap: 0.1rem;
+  }
+
+  .carousel-slide .xtranodly-slide2 .comp-desc {
+    font-size: 0.75rem;
+  }
+
+  .carousel-slide .xtranodly-slide2 .node-type-item {
+    font-size: 0.7rem;
+  }
+}

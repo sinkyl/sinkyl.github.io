@@ -1,0 +1,270 @@
+---
+// Xtranodly tick execution visualization SVG - shows a small graph executing one tick
+---
+
+<svg class="xtranodly-exec-svg" viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- ===== GRAPH NODES ===== -->
+
+  <!-- Node: Input -->
+  <g class="node node-boundary">
+    <rect x="40" y="80" width="100" height="50" rx="8"/>
+    <text x="90" y="101" class="node-name">Input</text>
+    <text x="90" y="117" class="node-type">boundary</text>
+  </g>
+
+  <!-- Edge: Input → AddConst (solid green = immediate) -->
+  <g class="edge direct-edge">
+    <path d="M 140 105 L 200 105" class="edge-line"/>
+    <polygon points="200,105 193,101 193,109" class="edge-head"/>
+    <text x="170" y="97" class="edge-label">immediate</text>
+  </g>
+
+  <!-- Node: AddConst -->
+  <g class="node node-compute">
+    <rect x="210" y="80" width="110" height="50" rx="8"/>
+    <text x="265" y="101" class="node-name">AddConst</text>
+    <text x="265" y="117" class="node-type">compute</text>
+  </g>
+
+  <!-- Edge: AddConst → Fanout (solid green = immediate) -->
+  <g class="edge direct-edge">
+    <path d="M 320 105 L 380 105" class="edge-line"/>
+    <polygon points="380,105 373,101 373,109" class="edge-head"/>
+    <text x="350" y="97" class="edge-label">immediate</text>
+  </g>
+
+  <!-- Node: Fanout -->
+  <g class="node node-fanout">
+    <rect x="390" y="80" width="100" height="50" rx="8"/>
+    <text x="440" y="101" class="node-name">Fanout</text>
+    <text x="440" y="117" class="node-type">1 → many</text>
+  </g>
+
+  <!-- Edge: Fanout → Output (solid green, upward) -->
+  <g class="edge direct-edge">
+    <path d="M 490 95 L 560 95 L 560 55 L 600 55" class="edge-line"/>
+    <polygon points="600,55 593,51 593,59" class="edge-head"/>
+  </g>
+
+  <!-- Node: Output -->
+  <g class="node node-boundary">
+    <rect x="610" y="30" width="90" height="50" rx="8"/>
+    <text x="655" y="51" class="node-name">Output</text>
+    <text x="655" y="67" class="node-type">boundary</text>
+  </g>
+
+  <!-- Edge: Fanout → Register (dashed orange = 1-tick delay) -->
+  <g class="edge registered-edge">
+    <path d="M 490 115 L 560 115 L 560 175 L 600 175" class="edge-line"/>
+    <polygon points="600,175 593,171 593,179" class="edge-head"/>
+    <text x="555" y="150" class="edge-label-delay">1-tick delay</text>
+  </g>
+
+  <!-- Node: Register (D flip-flop) -->
+  <g class="node node-register">
+    <rect x="610" y="150" width="90" height="50" rx="8"/>
+    <text x="655" y="171" class="node-name">Register</text>
+    <text x="655" y="187" class="node-type">D flip-flop</text>
+  </g>
+
+  <!-- Feedback: Register → Input (dashed orange, looping back) -->
+  <g class="edge registered-edge">
+    <path d="M 655 200 L 655 230 L 30 230 L 30 105 L 40 105" class="edge-line"/>
+    <polygon points="40,105 33,101 33,109" class="edge-head"/>
+    <text x="340" y="246" class="edge-label-delay">feedback (next tick)</text>
+  </g>
+
+  <!-- ===== TIMELINE BAR ===== -->
+  <g class="timeline">
+    <line x1="60" y1="278" x2="680" y2="278" class="timeline-line"/>
+
+    <!-- Tick markers -->
+    <g class="tick-marker past">
+      <line x1="120" y1="273" x2="120" y2="283"/>
+      <text x="120" y="296">N-2</text>
+    </g>
+    <g class="tick-marker past">
+      <line x1="240" y1="273" x2="240" y2="283"/>
+      <text x="240" y="296">N-1</text>
+    </g>
+    <g class="tick-marker current">
+      <rect x="330" y="270" width="60" height="16" rx="3"/>
+      <text x="360" y="282">N</text>
+    </g>
+    <g class="tick-marker future">
+      <line x1="480" y1="273" x2="480" y2="283"/>
+      <text x="480" y="296">N+1</text>
+    </g>
+    <g class="tick-marker future">
+      <line x1="600" y1="273" x2="600" y2="283"/>
+      <text x="600" y="296">N+2</text>
+    </g>
+
+    <text x="60" y="296" class="timeline-label">tick</text>
+  </g>
+
+  <!-- Legend -->
+  <g class="legend">
+    <line x1="50" y1="20" x2="80" y2="20" class="legend-direct"/>
+    <text x="88" y="24" class="legend-text">Direct (immediate)</text>
+    <line x1="250" y1="20" x2="280" y2="20" class="legend-registered"/>
+    <text x="288" y="24" class="legend-text">Registered (1-tick delay)</text>
+  </g>
+</svg>
+
+<style is:global>
+  .xtranodly-exec-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Nodes */
+  .xtranodly-exec-svg .node rect {
+    fill: var(--bg-secondary, #1e2227) !important;
+    stroke-width: 1.5 !important;
+  }
+
+  .xtranodly-exec-svg .node-compute rect {
+    stroke: var(--color-blue, #61afef) !important;
+  }
+
+  .xtranodly-exec-svg .node-register rect {
+    stroke: var(--color-orange, #d19a66) !important;
+  }
+
+  .xtranodly-exec-svg .node-fanout rect {
+    stroke: var(--color-green, #98c379) !important;
+  }
+
+  .xtranodly-exec-svg .node-boundary rect {
+    stroke: var(--color-red, #e06c75) !important;
+  }
+
+  .xtranodly-exec-svg .node-name {
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3) !important;
+    text-anchor: middle;
+  }
+
+  .xtranodly-exec-svg .node-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af) !important;
+    text-anchor: middle;
+  }
+
+  /* Direct edges (solid green) */
+  .xtranodly-exec-svg .direct-edge .edge-line {
+    fill: none !important;
+    stroke: var(--color-green, #98c379) !important;
+    stroke-width: 1.5 !important;
+  }
+
+  .xtranodly-exec-svg .direct-edge .edge-head {
+    fill: var(--color-green, #98c379) !important;
+  }
+
+  .xtranodly-exec-svg .edge-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--color-green, #98c379) !important;
+    text-anchor: middle;
+    opacity: 0.8;
+  }
+
+  /* Registered edges (dashed orange) */
+  .xtranodly-exec-svg .registered-edge .edge-line {
+    fill: none !important;
+    stroke: var(--color-orange, #d19a66) !important;
+    stroke-width: 1.5 !important;
+    stroke-dasharray: 6 3;
+  }
+
+  .xtranodly-exec-svg .registered-edge .edge-head {
+    fill: var(--color-orange, #d19a66) !important;
+  }
+
+  .xtranodly-exec-svg .edge-label-delay {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--color-orange, #d19a66) !important;
+    text-anchor: middle;
+    opacity: 0.8;
+  }
+
+  /* Timeline */
+  .xtranodly-exec-svg .timeline-line {
+    stroke: var(--border, #2e3339) !important;
+    stroke-width: 1.5 !important;
+  }
+
+  .xtranodly-exec-svg .tick-marker line {
+    stroke: var(--text-muted, #9ca3af) !important;
+    stroke-width: 1;
+  }
+
+  .xtranodly-exec-svg .tick-marker text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af) !important;
+    text-anchor: middle;
+  }
+
+  .xtranodly-exec-svg .tick-marker.past text,
+  .xtranodly-exec-svg .tick-marker.past line {
+    opacity: 0.5;
+  }
+
+  .xtranodly-exec-svg .tick-marker.future text,
+  .xtranodly-exec-svg .tick-marker.future line {
+    opacity: 0.5;
+  }
+
+  .xtranodly-exec-svg .tick-marker.current rect {
+    fill: var(--color-blue, #61afef) !important;
+    opacity: 0.2;
+    stroke: var(--color-blue, #61afef) !important;
+    stroke-width: 1;
+  }
+
+  .xtranodly-exec-svg .tick-marker.current text {
+    font-weight: 700;
+    fill: var(--color-blue, #61afef) !important;
+  }
+
+  .xtranodly-exec-svg .timeline-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af) !important;
+    text-anchor: start;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  /* Legend */
+  .xtranodly-exec-svg .legend-direct {
+    stroke: var(--color-green, #98c379) !important;
+    stroke-width: 2 !important;
+  }
+
+  .xtranodly-exec-svg .legend-registered {
+    stroke: var(--color-orange, #d19a66) !important;
+    stroke-width: 2 !important;
+    stroke-dasharray: 6 3;
+  }
+
+  .xtranodly-exec-svg .legend-text {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af) !important;
+    text-anchor: start;
+  }
+
+  /* Light mode */
+  [data-theme="light"] .xtranodly-exec-svg .node rect {
+    fill: var(--bg, #f8f7f4) !important;
+  }
+</style>

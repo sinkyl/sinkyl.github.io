@@ -1,0 +1,414 @@
+/* tokens */
+
+:root {
+  /* Brand colors (One Dark Pro) */
+  --color-blue: #61afef;
+  --color-purple: #c678dd;
+  --color-orange: #d19a66;
+  --color-green: #98c379;
+  --color-red: #e06c75;
+  --color-cyan: #56b6c2;
+  --color-yellow: #e5c07b;
+  --color-slate: #64748b;
+
+  /* Dimmed colors (One Dark Pro muted variants) */
+  --color-blue-dim: #4d8abe;
+  --color-purple-dim: #9a5eb0;
+  --color-orange-dim: #a67a50;
+  --color-green-dim: #7a9f60;
+  --color-red-dim: #b05a63;
+  --color-cyan-dim: #4a9aa3;
+  --color-white-dim: #abb2bf;
+
+  /* Functional colors (set by theme) */
+  --color-primary: var(--color-blue);
+  --color-secondary: var(--color-purple);
+  --color-accent: var(--color-blue);
+
+  /* Border radius tokens */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* Opacity tokens */
+  --opacity-disabled: 0.3;
+  --opacity-muted: 0.5;
+  --opacity-soft: 0.6;
+  --opacity-medium: 0.7;
+  --opacity-high: 0.8;
+
+  /* Shadow tokens */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  /* responsive tokens */
+
+  /* Spacing tokens */
+  --spacing-page: 2rem;
+  --spacing-page-x: 2rem;
+  --spacing-section: 1.5rem;
+  --spacing-card: 1.5rem;
+  --spacing-stack: 1rem;
+
+  /* Layout tokens */
+  --content-max-width: 1000px;
+  --carousel-height: 40vh;
+  --carousel-image-height: 22vh;
+  --modal-max-height: 85vh;
+
+  /* Touch/interaction tokens */
+  --touch-target: 36px;
+  --icon-size: 18px;
+  --icon-size-sm: 14px;
+
+  /* Nav tokens */
+  --nav-padding: 0 2rem;
+  --nav-gap: 1.5rem;
+}
+
+/* mobile overrides */
+
+@media (max-width: 600px) {
+  :root {
+    --spacing-page: 1.5rem;
+    --spacing-page-x: 1rem;
+    --spacing-section: 1rem;
+    --spacing-card: 1rem;
+    --spacing-stack: 0.75rem;
+
+    --carousel-height: 50vh;
+    --carousel-image-height: 18vh;
+    --modal-max-height: 90vh;
+
+    --touch-target: 44px;
+    --icon-size: 20px;
+    --icon-size-sm: 16px;
+
+    --nav-padding: 0 1rem;
+    --nav-gap: 1rem;
+  }
+}
+
+/* buttons */
+
+/* Base button reset */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ghost button - transparent with border */
+.btn-ghost {
+  background: none;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+}
+
+/* Accent button - brand colored */
+.btn-accent {
+  background: color-mix(in srgb, var(--color-blue) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-blue) 25%, transparent);
+  color: var(--color-blue);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-blue) 20%, transparent);
+  border-color: var(--color-blue);
+}
+
+/* Primary button - solid background */
+.btn-primary {
+  background: var(--color-blue);
+  border-color: var(--color-blue);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-blue) 85%, black);
+  transform: translateY(-1px);
+}
+
+/* Icon-only button */
+.btn-icon {
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+}
+
+/* Small button */
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+}
+
+/* Large button */
+.btn-lg {
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Pill-shaped button */
+.btn-pill {
+  border-radius: var(--radius-full);
+}
+
+/* cards */
+
+/* Base card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Interactive card - has hover state */
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  border-color: var(--accent);
+}
+
+/* Bento card - larger radius, padded */
+.card-bento {
+  border-radius: var(--radius-2xl);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Card with colored accent border on hover */
+.card-accent:hover {
+  border-color: var(--card-color, var(--accent));
+}
+
+/* labels & badges */
+
+.label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.label-corner {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.7rem;
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--badge-color, var(--accent)) 12%, transparent);
+  color: var(--badge-color, var(--accent));
+  border: 1px solid color-mix(in srgb, var(--badge-color, var(--accent)) 30%, transparent);
+}
+
+/* inputs */
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-blue);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Rounded input (pill-shaped) */
+.input-rounded {
+  border-radius: 20px;
+  padding: 0.6rem 1rem;
+}
+
+/* status indicators */
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color, var(--color-green));
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-dot-sm {
+  width: 6px;
+  height: 6px;
+}
+
+/* links */
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.link:hover {
+  opacity: 0.8;
+}
+
+.link-muted {
+  color: var(--text-muted);
+}
+
+.link-muted:hover {
+  color: var(--text);
+}
+
+/* flex & layout utilities */
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-xs { gap: 0.25rem; }
+.gap-sm { gap: 0.5rem; }
+.gap-md { gap: 0.75rem; }
+.gap-lg { gap: 1rem; }
+.gap-xl { gap: 1.5rem; }
+
+/* spacing utilities */
+
+.p-sm { padding: 0.5rem; }
+.p-md { padding: 0.75rem; }
+.p-lg { padding: 1rem; }
+.p-xl { padding: 1.5rem; }
+
+.mt-sm { margin-top: 0.5rem; }
+.mt-md { margin-top: 0.75rem; }
+.mt-lg { margin-top: 1rem; }
+.mt-xl { margin-top: 1.5rem; }
+
+/* text utilities */
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-sm {
+  font-size: 0.85rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* gradients */
+
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--color-slate),
+    var(--color-blue),
+    var(--color-orange),
+    var(--color-green),
+    var(--color-blue),
+    var(--color-slate)
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 10s ease infinite;
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-blue), var(--color-purple));
+}
+
+.gradient-warm {
+  background: linear-gradient(135deg, var(--color-red), var(--color-orange));
+}
+
+.gradient-cool {
+  background: linear-gradient(135deg, var(--color-green), var(--color-blue));
+}
+
+/* transitions */
+
+.transition-fast {
+  transition: all 0.15s ease-out;
+}
+
+.transition-base {
+  transition: all 0.2s ease-out;
+}
+
+.transition-slow {
+  transition: all 0.3s ease-out;
+}

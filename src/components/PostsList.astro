@@ -1,0 +1,75 @@
+---
+import PostCard from './PostCard.astro';
+import WeekHeader from './WeekHeader.astro';
+import Pagination from './Pagination.astro';
+import { isFirstOfWeek } from '../lib/weekGrouping';
+import { POSTS_PER_PAGE } from '../lib/constants';
+import type { CollectionEntry } from 'astro:content';
+import type { ContentIndicators } from '../lib/contentIndicators';
+
+interface PostWithWeek {
+  post: CollectionEntry<'blog'>;
+  weekKey: string;
+  weekLabel: string;
+}
+
+interface Props {
+  postsWithWeek: PostWithWeek[];
+  postsWithIndicators: Map<string, ContentIndicators>;
+  totalPages: number;
+  containerId: string;
+  showProjectBadge?: boolean;
+  showLeftBorder?: boolean;
+  tagsPosition?: 'header' | 'bottom';
+  projectId?: string;
+}
+
+const {
+  postsWithWeek,
+  postsWithIndicators,
+  totalPages,
+  containerId,
+  showProjectBadge = true,
+  showLeftBorder = true,
+  tagsPosition = 'bottom',
+  projectId,
+} = Astro.props;
+---
+
+<div class="posts-container" id={containerId}>
+  {postsWithWeek.map(({ post, weekKey, weekLabel }, index) => (
+    <>
+      {isFirstOfWeek(postsWithWeek, index) && (
+        <WeekHeader weekKey={weekKey} weekLabel={weekLabel} index={index} />
+      )}
+      <PostCard
+        slug={post.id}
+        date={post.data.date}
+        languages={post.data.languages}
+        description={post.data.description}
+        patterns={post.data.patterns}
+        project={projectId || post.data.project}
+        showProjectBadge={showProjectBadge}
+        showLeftBorder={showLeftBorder}
+        tagsPosition={tagsPosition}
+        index={index}
+        weekKey={weekKey}
+        indicators={postsWithIndicators.get(post.id)}
+      />
+    </>
+  ))}
+</div>
+
+<Pagination
+  totalPages={totalPages}
+  postsPerPage={POSTS_PER_PAGE}
+  containerId={containerId}
+/>
+
+<style>
+  .posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+</style>

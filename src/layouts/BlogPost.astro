@@ -1,0 +1,443 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import MetaTags from '../components/MetaTags.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getProject } from '../lib/projects';
+import { formatDateLong, formatDateShort, formatDateISO } from '../lib/dateUtils';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  prevPost?: CollectionEntry<'blog'> | null;
+  nextPost?: CollectionEntry<'blog'> | null;
+  prevProjectPost?: CollectionEntry<'blog'> | null;
+  nextProjectPost?: CollectionEntry<'blog'> | null;
+}
+
+const { post, prevPost, nextPost, prevProjectPost, nextProjectPost } = Astro.props;
+const { title, date, tags, languages, patterns, architectures, project } = post.data;
+const currentProject = project ? getProject(project) : null;
+
+const prevProject = prevPost?.data.project ? getProject(prevPost.data.project) : null;
+const nextProject = nextPost?.data.project ? getProject(nextPost.data.project) : null;
+
+const prevProjProject = prevProjectPost?.data.project ? getProject(prevProjectPost.data.project) : null;
+const nextProjProject = nextProjectPost?.data.project ? getProject(nextProjectPost.data.project) : null;
+const hasProjectNav = prevProjectPost || nextProjectPost;
+---
+
+<BaseLayout title={title} preventZoom={false}>
+  <article data-color={currentProject?.colorKey}>
+    <a href="#" class="back" id="back-link">&larr; Back</a>
+    <header class="post-header">
+      <h1>{title}</h1>
+      <time datetime={formatDateISO(date)}>
+        {formatDateLong(date)}
+      </time>
+
+      <MetaTags
+        languages={languages}
+        patterns={patterns}
+        architectures={architectures}
+        tags={tags}
+      />
+    </header>
+
+    <div class="content">
+      <slot />
+    </div>
+
+    {/* Global nav: shown by default when coming from /blog */}
+    {(prevPost || nextPost) && (
+      <nav class:list={['post-nav', 'post-nav-global', { 'single': !prevPost || !nextPost }]}>
+        {nextPost && (
+          <a href={`/blog/${nextPost.id}`} class="nav-link next" data-color={nextProject?.colorKey}>
+            <span class="nav-direction">&larr; Next</span>
+            <span class="nav-info">
+              {nextProject && <span class="nav-project">{nextProject.name}</span>}
+              <span class="nav-description">
+                {nextProject && ' · '}
+                {nextPost.data.description || nextPost.data.languages?.slice(0, 2).join(', ') || ''}
+              </span>
+              <span class="nav-date">
+                {' · '}
+                {formatDateShort(nextPost.data.date)}
+              </span>
+            </span>
+          </a>
+        )}
+
+        {prevPost && (
+          <a href={`/blog/${prevPost.id}`} class="nav-link prev" data-color={prevProject?.colorKey}>
+            <span class="nav-direction">Previous &rarr;</span>
+            <span class="nav-info">
+              {prevProject && <span class="nav-project">{prevProject.name}</span>}
+              <span class="nav-description">
+                {prevProject && ' · '}
+                {prevPost.data.description || prevPost.data.languages?.slice(0, 2).join(', ') || ''}
+              </span>
+              <span class="nav-date">
+                {' · '}
+                {formatDateShort(prevPost.data.date)}
+              </span>
+            </span>
+          </a>
+        )}
+      </nav>
+    )}
+
+    {/* Project-scoped nav: hidden by default, shown via JS when coming from a project page */}
+    {hasProjectNav && (
+      <nav class:list={['post-nav', 'post-nav-project', { 'single': !prevProjectPost || !nextProjectPost }]} hidden>
+        {nextProjectPost && (
+          <a href={`/blog/${nextProjectPost.id}`} class="nav-link next" data-color={nextProjProject?.colorKey}>
+            <span class="nav-direction">&larr; Next</span>
+            <span class="nav-info">
+              {nextProjProject && <span class="nav-project">{nextProjProject.name}</span>}
+              <span class="nav-description">
+                {nextProjProject && ' · '}
+                {nextProjectPost.data.description || nextProjectPost.data.languages?.slice(0, 2).join(', ') || ''}
+              </span>
+              <span class="nav-date">
+                {' · '}
+                {formatDateShort(nextProjectPost.data.date)}
+              </span>
+            </span>
+          </a>
+        )}
+
+        {prevProjectPost && (
+          <a href={`/blog/${prevProjectPost.id}`} class="nav-link prev" data-color={prevProjProject?.colorKey}>
+            <span class="nav-direction">Previous &rarr;</span>
+            <span class="nav-info">
+              {prevProjProject && <span class="nav-project">{prevProjProject.name}</span>}
+              <span class="nav-description">
+                {prevProjProject && ' · '}
+                {prevProjectPost.data.description || prevProjectPost.data.languages?.slice(0, 2).join(', ') || ''}
+              </span>
+              <span class="nav-date">
+                {' · '}
+                {formatDateShort(prevProjectPost.data.date)}
+              </span>
+            </span>
+          </a>
+        )}
+      </nav>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  article {
+    max-width: 100%;
+  }
+
+  .back {
+    font-size: var(--font-base);
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    display: inline-block;
+    text-decoration: underline;
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  .post-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h1 {
+    font-size: var(--font-4xl);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  time {
+    color: var(--text-muted);
+    font-size: var(--font-md);
+  }
+
+  .content {
+    --post-section-accent: #4a5a6a;
+    --post-heading-text: #cdd4dc;
+    --post-body-text: #b0b8c4;
+    line-height: 1.7;
+    color: var(--post-body-text);
+  }
+
+  :global([data-theme="light"]) .content {
+    --post-section-accent: #8a9aaa;
+    --post-heading-text: #2a2f36;
+    --post-body-text: #4a4f57;
+  }
+
+  .content :global(h2) {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: var(--font-2xl);
+    border-left: 3px solid var(--item-color, var(--accent-muted));
+    padding-left: 0.75rem;
+    color: var(--post-heading-text);
+  }
+
+  .content :global(h3) {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: var(--font-xl);
+    font-weight: 600;
+    color: var(--post-heading-text);
+  }
+
+  .content :global(strong) {
+    color: var(--post-heading-text);
+  }
+
+  .content :global(p) {
+    margin-bottom: 1.2rem;
+  }
+
+  .content :global(ul),
+  .content :global(ol) {
+    margin-bottom: 1.2rem;
+    padding-left: 2rem;
+  }
+
+  .content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .content :global(pre) {
+    margin: 1.5rem 0;
+    border: 1px solid var(--border);
+    font-family: var(--font-code);
+    font-size: 0.9em;
+    filter: saturate(0.9);
+  }
+
+  .content :global(code) {
+    font-family: var(--font-code);
+  }
+
+  .content :global(:not(pre) > code) {
+    background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .content :global(blockquote) {
+    border-left: 3px solid var(--post-section-accent);
+    padding: 0.5rem 0 0.5rem 1rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 1.5rem 0;
+  }
+
+  .content :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .content :global(a[href^="http"]) {
+    text-decoration: none;
+    border-bottom: 1px solid var(--text-muted);
+    transition: border-color 0.2s;
+  }
+
+  .content :global(a[href^="http"]:hover) {
+    border-bottom-color: var(--accent);
+  }
+
+  /* Mermaid diagram styling */
+  /* Show subtle loading skeleton while mermaid loads */
+  .content :global(pre[data-language="mermaid"]) {
+    position: relative;
+    min-height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    color: transparent;
+    user-select: none;
+  }
+
+  .content :global(pre[data-language="mermaid"])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      var(--bg-secondary) 0%,
+      color-mix(in srgb, var(--border) 50%, var(--bg-secondary)) 50%,
+      var(--bg-secondary) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .content :global(.mermaid) {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .content :global(.mermaid[data-processed="true"]) {
+    opacity: 1;
+  }
+
+  /* Post navigation */
+  .post-nav[hidden] {
+    display: none;
+  }
+
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .post-nav.single {
+    justify-content: center;
+  }
+
+  .post-nav.single .nav-link {
+    margin-left: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    font-size: var(--font-base);
+    transition: color 0.2s;
+  }
+
+  .nav-link.prev {
+    margin-left: auto;
+  }
+
+  .nav-direction {
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .nav-link:hover .nav-direction {
+    color: var(--item-color, var(--accent));
+  }
+
+  .nav-info {
+    color: var(--text-muted);
+    opacity: var(--opacity-high);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+  }
+
+  .nav-description {
+    display: inline;
+  }
+
+  .nav-date {
+    display: inline;
+  }
+
+  .nav-project {
+    transition: color 0.2s;
+  }
+
+  .nav-link:hover .nav-project {
+    color: var(--item-color, var(--accent));
+  }
+
+  /* Progressive text reduction for side-by-side layout */
+  @media (max-width: 800px) {
+    .nav-info {
+      max-width: 220px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .nav-info {
+      max-width: 160px;
+    }
+
+    .nav-description {
+      display: none;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .nav-info {
+      max-width: 100px;
+    }
+
+    .nav-date {
+      display: none;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .post-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      align-items: center;
+    }
+
+    .nav-link.prev {
+      margin-left: 0;
+    }
+
+    .nav-info {
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .nav-description,
+    .nav-date {
+      display: inline;
+    }
+  }
+</style>
+
+<script>
+  import { initMermaidRenderer } from '../lib/mermaidRenderer';
+  import { initBackNavigation } from '../lib/backNavigation';
+
+  initMermaidRenderer();
+  initBackNavigation();
+
+  // Swap to project-scoped nav when the user came from a project page
+  const source = sessionStorage.getItem('postListSource');
+  if (source) {
+    try {
+      const fromProject = new URL(source).pathname.startsWith('/projects/');
+      if (fromProject) {
+        const globalNav = document.querySelector('.post-nav-global');
+        const projectNav = document.querySelector('.post-nav-project');
+        if (projectNav) {
+          globalNav?.setAttribute('hidden', '');
+          projectNav.removeAttribute('hidden');
+        }
+      }
+    } catch { /* invalid URL, keep global nav */ }
+  }
+</script>

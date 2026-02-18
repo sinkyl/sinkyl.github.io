@@ -1,0 +1,265 @@
+---
+// Bazaar architecture visualization SVG - uses CSS variables for theming
+---
+
+<svg class="bazaar-arch-svg" viewBox="0 0 720 330" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background region (stacked effect - offset top-right) -->
+  <rect x="40" y="5" width="660" height="280" rx="12" ry="12" class="region-box region-back"/>
+  <text x="370" y="22" class="region-label region-label-back">Region n</text>
+
+  <!-- Main region container -->
+  <rect x="20" y="30" width="660" height="280" rx="12" ry="12" class="region-box"/>
+  <text x="350" y="48" class="region-label">Region</text>
+
+  <!-- Identity Cluster -->
+  <g class="cluster identity-cluster">
+    <rect x="50" y="80" width="140" height="80" rx="8" ry="8"/>
+    <text x="120" y="110" class="cluster-title">Identity</text>
+    <text x="120" y="130" class="cluster-subtitle">SSO · OIDC</text>
+    <text x="120" y="148" class="cluster-detail">OpenIddict</text>
+  </g>
+
+  <!-- Payment Cluster -->
+  <g class="cluster payment-cluster">
+    <rect x="50" y="180" width="140" height="80" rx="8" ry="8"/>
+    <text x="120" y="210" class="cluster-title">Payment</text>
+    <text x="120" y="230" class="cluster-subtitle">PCI-DSS</text>
+    <text x="120" y="248" class="cluster-detail">Isolated</text>
+  </g>
+
+  <!-- Arrow from Identity to Marketplace -->
+  <g class="arrow">
+    <path d="M 190 120 L 240 120" class="arrow-line"/>
+    <polygon points="240,120 232,116 232,124" class="arrow-head"/>
+  </g>
+
+  <!-- Arrow from Payment to Marketplace -->
+  <g class="arrow">
+    <path d="M 190 220 L 220 220 L 220 160 L 240 160" class="arrow-line"/>
+    <polygon points="240,160 232,156 232,164" class="arrow-head"/>
+  </g>
+
+  <!-- Marketplace Cluster -->
+  <g class="cluster marketplace-cluster">
+    <rect x="250" y="90" width="160" height="100" rx="8" ry="8"/>
+    <text x="330" y="120" class="cluster-title">Marketplace</text>
+    <text x="330" y="142" class="cluster-subtitle">Search · Cart</text>
+    <text x="330" y="162" class="cluster-subtitle">Checkout</text>
+    <text x="330" y="182" class="cluster-detail">ElasticSearch</text>
+  </g>
+
+  <!-- Arrow from Marketplace to Stores -->
+  <g class="arrow">
+    <path d="M 410 140 L 460 140" class="arrow-line"/>
+    <polygon points="460,140 452,136 452,144" class="arrow-head"/>
+  </g>
+
+  <!-- Store Clusters container -->
+  <g class="stores-container">
+    <rect x="470" y="80" width="190" height="160" rx="8" ry="8" class="stores-box"/>
+    <text x="565" y="105" class="stores-label">Store Clusters</text>
+
+    <!-- Individual stores -->
+    <g class="store">
+      <rect x="485" y="115" width="70" height="50" rx="4" ry="4"/>
+      <text x="520" y="137" class="store-name">Store A</text>
+      <text x="520" y="153" class="store-detail">μservices</text>
+    </g>
+
+    <g class="store">
+      <rect x="570" y="115" width="70" height="50" rx="4" ry="4"/>
+      <text x="605" y="137" class="store-name">Store B</text>
+      <text x="605" y="153" class="store-detail">μservices</text>
+    </g>
+
+    <g class="store">
+      <rect x="527" y="175" width="70" height="50" rx="4" ry="4"/>
+      <text x="562" y="197" class="store-name">Store N</text>
+      <text x="562" y="213" class="store-detail">scale-to-0</text>
+    </g>
+  </g>
+
+  <!-- StorePlatform App -->
+  <g class="platform-app">
+    <rect x="500" y="260" width="150" height="40" rx="6" ry="6"/>
+    <text x="575" y="285" class="app-label">StorePlatform App</text>
+  </g>
+
+  <!-- Arrow from Stores to Platform App -->
+  <g class="arrow">
+    <path d="M 565 240 L 565 260" class="arrow-line dashed"/>
+    <polygon points="565,260 561,252 569,252" class="arrow-head"/>
+  </g>
+
+  <!-- Legend -->
+  <g class="legend">
+    <text x="50" y="285" class="legend-text">← Auth flow</text>
+    <text x="50" y="300" class="legend-text">← Data/Events</text>
+  </g>
+</svg>
+
+<style is:global>
+  .bazaar-arch-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Region container */
+  .bazaar-arch-svg .region-box {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--border, #2e3339);
+    stroke-width: 2;
+  }
+
+  .bazaar-arch-svg .region-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  /* Stacked region label */
+  .bazaar-arch-svg .region-label-back {
+    font-size: 12px;
+  }
+
+  /* Clusters */
+  .bazaar-arch-svg .cluster rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--accent, #c87038);
+    stroke-width: 1.5;
+  }
+
+  .bazaar-arch-svg .cluster-title {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  .bazaar-arch-svg .cluster-subtitle {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  .bazaar-arch-svg .cluster-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--accent, #c87038);
+    text-anchor: middle;
+    opacity: 0.8;
+  }
+
+  /* Specific cluster colors */
+  .bazaar-arch-svg .identity-cluster rect {
+    stroke: var(--color-blue, #61afef);
+  }
+  .bazaar-arch-svg .identity-cluster .cluster-detail {
+    fill: var(--color-blue, #61afef);
+  }
+
+  .bazaar-arch-svg .payment-cluster rect {
+    stroke: var(--color-green, #98c379);
+  }
+  .bazaar-arch-svg .payment-cluster .cluster-detail {
+    fill: var(--color-green, #98c379);
+  }
+
+  .bazaar-arch-svg .marketplace-cluster rect {
+    stroke: var(--color-orange, #d19a66);
+  }
+  .bazaar-arch-svg .marketplace-cluster .cluster-detail {
+    fill: var(--color-orange, #d19a66);
+  }
+
+  /* Stores container */
+  .bazaar-arch-svg .stores-box {
+    fill: none;
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 2;
+  }
+
+  .bazaar-arch-svg .stores-label {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    fill: var(--color-purple, #c678dd);
+    text-anchor: middle;
+  }
+
+  .bazaar-arch-svg .store rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1;
+    opacity: 0.9;
+  }
+
+  .bazaar-arch-svg .store-name {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  .bazaar-arch-svg .store-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  /* Platform App */
+  .bazaar-arch-svg .platform-app rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--color-cyan, #56b6c2);
+    stroke-width: 1.5;
+  }
+
+  .bazaar-arch-svg .app-label {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    fill: var(--color-cyan, #56b6c2);
+    text-anchor: middle;
+  }
+
+  /* Arrows */
+  .bazaar-arch-svg .arrow-line {
+    fill: none;
+    stroke: var(--text-muted, #9ca3af);
+    stroke-width: 1.5;
+  }
+
+  .bazaar-arch-svg .arrow-line.dashed {
+    stroke-dasharray: 4 2;
+  }
+
+  .bazaar-arch-svg .arrow-head {
+    fill: var(--text-muted, #9ca3af);
+  }
+
+  /* Legend */
+  .bazaar-arch-svg .legend-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--text-muted, #9ca3af);
+    opacity: 0.7;
+  }
+
+  /* Light mode adjustments */
+  [data-theme="light"] .bazaar-arch-svg .region-box {
+    fill: var(--bg-secondary, #fdfcfa);
+  }
+
+  [data-theme="light"] .bazaar-arch-svg .cluster rect,
+  [data-theme="light"] .bazaar-arch-svg .store rect,
+  [data-theme="light"] .bazaar-arch-svg .platform-app rect {
+    fill: var(--bg, #f8f7f4);
+  }
+</style>

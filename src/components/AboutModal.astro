@@ -1,0 +1,628 @@
+---
+// Terminal-style About Modal
+// License content is read from LICENSE.md at build time (single source of truth)
+import fs from 'node:fs';
+import path from 'node:path';
+
+const licenseRaw = fs.readFileSync(path.resolve('LICENSE.md'), 'utf-8');
+
+// Parse LICENSE.md into structured sections
+const [mitSection, contentSection] = licenseRaw.split(/^---$/m).map(s => s.trim());
+
+function parseMitSection(raw: string) {
+  const allLines = raw.split('\n');
+  const nonEmpty = allLines.filter(l => l.trim());
+  const heading = nonEmpty[0].replace(/^#\s*/, '');
+  const copyright = nonEmpty[1];
+  // Find where copyright appears in allLines, paragraphs start after that
+  const copyrightIndex = allLines.findIndex(l => l.trim() === copyright.trim());
+  const paragraphs: string[] = [];
+  let current: string[] = [];
+  for (const line of allLines.slice(copyrightIndex + 1)) {
+    if (line.trim() === '') {
+      if (current.length) { paragraphs.push(current.join(' ')); current = []; }
+    } else {
+      current.push(line.trim());
+    }
+  }
+  if (current.length) paragraphs.push(current.join(' '));
+  return { heading, copyright, paragraphs };
+}
+
+function parseContentSection(raw: string) {
+  const lines = raw.split('\n');
+  const heading = lines.find(l => l.startsWith('#'))?.replace(/^#\s*/, '') || '';
+  // Find the paragraph after the heading (the "following content..." line)
+  const intro: string[] = [];
+  const items: { path: string; desc: string }[] = [];
+  const outro: string[] = [];
+  let pastHeading = false;
+  let pastItems = false;
+  for (const line of lines) {
+    if (line.startsWith('#')) { pastHeading = true; continue; }
+    if (!pastHeading) continue;
+    const itemMatch = line.match(/^-\s*`([^`]+)`\s*—\s*(.+)$/);
+    if (itemMatch) {
+      items.push({ path: itemMatch[1], desc: itemMatch[2] });
+      continue;
+    }
+    if (items.length > 0 && !itemMatch) pastItems = true;
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (!pastItems && items.length === 0) {
+      intro.push(trimmed);
+    } else if (pastItems) {
+      outro.push(trimmed);
+    }
+  }
+  return { heading, intro, items, outro };
+}
+
+const mit = parseMitSection(mitSection);
+const content = parseContentSection(contentSection);
+---
+
+<button id="footer-trigger" class="footer-trigger">
+  &copy; {new Date().getFullYear()} - sinkyl Devlog
+  <svg class="terminal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="4 17 10 11 4 5"></polyline>
+    <line x1="12" y1="19" x2="20" y2="19"></line>
+  </svg>
+</button>
+
+<div id="about-modal" class="about-modal" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-container">
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-buttons">
+          <span class="btn-close"></span>
+          <span class="btn-minimize"></span>
+          <span class="btn-maximize"></span>
+        </div>
+        <span class="terminal-title">~/sinkyl/about.sh</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat ./manifesto.txt</span>
+        </div>
+        <div class="terminal-output ascii-art">
+{`   _____ _       _          _
+  / ____(_)     | |        | |
+ | (___  _ _ __ | | ___   _| |
+  \\___ \\| | '_ \\| |/ / | | | |
+  ____) | | | | |   <| |_| | |
+ |_____/|_|_| |_|_|\\_\\\\__, |_|
+                       __/ |
+                      |___/   `}
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">echo $PHILOSOPHY</span>
+        </div>
+        <div class="terminal-output philosophy">
+          "I don't build products. I architect obsessions."
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat ./why.md</span>
+        </div>
+        <div class="terminal-output story">
+          <p>This isn't just a devlog. It's a <span class="highlight">public accountability system</span>.</p>
+          <p>Every week, I ship. Every week, I document. No excuses, no hiding behind "stealth mode".</p>
+          <p>Three projects. One human. Zero external funding.</p>
+          <p class="dim">// If I fail, you'll see it here first.</p>
+        </div>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat LICENSE</span>
+        </div>
+        <button class="terminal-output license license-trigger" data-license-open>
+          <span class="license-badge">SPLIT LICENSE</span>
+          <p><span class="highlight">Code</span> → MIT. Fork it, ship it, make it yours.</p>
+          <p><span class="highlight">Content</span> → All Rights Reserved. Spatium, Bazaar, Xtranodly — mine.</p>
+          <p class="dim">The framework is free. The ideas aren't. <span class="license-hint">→ read full</span></p>
+        </button>
+
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">uptime</span>
+        </div>
+        <div class="terminal-output stats">
+          <div class="stat-grid">
+            <div class="stat">
+              <span class="stat-value" id="commits-count">∞</span>
+              <span class="stat-label">commits & counting</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">3 <span class="stat-hint">+ 2</span></span>
+              <span class="stat-label">parallel obsessions</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">24/7</span>
+              <span class="stat-label">brain uptime</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="terminal-line blink">
+          <span class="prompt">$</span>
+          <span class="cursor">_</span>
+        </div>
+      </div>
+
+      <!-- Full LICENSE view (hidden by default) -->
+      <div class="license-detail" data-license-detail>
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat LICENSE --full</span>
+        </div>
+        <div class="terminal-output license-full">
+          <p class="license-heading">{mit.heading}</p>
+          <p>{mit.copyright}</p>
+          {mit.paragraphs.map((p, i) => (
+            <p class:list={['license-text', { dim: i === mit.paragraphs.length - 1 }]}>{p}</p>
+          ))}
+          <div class="license-separator">════════════════════════════════════════</div>
+          <p class="license-heading reserved">{content.heading}</p>
+          {content.intro.map(p => (
+            <p class="license-text" set:html={p
+              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            } />
+          ))}
+          <ul class="license-list">
+            {content.items.map(item => (
+              <li><span class="highlight">{item.path}</span> — {item.desc}</li>
+            ))}
+          </ul>
+          {content.outro.map((p, i) => (
+            <p class:list={['license-text', { dim: i === content.outro.length - 1 }]}
+              set:html={p.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}
+            />
+          ))}
+        </div>
+        <button class="license-back" data-license-back>
+          <span class="prompt">$</span> <span class="command">cd ..</span>
+        </button>
+      </div>
+    </div>
+    <button class="modal-close" aria-label="Close modal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .footer-trigger {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-xs);
+    transition: color 0.2s;
+  }
+
+  .footer-trigger:hover {
+    color: var(--accent);
+  }
+
+  .terminal-icon {
+    width: 19px;
+    height: 19px;
+    margin-top: 0.2rem;
+    opacity: var(--opacity-soft);
+    transition: opacity 0.2s;
+  }
+
+  .footer-trigger:hover .terminal-icon {
+    opacity: 1;
+  }
+
+  /* About Modal */
+  .about-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+
+  .about-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+  }
+
+  :global([data-theme="light"]) .modal-backdrop {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .modal-container {
+    position: relative;
+    max-width: 786px;
+    width: 92%;
+    max-height: 85vh;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s ease-out;
+  }
+
+  .about-modal.open .modal-container {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover {
+    color: var(--text);
+  }
+
+  .modal-close svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Terminal Window */
+  .terminal-window {
+    background: var(--bg);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .terminal-header {
+    background: var(--bg-secondary);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .terminal-buttons span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .btn-close { background: #8b4049; }
+  .btn-minimize { background: #8b7335; }
+  .btn-maximize { background: #3d6b4a; }
+
+  .terminal-title {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .terminal-body {
+    padding: 1.5rem 1.5rem 0.75rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .terminal-line {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .prompt {
+    color: var(--color-green-dim);
+    font-weight: bold;
+  }
+
+  .command {
+    color: var(--color-blue-dim);
+  }
+
+  .terminal-output {
+    color: var(--color-white-dim);
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+  }
+
+  :global([data-theme="light"]) .terminal-output {
+    color: var(--text-muted);
+  }
+
+  .terminal-output.ascii-art {
+    color: var(--color-purple-dim);
+    font-size: var(--font-xs);
+    line-height: 1.2;
+    white-space: pre;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .terminal-output.philosophy {
+    color: var(--color-orange-dim);
+    font-style: italic;
+  }
+
+  .terminal-output.story p {
+    margin-bottom: 0.75rem;
+  }
+
+  .terminal-output .highlight {
+    color: var(--color-blue-dim);
+    font-weight: bold;
+  }
+
+  .terminal-output .dim {
+    color: var(--text-muted);
+  }
+
+  .terminal-output.license {
+    border-left: 2px solid var(--color-red-dim);
+    padding-left: 1rem;
+  }
+
+  .license-badge {
+    display: inline-block;
+    background: var(--color-red-dim);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-xs);
+    font-size: var(--font-sm-md);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .terminal-output.license p {
+    margin-bottom: 0.5rem;
+  }
+
+  .terminal-output.license a {
+    color: var(--color-blue-dim);
+    text-decoration: underline;
+  }
+
+  /* License trigger (clickable summary) */
+  .license-trigger {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .license-trigger:hover {
+    border-left-color: var(--accent);
+  }
+
+  .license-hint {
+    color: var(--color-blue-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 0.8em;
+  }
+
+  .license-trigger:hover .license-hint {
+    opacity: 1;
+  }
+
+  /* Full license detail view */
+  .license-detail {
+    display: none;
+    padding: 1.5rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .license-detail.active {
+    display: block;
+  }
+
+  .license-full {
+    border-left: 2px solid var(--color-blue-dim);
+    padding-left: 1rem;
+    color: var(--color-white-dim);
+  }
+
+  :global([data-theme="light"]) .license-full {
+    color: var(--text-muted);
+  }
+
+  .license-full .license-heading {
+    color: var(--color-blue-dim);
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .license-full .license-heading.reserved {
+    color: var(--color-red-dim);
+  }
+
+  .license-full .license-text {
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .license-full .license-text strong {
+    color: var(--text);
+  }
+
+  .license-full .license-separator {
+    color: var(--text-muted);
+    opacity: 0.4;
+    margin: 1rem 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+
+  .license-full .license-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .license-full .license-list li {
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+    padding-left: 1rem;
+  }
+
+  .license-full .license-list li::before {
+    content: '›';
+    color: var(--color-red-dim);
+    font-weight: bold;
+    margin-left: -1rem;
+    margin-right: 0.5rem;
+  }
+
+  .license-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 0.35rem 0.75rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .license-back:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+  }
+
+  .terminal-output.stats {
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .stat-value {
+    display: block;
+    font-size: var(--font-2xl);
+    font-weight: bold;
+    color: var(--color-blue-dim);
+  }
+
+  .stat-label {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .stat-hint {
+    font-size: 0.6em;
+    opacity: var(--opacity-soft);
+    font-weight: normal;
+  }
+
+  .terminal-line.blink .cursor {
+    animation: cursorBlink 1s step-end infinite;
+  }
+
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .terminal-body {
+      font-size: var(--font-sm-md);
+      padding: 1rem;
+    }
+
+    .terminal-output.ascii-art {
+      font-size: 0.55rem;
+    }
+
+    .stat-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .stat-value {
+      font-size: var(--font-xl);
+    }
+  }
+</style>
+
+<script>
+  import { initModal } from '../lib/modalManager';
+
+  initModal('about-modal', 'footer-trigger');
+
+  // License detail toggle
+  const modal = document.getElementById('about-modal');
+  if (modal) {
+    const body = modal.querySelector('.terminal-body') as HTMLElement;
+    const detail = modal.querySelector('[data-license-detail]') as HTMLElement;
+    const openBtn = modal.querySelector('[data-license-open]');
+    const backBtn = modal.querySelector('[data-license-back]');
+
+    openBtn?.addEventListener('click', () => {
+      body.style.display = 'none';
+      detail.classList.add('active');
+      detail.scrollTop = 0;
+    });
+
+    backBtn?.addEventListener('click', () => {
+      detail.classList.remove('active');
+      body.style.display = '';
+    });
+  }
+</script>

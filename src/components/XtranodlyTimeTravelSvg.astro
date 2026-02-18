@@ -1,0 +1,405 @@
+---
+// Xtranodly time travel & nesting visualization SVG
+---
+
+<svg class="xtranodly-tt-svg" viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- ===== LEFT SIDE (~55%): Branching Timeline ===== -->
+
+  <text x="30" y="20" class="section-title">Time Travel</text>
+
+  <!-- Main timeline -->
+  <g class="timeline-branch main-branch">
+    <!-- Timeline line -->
+    <line x1="50" y1="70" x2="370" y2="70" class="branch-line"/>
+
+    <!-- Snapshot markers (yellow circles) -->
+    <g class="snapshot">
+      <circle cx="90" cy="70" r="7"/>
+      <text x="90" y="90" class="snap-label">S1</text>
+    </g>
+    <g class="snapshot">
+      <circle cx="160" cy="70" r="7"/>
+      <text x="160" y="90" class="snap-label">S2</text>
+    </g>
+    <g class="snapshot">
+      <circle cx="230" cy="70" r="7"/>
+      <text x="230" y="90" class="snap-label">S3</text>
+    </g>
+
+    <!-- Checkpoint (green, larger) -->
+    <g class="checkpoint">
+      <circle cx="300" cy="70" r="9"/>
+      <text x="300" y="90" class="checkpoint-label">CP</text>
+    </g>
+
+    <!-- Arrow tip -->
+    <polygon points="370,70 363,66 363,74" class="branch-head"/>
+  </g>
+
+  <!-- Fork: Branch from S3 -->
+  <g class="timeline-branch fork-branch">
+    <path d="M 230 70 L 260 130 L 370 130" class="branch-line-fork"/>
+    <polygon points="370,130 363,126 363,134" class="branch-head-fork"/>
+
+    <!-- Snapshots on fork -->
+    <g class="snapshot">
+      <circle cx="290" cy="130" r="6"/>
+      <text x="290" y="148" class="snap-label">S3'</text>
+    </g>
+    <g class="snapshot">
+      <circle cx="340" cy="130" r="6"/>
+      <text x="340" y="148" class="snap-label">S4'</text>
+    </g>
+  </g>
+
+  <!-- Labels -->
+  <text x="210" y="55" class="branch-label">main</text>
+  <text x="320" y="118" class="branch-label fork-label">branch</text>
+
+  <!-- Rewind arrow -->
+  <g class="rewind-arrow">
+    <path d="M 300 100 C 280 115, 250 112, 230 100" class="rewind-line"/>
+    <polygon points="230,100 235,107 238,99" class="rewind-head"/>
+    <text x="265" y="120" class="rewind-label">rewind</text>
+  </g>
+
+  <!-- Annotations -->
+  <g class="tt-annotations">
+    <circle cx="60" cy="170" r="5" class="snap-dot"/>
+    <text x="72" y="174" class="annotation-text">Snapshot — saved state</text>
+
+    <circle cx="60" cy="192" r="5" class="cp-dot"/>
+    <text x="72" y="196" class="annotation-text">Checkpoint — restorable</text>
+
+    <line x1="50" y1="212" x2="70" y2="212" class="fork-line-legend"/>
+    <text x="72" y="216" class="annotation-text">Branch — divergent timeline</text>
+  </g>
+
+  <!-- ===== VERTICAL DASHED SEPARATOR ===== -->
+  <line x1="395" y1="10" x2="395" y2="270" class="section-separator"/>
+
+  <!-- ===== RIGHT SIDE (~45%): Nested Graphs ===== -->
+
+  <text x="415" y="20" class="section-title">Nesting</text>
+
+  <!-- Root Graph (outermost) -->
+  <g class="nest-level root-graph">
+    <rect x="415" y="35" width="285" height="230" rx="8"/>
+    <text x="425" y="52" class="nest-label">Root Graph</text>
+
+    <!-- Root nodes -->
+    <g class="nest-node">
+      <rect x="435" y="60" width="50" height="28" rx="4"/>
+      <text x="460" y="78" class="nest-node-label">A</text>
+    </g>
+    <g class="nest-node">
+      <rect x="435" y="210" width="50" height="28" rx="4"/>
+      <text x="460" y="228" class="nest-node-label">D</text>
+    </g>
+
+    <!-- Edge A → Context -->
+    <g class="nest-edge">
+      <path d="M 485 74 L 510 74" class="nest-edge-line"/>
+      <polygon points="510,74 505,71 505,77" class="nest-edge-head"/>
+    </g>
+
+    <!-- ContextNode (middle) -->
+    <g class="nest-level context-node">
+      <rect x="515" y="55" width="170" height="130" rx="6"/>
+      <text x="525" y="72" class="nest-label context-label">ContextNode</text>
+
+      <!-- Boundary in -->
+      <g class="nest-node boundary-node">
+        <rect x="530" y="82" width="36" height="22" rx="3"/>
+        <text x="548" y="97" class="nest-node-label-sm">In</text>
+      </g>
+
+      <!-- Boundary out -->
+      <g class="nest-node boundary-node">
+        <rect x="635" y="82" width="36" height="22" rx="3"/>
+        <text x="653" y="97" class="nest-node-label-sm">Out</text>
+      </g>
+
+      <!-- Sub-Context (innermost) -->
+      <g class="nest-level sub-context">
+        <rect x="525" y="112" width="150" height="65" rx="5"/>
+        <text x="535" y="126" class="nest-label sub-label">Sub-Context</text>
+
+        <!-- Inner nodes -->
+        <g class="nest-node inner-node">
+          <rect x="540" y="134" width="36" height="22" rx="3"/>
+          <text x="558" y="149" class="nest-node-label-sm">X</text>
+        </g>
+        <g class="nest-node inner-node">
+          <rect x="594" y="134" width="36" height="22" rx="3"/>
+          <text x="612" y="149" class="nest-node-label-sm">Y</text>
+        </g>
+
+        <!-- Edge X → Y -->
+        <g class="nest-edge">
+          <path d="M 576 145 L 594 145" class="nest-edge-line"/>
+          <polygon points="594,145 590,142 590,148" class="nest-edge-head"/>
+        </g>
+      </g>
+
+      <!-- Edge In → Sub-Context -->
+      <g class="nest-edge">
+        <path d="M 548 104 L 548 112" class="nest-edge-line"/>
+        <polygon points="548,112 545,108 551,108" class="nest-edge-head"/>
+      </g>
+
+      <!-- Edge Sub-Context → Out -->
+      <g class="nest-edge">
+        <path d="M 653 177 L 653 104" class="nest-edge-line"/>
+        <polygon points="653,104 650,108 656,108" class="nest-edge-head"/>
+      </g>
+    </g>
+
+    <!-- Edge Context → D -->
+    <g class="nest-edge">
+      <path d="M 600 185 L 600 210 L 485 224" class="nest-edge-line"/>
+      <polygon points="485,224 490,221 490,227" class="nest-edge-head"/>
+    </g>
+  </g>
+
+  <!-- Depth annotation -->
+  <text x="560" y="255" class="depth-annotation">arbitrarily deep</text>
+</svg>
+
+<style is:global>
+  .xtranodly-tt-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Section titles */
+  .xtranodly-tt-svg .section-title {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3);
+    text-anchor: start;
+  }
+
+  /* Section separator */
+  .xtranodly-tt-svg .section-separator {
+    stroke: var(--border, #2e3339);
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+  }
+
+  /* ===== Timeline ===== */
+
+  /* Main branch line */
+  .xtranodly-tt-svg .branch-line {
+    stroke: var(--text-muted, #9ca3af);
+    stroke-width: 2;
+  }
+
+  .xtranodly-tt-svg .branch-head {
+    fill: var(--text-muted, #9ca3af);
+  }
+
+  /* Snapshot markers */
+  .xtranodly-tt-svg .snapshot circle {
+    fill: var(--color-yellow, #e5c07b);
+    stroke: none;
+  }
+
+  .xtranodly-tt-svg .snap-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--color-yellow, #e5c07b);
+    text-anchor: middle;
+  }
+
+  /* Checkpoint */
+  .xtranodly-tt-svg .checkpoint circle {
+    fill: none;
+    stroke: var(--color-green, #98c379);
+    stroke-width: 2;
+  }
+
+  .xtranodly-tt-svg .checkpoint-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    fill: var(--color-green, #98c379);
+    text-anchor: middle;
+  }
+
+  /* Fork branch */
+  .xtranodly-tt-svg .branch-line-fork {
+    fill: none;
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 3;
+  }
+
+  .xtranodly-tt-svg .branch-head-fork {
+    fill: var(--color-purple, #c678dd);
+  }
+
+  /* Branch labels */
+  .xtranodly-tt-svg .branch-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+  }
+
+  .xtranodly-tt-svg .fork-label {
+    fill: var(--color-purple, #c678dd);
+  }
+
+  /* Rewind arrow */
+  .xtranodly-tt-svg .rewind-line {
+    fill: none;
+    stroke: var(--color-cyan, #56b6c2);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 2;
+  }
+
+  .xtranodly-tt-svg .rewind-head {
+    fill: var(--color-cyan, #56b6c2);
+  }
+
+  .xtranodly-tt-svg .rewind-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--color-cyan, #56b6c2);
+    text-anchor: middle;
+    opacity: 0.8;
+  }
+
+  /* Annotations */
+  .xtranodly-tt-svg .snap-dot {
+    fill: var(--color-yellow, #e5c07b);
+  }
+
+  .xtranodly-tt-svg .cp-dot {
+    fill: none;
+    stroke: var(--color-green, #98c379);
+    stroke-width: 2;
+  }
+
+  .xtranodly-tt-svg .fork-line-legend {
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 3;
+  }
+
+  .xtranodly-tt-svg .annotation-text {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: start;
+  }
+
+  /* ===== Nesting ===== */
+
+  /* Root graph */
+  .xtranodly-tt-svg .root-graph > rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--color-blue, #61afef);
+    stroke-width: 1.5;
+  }
+
+  /* ContextNode */
+  .xtranodly-tt-svg .context-node > rect {
+    fill: var(--bg, #181a1f);
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1.5;
+  }
+
+  /* Sub-Context */
+  .xtranodly-tt-svg .sub-context > rect {
+    fill: var(--bg-secondary, #1e2227);
+    stroke: var(--color-purple, #c678dd);
+    stroke-width: 1;
+    stroke-dasharray: 4 2;
+  }
+
+  /* Nest labels */
+  .xtranodly-tt-svg .nest-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    fill: var(--color-blue, #61afef);
+    text-anchor: start;
+  }
+
+  .xtranodly-tt-svg .context-label {
+    fill: var(--color-purple, #c678dd);
+  }
+
+  .xtranodly-tt-svg .sub-label {
+    fill: var(--color-purple, #c678dd);
+    font-size: 9px;
+    opacity: 0.8;
+  }
+
+  /* Nest nodes */
+  .xtranodly-tt-svg .nest-node rect {
+    fill: var(--bg, #181a1f);
+    stroke: var(--color-blue, #61afef);
+    stroke-width: 1;
+  }
+
+  .xtranodly-tt-svg .boundary-node rect {
+    stroke: var(--color-red, #e06c75);
+  }
+
+  .xtranodly-tt-svg .inner-node rect {
+    stroke: var(--color-blue, #61afef);
+    opacity: 0.8;
+  }
+
+  .xtranodly-tt-svg .nest-node-label {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  .xtranodly-tt-svg .nest-node-label-sm {
+    font-family: system-ui, sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    fill: var(--text, #e6edf3);
+    text-anchor: middle;
+  }
+
+  /* Nest edges */
+  .xtranodly-tt-svg .nest-edge-line {
+    fill: none;
+    stroke: var(--text-muted, #9ca3af);
+    stroke-width: 1;
+  }
+
+  .xtranodly-tt-svg .nest-edge-head {
+    fill: var(--text-muted, #9ca3af);
+  }
+
+  /* Depth annotation */
+  .xtranodly-tt-svg .depth-annotation {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-muted, #9ca3af);
+    text-anchor: middle;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* Light mode */
+  [data-theme="light"] .xtranodly-tt-svg .root-graph > rect,
+  [data-theme="light"] .xtranodly-tt-svg .sub-context > rect {
+    fill: var(--bg-secondary, #fdfcfa);
+  }
+
+  [data-theme="light"] .xtranodly-tt-svg .context-node > rect,
+  [data-theme="light"] .xtranodly-tt-svg .nest-node rect {
+    fill: var(--bg, #f8f7f4);
+  }
+</style>

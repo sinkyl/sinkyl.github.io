@@ -1,0 +1,257 @@
+---
+// Spatium slide 3 — Emergence: convergence tree + wave propagation grid
+// ASCII aesthetic: fixed grays, monospace, no theme switching
+---
+
+<svg class="spatium-emerge-svg" viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ===== CONVERGENCE TREE (left side) ===== -->
+
+  <!-- Input patterns -->
+  <text x="43" y="20" class="ascii-bits ascii-center">░▓░</text>
+  <text x="123" y="20" class="ascii-bits ascii-center">▓░▓</text>
+  <text x="203" y="20" class="ascii-bits ascii-center">░░▓</text>
+
+  <!-- Arrows down -->
+  <line x1="42" y1="26" x2="42" y2="36" class="ascii-line"/>
+  <polygon points="42,36 39,31 45,31" class="ascii-arrow"/>
+  <line x1="122" y1="26" x2="122" y2="36" class="ascii-line"/>
+  <polygon points="122,36 119,31 125,31" class="ascii-arrow"/>
+  <line x1="202" y1="26" x2="202" y2="36" class="ascii-line"/>
+  <polygon points="202,36 199,31 205,31" class="ascii-arrow"/>
+
+  <!-- Unit boxes -->
+  <g transform="translate(22, 38)">
+    <rect width="42" height="24" rx="2" class="ascii-box"/>
+    <text x="21" y="12" class="ascii-dot ascii-center-v">·</text>
+  </g>
+  <g transform="translate(102, 38)">
+    <rect width="42" height="24" rx="2" class="ascii-box"/>
+    <text x="21" y="12" class="ascii-dot ascii-center-v">·</text>
+  </g>
+  <g transform="translate(182, 38)">
+    <rect width="42" height="24" rx="2" class="ascii-box"/>
+    <text x="21" y="12" class="ascii-dot ascii-center-v">·</text>
+  </g>
+
+  <!-- Converging lines -->
+  <line x1="43" y1="62" x2="43" y2="75" class="ascii-line"/>
+  <line x1="123" y1="62" x2="123" y2="75" class="ascii-line"/>
+  <line x1="203" y1="62" x2="203" y2="75" class="ascii-line"/>
+  <line x1="43" y1="75" x2="123" y2="85" class="ascii-line"/>
+  <line x1="203" y1="75" x2="123" y2="85" class="ascii-line"/>
+  <line x1="123" y1="75" x2="123" y2="85" class="ascii-line"/>
+
+  <!-- Arrow down -->
+  <line x1="123" y1="85" x2="123" y2="95" class="ascii-line"/>
+  <polygon points="123,95 120,90 126,90" class="ascii-arrow"/>
+
+  <!-- Result box -->
+  <g transform="translate(80, 97)">
+    <rect width="86" height="28" rx="2" class="ascii-box-active"/>
+    <text x="43" y="9" class="ascii-label-bright ascii-center-v">complex</text>
+    <text x="43" y="21" class="ascii-label-bright ascii-center-v">behavior</text>
+  </g>
+
+  <!-- ===== CONNECTOR between diagrams ===== -->
+  <g transform="translate(310, 70)">
+    <line x1="-50" y1="0" x2="-24" y2="0" class="ascii-connector-line"/>
+    <text x="-21" y="0" class="ascii-connector-cap ascii-center-v">╡</text>
+    <text x="0" y="0" class="ascii-connector-label ascii-center-v">zoomed</text>
+    <text x="21" y="0" class="ascii-connector-cap ascii-center-v">╞</text>
+    <line x1="24" y1="0" x2="48" y2="0" class="ascii-connector-line"/>
+    <polygon points="50,0 45,-2.5 45,2.5" class="ascii-arrow"/>
+  </g>
+
+  <!-- ===== WAVE PROPAGATION GRID (right side) ===== -->
+
+  <!-- Grid of symbols showing ripple pattern -->
+  <g transform="translate(390, 10)">
+    <!-- Row 1 -->
+    <text x="0" y="14" class="ascii-silent">·  ·  ·</text>
+    <text x="60" y="14" class="ascii-wave-char">∿</text>
+    <text x="78" y="14" class="ascii-silent">·  ·  ·</text>
+
+    <!-- Row 2 -->
+    <text x="0" y="32" class="ascii-silent">·  ·</text>
+    <text x="40" y="32" class="ascii-wave-char">∿  ∿  ∿</text>
+    <text x="100" y="32" class="ascii-silent">·  ·</text>
+
+    <!-- Row 3 -->
+    <text x="0" y="50" class="ascii-silent">·</text>
+    <text x="20" y="50" class="ascii-wave-char">∿  ∿</text>
+    <text x="60" y="50" class="ascii-active">●</text>
+    <text x="78" y="50" class="ascii-wave-char">∿  ∿</text>
+    <text x="118" y="50" class="ascii-silent">·</text>
+
+    <!-- Row 4 (center) -->
+    <text x="0" y="68" class="ascii-wave-char">∿  ∿</text>
+    <text x="40" y="68" class="ascii-active">●</text>
+    <text x="58" y="68" class="ascii-resonating">◉</text>
+    <text x="78" y="68" class="ascii-active">●</text>
+    <text x="98" y="68" class="ascii-wave-char">∿  ∿</text>
+
+    <!-- Row 5 -->
+    <text x="0" y="86" class="ascii-silent">·</text>
+    <text x="20" y="86" class="ascii-wave-char">∿  ∿</text>
+    <text x="60" y="86" class="ascii-active">●</text>
+    <text x="78" y="86" class="ascii-wave-char">∿  ∿</text>
+    <text x="118" y="86" class="ascii-silent">·</text>
+
+    <!-- Row 6 -->
+    <text x="0" y="104" class="ascii-silent">·  ·</text>
+    <text x="40" y="104" class="ascii-wave-char">∿  ∿  ∿</text>
+    <text x="100" y="104" class="ascii-silent">·  ·</text>
+
+    <!-- Row 7 -->
+    <text x="0" y="122" class="ascii-silent">·  ·  ·</text>
+    <text x="60" y="122" class="ascii-wave-char">∿</text>
+    <text x="78" y="122" class="ascii-silent">·  ·  ·</text>
+
+    <!-- Legend -->
+    <text x="145" y="32" class="ascii-legend">·  = silent</text>
+    <text x="145" y="50" class="ascii-legend">∿  = wave</text>
+    <text x="145" y="68" class="ascii-legend">●  = activated</text>
+    <text x="145" y="86" class="ascii-legend">◉  = resonating</text>
+  </g>
+
+  <!-- ===== BOTTOM TEXT ===== -->
+  <text x="320" y="165" class="ascii-closing">No unit sees the whole picture. Each only knows its immediate neighborhood.</text>
+  <text x="320" y="182" class="ascii-closing">Yet from this local blindness, global structure forms.</text>
+  <text x="320" y="202" class="ascii-closing-em">Waves find paths. Patterns find each other.</text>
+
+</svg>
+
+<style is:global>
+  .spatium-emerge-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===== Fixed gray palette ===== */
+
+  .spatium-emerge-svg .ascii-box {
+    fill: none;
+    stroke: #7a7f85;
+    stroke-width: 1.2;
+  }
+
+  .spatium-emerge-svg .ascii-box-active {
+    fill: rgba(155, 160, 168, 0.08);
+    stroke: #9ca3af;
+    stroke-width: 1.5;
+  }
+
+  .spatium-emerge-svg .ascii-bits {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    fill: #9ca3af;
+    text-anchor: start;
+    letter-spacing: 0.05em;
+  }
+
+  .spatium-emerge-svg .ascii-bits.ascii-center {
+    text-anchor: middle;
+  }
+
+  .spatium-emerge-svg .ascii-center-v {
+    dominant-baseline: central;
+  }
+
+  .spatium-emerge-svg .ascii-dot {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    fill: #7a7f85;
+    text-anchor: middle;
+  }
+
+  .spatium-emerge-svg .ascii-label-bright {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    fill: #c9cdd1;
+    text-anchor: middle;
+  }
+
+  .spatium-emerge-svg .ascii-line {
+    stroke: #7a7f85;
+    stroke-width: 1;
+  }
+
+  .spatium-emerge-svg .ascii-arrow {
+    fill: #7a7f85;
+  }
+
+  /* Connector between diagrams */
+  .spatium-emerge-svg .ascii-connector-line {
+    stroke: #7a7f85;
+    stroke-width: 1;
+    stroke-dasharray: 6 3;
+  }
+
+  .spatium-emerge-svg .ascii-connector-cap {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: #7a7f85;
+    text-anchor: middle;
+  }
+
+  .spatium-emerge-svg .ascii-connector-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #9ca3af;
+    text-anchor: middle;
+  }
+
+  /* Wave propagation characters */
+  .spatium-emerge-svg .ascii-silent {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: #3a3f45;
+    text-anchor: start;
+  }
+
+  .spatium-emerge-svg .ascii-wave-char {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: #5a5f65;
+    text-anchor: start;
+  }
+
+  .spatium-emerge-svg .ascii-active {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: #9ca3af;
+    text-anchor: start;
+  }
+
+  .spatium-emerge-svg .ascii-resonating {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: #c9cdd1;
+    text-anchor: start;
+  }
+
+  .spatium-emerge-svg .ascii-legend {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #5a5f65;
+    text-anchor: start;
+  }
+
+  /* Bottom text */
+  .spatium-emerge-svg .ascii-closing {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: #9ca3af;
+    text-anchor: middle;
+  }
+
+  .spatium-emerge-svg .ascii-closing-em {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: #c9cdd1;
+    text-anchor: middle;
+    font-style: italic;
+  }
+</style>

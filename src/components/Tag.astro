@@ -1,0 +1,35 @@
+---
+import { getTechColor } from '../lib/colors';
+
+interface Props {
+  label: string;
+  color?: string;
+  size?: 'sm' | 'md';
+}
+
+const { label, color, size = 'sm' } = Astro.props;
+const techColor = color || getTechColor(label);
+---
+
+<span class:list={['tag', size]} style={`--tech-color: ${techColor}`}>
+  {label}
+</span>
+
+<style>
+  .tag {
+    border-radius: var(--radius-xs);
+    background: color-mix(in srgb, var(--tech-color) 12%, transparent);
+    color: var(--tech-color);
+    border: 1px solid color-mix(in srgb, var(--tech-color) 30%, transparent);
+  }
+
+  .tag.sm {
+    font-size: var(--font-sm);
+    padding: 0.1rem 0.3rem;
+  }
+
+  .tag.md {
+    font-size: var(--font-sm-md);
+    padding: 0.2rem 0.5rem;
+  }
+</style>

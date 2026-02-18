@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlocksBackground from '../../components/BlocksBackground.astro';
+import PostsList from '../../components/PostsList.astro';
+import HeaderCarousel from '../../components/HeaderCarousel.astro';
+import { projects } from '../../lib/projects';
+import { getPosts } from '../../lib/getPosts';
+
+export async function getStaticPaths() {
+  return projects.map(project => ({
+    params: { project: project.id },
+    props: { project }
+  }));
+}
+
+const { project } = Astro.props;
+const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = await getPosts(project.id);
+---
+
+<BaseLayout title={`${project.name} — sinkyl Devlog`}>
+  <BlocksBackground />
+  <section class="header" data-color={project.colorKey}>
+    <h1>{project.name}</h1>
+    <HeaderCarousel project={project} />
+    <p class="count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
+  </section>
+
+  {posts.length === 0 ? (
+    <p class="empty">No posts yet for this project.</p>
+  ) : (
+    <PostsList
+      postsWithWeek={postsWithWeek}
+      postsWithIndicators={postsWithIndicators}
+      totalPages={totalPages}
+      containerId={containerId}
+      showProjectBadge={false}
+      showLeftBorder={false}
+      tagsPosition="header"
+      projectId={project.id}
+    />
+  )}
+</BaseLayout>
+
+<style>
+  :global(main) {
+    padding-top: 1rem;
+  }
+
+  .header {
+    padding-bottom: 2rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+    color: var(--item-color);
+  }
+
+  .count {
+    color: var(--text-muted);
+    font-size: var(--font-sm);
+    opacity: var(--opacity-medium);
+  }
+
+  .empty {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .header h1 {
+      font-size: 1.75rem;
+    }
+  }
+</style>
+
+<script>
+  import { initPagination } from '../../lib/paginationController';
+  import { initMermaidRenderer } from '../../lib/mermaidRenderer';
+  import { CONTAINER_IDS } from '../../lib/constants';
+
+  initPagination(CONTAINER_IDS.posts);
+
+  // Initialize mermaid on page load
+  initMermaidRenderer();
+
+  // Re-render mermaid when carousel expands (diagrams may need re-measurement)
+  document.addEventListener('carousel:expanded', () => {
+    initMermaidRenderer();
+  });
+</script>

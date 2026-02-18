@@ -1,0 +1,203 @@
+---
+// Palette Switcher - allows switching between color palettes
+import { palettes as paletteData } from '../lib/palettes';
+
+// Map palette data to switcher format (use dark accent as preview color)
+const palettes = paletteData.map(p => ({
+  id: p.id,
+  name: p.name,
+  color: p.colors.dark.accent,
+}));
+---
+
+<div class="palette-switcher" id="palette-switcher">
+  <button type="button" class="palette-toggle" id="palette-toggle" aria-label="Change color palette">
+    <svg class="palette-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <circle cx="12" cy="12" r="4" fill="currentColor"/>
+      <line x1="12" y1="2" x2="12" y2="6"/>
+      <line x1="12" y1="18" x2="12" y2="22"/>
+      <line x1="2" y1="12" x2="6" y2="12"/>
+      <line x1="18" y1="12" x2="22" y2="12"/>
+    </svg>
+  </button>
+  <div class="palette-menu" id="palette-menu">
+    {palettes.map(palette => (
+      <button
+        type="button"
+        class="palette-option"
+        data-palette={palette.id}
+        title={palette.name}
+        style={`--palette-color: ${palette.color}`}
+      >
+        <span class="palette-dot"></span>
+        <span class="palette-name">{palette.name}</span>
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .palette-switcher {
+    position: relative;
+  }
+
+  .palette-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .palette-toggle:hover {
+    border-color: var(--accent);
+    background: var(--bg-secondary);
+  }
+
+  .palette-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--text);
+  }
+
+  .palette-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 140px;
+  }
+
+  .palette-switcher.open .palette-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .palette-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+
+  .palette-option:hover {
+    background: var(--bg);
+  }
+
+  .palette-option.active {
+    background: var(--bg);
+  }
+
+  .palette-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--palette-color);
+    flex-shrink: 0;
+  }
+
+  .palette-option.active .palette-dot {
+    box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--palette-color);
+  }
+
+  .palette-name {
+    flex: 1;
+    text-align: left;
+  }
+
+  /* Touch devices */
+  @media (hover: none) {
+    .palette-toggle:hover {
+      border-color: var(--border);
+      background: none;
+    }
+
+    .palette-toggle:active {
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+    }
+
+    .palette-option:hover {
+      background: none;
+    }
+
+    .palette-option:active {
+      background: var(--bg);
+    }
+  }
+</style>
+
+<script>
+  function initPaletteSwitcher() {
+    const switcher = document.getElementById('palette-switcher');
+    const toggle = document.getElementById('palette-toggle');
+    const menu = document.getElementById('palette-menu');
+
+    if (!switcher || !toggle || !menu) return;
+
+    // Toggle menu
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      switcher.classList.toggle('open');
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!switcher.contains(e.target as Node)) {
+        switcher.classList.remove('open');
+      }
+    });
+
+    // Handle palette selection
+    menu.querySelectorAll('.palette-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const palette = (btn as HTMLElement).dataset.palette;
+        if (palette) {
+          document.documentElement.setAttribute('data-palette', palette);
+          localStorage.setItem('palette', palette);
+          updateActiveState(palette);
+          switcher.classList.remove('open');
+        }
+      });
+    });
+
+    // Set initial active state
+    function updateActiveState(palette: string) {
+      menu.querySelectorAll('.palette-option').forEach(btn => {
+        const btnPalette = (btn as HTMLElement).dataset.palette;
+        btn.classList.toggle('active', btnPalette === palette);
+      });
+    }
+
+    // Initialize active state (lahmacun is the default)
+    const currentPalette = document.documentElement.getAttribute('data-palette') || 'lahmacun';
+    updateActiveState(currentPalette);
+  }
+
+  initPaletteSwitcher();
+</script>

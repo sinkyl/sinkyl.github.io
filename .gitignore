@@ -1,0 +1,16 @@
+dist/
+node_modules/
+.astro/
+
+*.log*
+.env
+.env.*
+
+.DS_Store
+.vscode/
+.idea/
+
+scripts/
+docs/
+*.prompt.txt
+package-lock.json

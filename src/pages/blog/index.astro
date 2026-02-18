@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlocksBackground from '../../components/BlocksBackground.astro';
+import PostsList from '../../components/PostsList.astro';
+import { getPosts } from '../../lib/getPosts';
+
+const { posts, postsWithWeek, postsWithIndicators, totalPages, containerId } = await getPosts();
+---
+
+<BaseLayout title="All Posts - sinkyl Devlog">
+  <BlocksBackground />
+  <h1>All Posts</h1>
+
+  {posts.length === 0 ? (
+    <p class="empty">No posts yet.</p>
+  ) : (
+    <PostsList
+      postsWithWeek={postsWithWeek}
+      postsWithIndicators={postsWithIndicators}
+      totalPages={totalPages}
+      containerId={containerId}
+      showProjectBadge={true}
+      showLeftBorder={true}
+      tagsPosition="bottom"
+    />
+  )}
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-bottom: 2rem;
+  }
+
+  .empty {
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { initPagination } from '../../lib/paginationController';
+  import { CONTAINER_IDS } from '../../lib/constants';
+
+  initPagination(CONTAINER_IDS.posts);
+</script>

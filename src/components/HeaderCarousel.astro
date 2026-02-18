@@ -1,0 +1,231 @@
+---
+import type { Project } from '../lib/projects';
+import SpatiumSpaceSvg from './SpatiumSpaceSvg.astro';
+import SpatiumResonanceSvg from './SpatiumResonanceSvg.astro';
+import SpatiumUnitSvg from './SpatiumUnitSvg.astro';
+import SpatiumEmergenceSvg from './SpatiumEmergenceSvg.astro';
+import BazaarArchitectureSvg from './BazaarArchitectureSvg.astro';
+import BazaarFlowSvg from './BazaarFlowSvg.astro';
+import BazaarInfraSvg from './BazaarInfraSvg.astro';
+import XtranodlyArchitectureSvg from './XtranodlyArchitectureSvg.astro';
+import XtranodlyExecutionSvg from './XtranodlyExecutionSvg.astro';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+
+const firstSlideText = project.description;
+const slides = Array.from({ length: project.slideCount }, (_, i) => i);
+const hasContent = project.slideCount > 0;
+const hasMultipleSlides = project.slideCount > 1;
+const isSpatium = project.id === 'spatium';
+const isBazaar = project.id === 'bazaar';
+const isXtranodly = project.id === 'xtranodly';
+---
+
+{hasContent && (
+  <div class="header-carousel" data-carousel data-color={project.colorKey}>
+    <!-- Collapsed preview -->
+    <div class="carousel-preview" data-carousel-preview>
+      <p class="preview-text">
+        {firstSlideText}
+        {hasMultipleSlides && (
+          <button class="more-toggle" data-expand-trigger>...more</button>
+        )}
+      </p>
+    </div>
+
+    <!-- Expanded carousel -->
+    <div class="carousel-expanded" data-carousel-expanded>
+      <div class="carousel-track" data-carousel-track>
+        {slides.map((index) => (
+          <div
+            class:list={['carousel-slide', `${project.id}-slide${index + 1}`, { active: index === 0 }]}
+            data-slide-index={index}
+          >
+            {isSpatium && index === 0 ? (
+              <div class="slide-content spatium-slide1">
+                <p class="spatium-hook">What if computation wasn't about connections, but about <strong>resonance</strong>?</p>
+                <p class="spatium-desc">Traditional systems wire things together. Spatium asks: what if units just <em>existed</em> in space, and the right patterns found each other through interference — like ripples meeting in water?</p>
+                <SpatiumResonanceSvg />
+              </div>
+            ) : isSpatium && index === 1 ? (
+              <div class="slide-content spatium-slide2">
+                <h3 class="slide-heading">The Unit</h3>
+                <p class="spatium-unit-desc">The fundamental building block — not a neuron with weights, but a <strong>volume of bits</strong> in 3D space. Each unit holds a unique pattern that defines what it responds to.</p>
+                <SpatiumUnitSvg />
+              </div>
+            ) : isSpatium && index === 2 ? (
+              <div class="slide-content spatium-slide3">
+                <h3 class="slide-heading">Emergence</h3>
+                <p class="spatium-emerge-desc">One unit is simple — it resonates or stays silent. But scatter thousands across a 3D space, and something else begins. A wave ripples outward. Some neighbors ignore it — wrong pattern. Others catch it, amplify it, send it further. Where waves meet and align, new units wake up.</p>
+                <SpatiumEmergenceSvg />
+              </div>
+            ) : isSpatium && index === 3 ? (
+              <div class="slide-content spatium-slide4">
+                <SpatiumSpaceSvg />
+                <p class="spatium-research-note">
+                  Exploring whether wave physics and resonance can replace traditional neural architectures. Written in <strong>Rust</strong>, tested alongside <a href="/projects/xtranodly#expanded" target="_blank" class="xtranodly-link">xtranodly.ai</a>. Related posts cover components and theory.
+                </p>
+              </div>
+            ) : isBazaar && index === 0 ? (
+              <div class="slide-content bazaar-slide1">
+                <p class="bazaar-intro">A <strong>region-based marketplace platform</strong> where each region runs its own Identity, Marketplace, and Payment clusters — while stores deploy as independent microservice clusters.</p>
+                <BazaarArchitectureSvg />
+              </div>
+            ) : isBazaar && index === 1 ? (
+              <div class="slide-content bazaar-slide2">
+                <h3 class="slide-heading">Core Clusters</h3>
+                <div class="bazaar-clusters-grid">
+                  <div class="bazaar-cluster-card" data-cluster="identity">
+                    <div class="cluster-card-name">Identity</div>
+                    <div class="cluster-card-role">Central SSO</div>
+                    <p class="cluster-card-desc">OAuth2/OIDC via OpenIddict — one sign-in across every store in the region. Handles token issuance, refresh rotation, and session management. Fixed scaling (always on).</p>
+                  </div>
+                  <div class="bazaar-cluster-card" data-cluster="marketplace">
+                    <div class="cluster-card-name">Marketplace</div>
+                    <div class="cluster-card-role">Search & Checkout</div>
+                    <p class="cluster-card-desc">Aggregates all stores into a unified catalog via ElasticSearch. Orchestrates cart assembly, cross-store checkout, and is the only cluster that calls Payment. Auto-scales 2–10 instances.</p>
+                  </div>
+                  <div class="bazaar-cluster-card" data-cluster="payment">
+                    <div class="cluster-card-name">Payment</div>
+                    <div class="cluster-card-role">PCI-DSS Zone</div>
+                    <p class="cluster-card-desc">Runs in complete network isolation for compliance. Handles card processing, settlement, and payment lifecycle. Only reachable by Marketplace. Fixed scaling, dedicated boundary.</p>
+                  </div>
+                  <div class="bazaar-cluster-card" data-cluster="stores">
+                    <div class="cluster-card-name">Store Clusters</div>
+                    <div class="cluster-card-role">Independent Deploy</div>
+                    <p class="cluster-card-desc">Each store is its own microservice set — own gateway, products, orders, inventory, and Redis. Own data, own scaling (1–5 instances). Dormant stores scale to zero. Managed via the <strong>StorePlatform</strong> desktop app.</p>
+                  </div>
+                </div>
+              </div>
+            ) : isBazaar && index === 2 ? (
+              <div class="slide-content bazaar-slide3">
+                <h3 class="slide-heading">The Flow</h3>
+                <BazaarFlowSvg />
+              </div>
+            ) : isBazaar && index === 3 ? (
+              <div class="slide-content bazaar-slide4">
+                <h3 class="slide-heading">Infrastructure</h3>
+                <BazaarInfraSvg />
+              </div>
+            ) : isXtranodly && index === 0 ? (
+              <div class="slide-content xtranodly-slide1">
+                <p class="xtranodly-intro">A <strong>Rust-native node graph framework</strong> — context nodes nest arbitrarily deep, open as floating panels or detached windows, and bridge nodes wire data across contexts without direct edges.</p>
+                <XtranodlyArchitectureSvg />
+              </div>
+            ) : isXtranodly && index === 1 ? (
+              <div class="slide-content xtranodly-slide2">
+                <h3 class="slide-heading">Main Components</h3>
+                <div class="xtranodly-components">
+                  <div class="xtranodly-comp-card" data-comp="graph">
+                    <div class="comp-name">Graph</div>
+                    <p class="comp-desc">The container — holds nodes and edges. The root graph is the workspace; each context node contains its own graph. Graphs nest without limit.</p>
+                  </div>
+                  <div class="xtranodly-comp-card" data-comp="node">
+                    <div class="comp-name">Node</div>
+                    <p class="comp-desc">Processing units with typed input/output ports. Each type defines how data flows through the graph.</p>
+                    <div class="node-types-list">
+                      <div class="node-type-item" data-type="compute"><span class="nt-name">Compute</span> <span class="nt-desc">— pure stateless transforms, evaluated every tick</span></div>
+                      <div class="node-type-item" data-type="register"><span class="nt-name">Register</span> <span class="nt-desc">— D flip-flop, holds state across ticks (1-tick delay)</span></div>
+                      <div class="node-type-item" data-type="context"><span class="nt-name">Context</span> <span class="nt-desc">— contains a nested graph, opens as floating panel or detached window. Nests arbitrarily deep.</span></div>
+                      <div class="node-type-item" data-type="boundary"><span class="nt-name">Boundary</span> <span class="nt-desc">— defines a context's input/output interface</span></div>
+                      <div class="node-type-item" data-type="bridge"><span class="nt-name">Bridge / Relay</span> <span class="nt-desc">— cross-context wiring; split across sender and receiver</span></div>
+                      <div class="node-type-item" data-type="fanout"><span class="nt-name">Fanout</span> <span class="nt-desc">— one-to-many signal distribution</span></div>
+                    </div>
+                  </div>
+                  <div class="xtranodly-comp-card" data-comp="edge">
+                    <div class="comp-name">Edge</div>
+                    <p class="comp-desc">Connections between ports. <strong>Direct</strong> edges propagate immediately within a tick. <strong>Registered</strong> edges introduce a 1-tick delay — the only source of temporal sequencing.</p>
+                  </div>
+                </div>
+              </div>
+            ) : isXtranodly && index === 2 ? (
+              <div class="slide-content xtranodly-slide3">
+                <h3 class="slide-heading">Tick Execution</h3>
+                <p class="xtranodly-exec-intro">Borrowed from FPGA design — a global <strong>tick clock</strong> drives the entire graph. Each tick, the engine topologically sorts every node and evaluates them in order. <strong>Direct</strong> edges propagate instantly within the tick (combinational). <strong>Registered</strong> edges latch their value and deliver it next tick (sequential) — the only way state persists. No race conditions, fully deterministic — execution order is defined by the graph topology, not by timing or chance. Suited for <strong>signal processing</strong>, <strong>visual programming</strong>, <strong>simulation</strong>, or any domain where reproducible dataflow matters.</p>
+                <XtranodlyExecutionSvg />
+              </div>
+            ) : isXtranodly && index === 3 ? (
+              <div class="slide-content xtranodly-slide4">
+                <h3 class="slide-heading">Why xtranodly</h3>
+                <p class="xtranodly-why-lead">Most node graph tools are either <strong>visual scripting wrappers</strong> that compile down to imperative code, or <strong>pipeline runners</strong> that shuffle data between stages. Neither gives you a real execution model — contexts can't depend on each other's live output, nesting is shallow or nonexistent, and debugging means print statements.</p>
+                <div class="xtranodly-why-points">
+                  <div class="why-point">
+                    <span class="why-icon">&#9672;</span>
+                    <p><strong>Contexts as first-class sub-systems.</strong> Each context is its own graph with its own boundary — and bridge nodes let them exchange data across any depth, without coupling their internals.</p>
+                  </div>
+                  <div class="why-point">
+                    <span class="why-icon">&#9672;</span>
+                    <p><strong>Dependent outputs, guaranteed order.</strong> When context A feeds context B, the tick engine resolves the full dependency chain every cycle. No callbacks, no async races — just topology.</p>
+                  </div>
+                  <div class="why-point">
+                    <span class="why-icon">&#9672;</span>
+                    <p><strong>Time travel built in.</strong> Every tick is a snapshot. Rewind, branch, compare — debug by replaying state, not by guessing.</p>
+                  </div>
+                </div>
+                <p class="xtranodly-why-closing">Built in <strong>Rust</strong>, rendered with <strong>wgpu</strong>. A graph framework that runs like hardware.</p>
+                <div class="xtranodly-logo">
+                  <svg class="xtranodly-logo-svg" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
+                    {/* Logo mark — spiral of nested boxes, infinite/recursive effect */}
+                    <g transform="translate(18,20)">
+                      <rect x="-16" y="-12" width="32" height="24" rx="3.5" class="logo-box" opacity="0.3"/>
+                      <rect x="-11.5" y="-8.5" width="23" height="17" rx="3" transform="rotate(14)" class="logo-box" opacity="0.5"/>
+                      <rect x="-7.5" y="-5.5" width="15" height="11" rx="2.5" transform="rotate(30)" class="logo-box" opacity="0.7"/>
+                      <rect x="-4.5" y="-3" width="9" height="6" rx="2" transform="rotate(48)" class="logo-box" opacity="1"/>
+                    </g>
+                    {/* Text */}
+                    <text x="44" y="25" class="logo-text">xtranodly</text>
+                    <text x="142" y="25" class="logo-text-ai">.ai</text>
+                  </svg>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      <div class="carousel-footer">
+        {hasMultipleSlides && (
+          <div class="carousel-nav">
+            <button class="nav-arrow prev" data-carousel-prev aria-label="Previous" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <div class="carousel-dots" data-carousel-dots>
+              {slides.map((index) => (
+                <button
+                  class:list={['dot', { active: index === 0 }]}
+                  data-dot-index={index}
+                  aria-label={`Go to page ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button class="nav-arrow next" data-carousel-next aria-label="Next">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+        )}
+        <button class="collapse-toggle" data-collapse-trigger>
+          Collapse
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  import { initHeaderCarousel } from '../lib/headerCarousel';
+
+  document.querySelectorAll('[data-carousel]').forEach(carousel => {
+    initHeaderCarousel(carousel as HTMLElement);
+  });
+</script>

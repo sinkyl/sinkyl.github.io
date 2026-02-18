@@ -1,0 +1,176 @@
+---
+// Spatium slide 2 — The Unit: 3D bit structure + wave matching
+// ASCII aesthetic: fixed grays, monospace, no theme switching
+---
+
+<svg class="spatium-unit-svg" viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ===== 3D BIT STRUCTURE (left side) ===== -->
+
+  <!-- Box frame -->
+  <rect x="30" y="15" width="140" height="94" rx="3" class="ascii-box"/>
+
+  <!-- Bit pattern rows (monospace grid) -->
+  <text x="100" y="41" class="ascii-bits ascii-center">░▓░▓▓░▓░░</text>
+  <text x="100" y="57" class="ascii-bits ascii-center">▓▓░░▓░▓▓░</text>
+  <text x="100" y="73" class="ascii-bits ascii-center">░▓▓▓░░▓░▓</text>
+  <text x="100" y="89" class="ascii-bits ascii-center">▓░░▓▓▓░░▓</text>
+
+  <!-- Annotation -->
+  <text x="182" y="48" class="ascii-note">← 3D bit structure</text>
+  <text x="190" y="62" class="ascii-note-dim">(simplified 2D view)</text>
+
+  <!-- ===== WAVE MATCHING (right side) ===== -->
+
+  <!-- Match case -->
+  <text x="370" y="25" class="ascii-label-dim">Wave</text>
+  <g transform="translate(410, 6)">
+    <rect width="82" height="26" rx="2" class="ascii-box"/>
+    <text x="41" y="16" class="ascii-bits-sm ascii-center">░░▓▓░▓░</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="498" y1="22" x2="518" y2="22" class="ascii-line"/>
+  <polygon points="518,22 512,19 512,25" class="ascii-arrow"/>
+
+  <text x="524" y="25" class="ascii-label-dim">Unit</text>
+  <g transform="translate(553, 6)">
+    <rect width="82" height="26" rx="2" class="ascii-box"/>
+    <text x="41" y="16" class="ascii-bits-sm ascii-center">░░▓▓░▓░</text>
+  </g>
+
+  <!-- Result: match -->
+  <text x="370" y="52" class="ascii-match">▸ patterns align → resonates</text>
+
+  <!-- Separator -->
+  <line x1="370" y1="65" x2="635" y2="65" class="ascii-sep"/>
+
+  <!-- Mismatch case -->
+  <text x="370" y="99" class="ascii-label-dim">Wave</text>
+  <g transform="translate(410, 80)">
+    <rect width="82" height="26" rx="2" class="ascii-box"/>
+    <text x="41" y="16" class="ascii-bits-sm ascii-center">▓▓░░▓░▓</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="498" y1="96" x2="518" y2="96" class="ascii-line"/>
+  <polygon points="518,96 512,93 512,99" class="ascii-arrow"/>
+
+  <text x="524" y="99" class="ascii-label-dim">Unit</text>
+  <g transform="translate(553, 80)">
+    <rect width="82" height="26" rx="2" class="ascii-box"/>
+    <text x="41" y="16" class="ascii-bits-sm ascii-center">░░▓▓░▓░</text>
+  </g>
+
+  <!-- Result: mismatch -->
+  <text x="370" y="124" class="ascii-miss">✗ mismatch → silence</text>
+
+  <!-- ===== BOTTOM: closing note ===== -->
+  <text x="320" y="155" class="ascii-closing">No weights to train. No activation functions.</text>
+  <text x="320" y="172" class="ascii-closing">The pattern is the filter — if it matches, the unit responds.</text>
+  <text x="320" y="189" class="ascii-closing-dim">If not, silence.</text>
+
+</svg>
+
+<style is:global>
+  .spatium-unit-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===== Fixed gray palette ===== */
+
+  .spatium-unit-svg .ascii-box {
+    fill: none;
+    stroke: #7a7f85;
+    stroke-width: 1.2;
+  }
+
+  .spatium-unit-svg .ascii-bits {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: #9ca3af;
+    text-anchor: start;
+    letter-spacing: 0.1em;
+  }
+
+  .spatium-unit-svg .ascii-bits.ascii-center,
+  .spatium-unit-svg .ascii-bits-sm.ascii-center {
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .spatium-unit-svg .ascii-bits-sm {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: #9ca3af;
+    text-anchor: start;
+    letter-spacing: 0.05em;
+  }
+
+  .spatium-unit-svg .ascii-label-dim {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #5a5f65;
+    text-anchor: start;
+  }
+
+  .spatium-unit-svg .ascii-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #9ca3af;
+    text-anchor: start;
+  }
+
+  .spatium-unit-svg .ascii-note-dim {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    fill: #5a5f65;
+    text-anchor: start;
+    font-style: italic;
+  }
+
+  .spatium-unit-svg .ascii-line {
+    stroke: #7a7f85;
+    stroke-width: 1.2;
+  }
+
+  .spatium-unit-svg .ascii-arrow {
+    fill: #7a7f85;
+  }
+
+  .spatium-unit-svg .ascii-sep {
+    stroke: #3a3f45;
+    stroke-width: 0.8;
+    stroke-dasharray: 3 3;
+  }
+
+  .spatium-unit-svg .ascii-match {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: #9ca3af;
+    text-anchor: start;
+  }
+
+  .spatium-unit-svg .ascii-miss {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: #5a5f65;
+    text-anchor: start;
+  }
+
+  .spatium-unit-svg .ascii-closing {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: #9ca3af;
+    text-anchor: middle;
+  }
+
+  .spatium-unit-svg .ascii-closing-dim {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: #5a5f65;
+    text-anchor: middle;
+    font-style: italic;
+  }
+</style>
