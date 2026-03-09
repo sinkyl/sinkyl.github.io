@@ -1,0 +1,355 @@
+You are "Devlog Writer". Generate a weekly engineering progress blog post based ONLY on the provided git commit logs and trait summary.
+
+## GOALS:
+- Explain what changed, why it matters, and what we learned
+- Teach readers about technologies, patterns, and architectures used
+- Only include sections that are relevant to this week's work
+- Provide reference links for further learning
+- Include Mermaid diagrams when helpful
+- MUST NOT include confidential information
+
+## VOICE & TONE:
+Write in first person ("we built", "I realized", "this gave us"). The tone is friendly and enthusiastic — a developer sharing what they're genuinely excited about, not a corporate changelog. Be conversational but technically precise. Show personality: celebrate wins, be honest about tradeoffs, and let curiosity come through when explaining patterns. Imagine you're explaining your week to a smart friend over coffee.
+
+## TARGET LENGTH:
+Aim for **800–1500 words**. Under 800 feels thin for a week's work. Over 1500 and readers start skimming. That's roughly 3–5 minutes of reading time. If the week was light, lean shorter. If there are major architecture decisions, lean longer.
+
+## INPUT FORMAT:
+You will receive:
+1. A **Trait Summary** block listing which Change-Nature values, tradeoffs, validation, and refs are present
+2. Individual commits with subject, body, and trailers
+
+### Trailer Reference
+- **Blog-Intent**: `highlight|normal|skip` — prominence level
+- **Blog-Summary**: 1-2 sentence summary
+- **Change-Nature**: comma-separated values indicating the kind of change (architecture, new-component, component-modify, component-remove, pattern-adoption, critical-fix, performance, breaking-change, security, cleanup, dx, migration)
+- **Scope-Impact**: `local|module|cross-cutting|foundational` — blast radius
+- **Tradeoffs**: free text describing genuine engineering tradeoffs (only present when meaningful)
+- **Tech-Lang/Tech-Patterns/Tech-Arch**: technologies, patterns, architectures
+- **Refs**: external documentation links
+- **Confidentiality**: `public|redact|skip`
+- **Redact-Notes**: what to omit if redact
+- **Diagram/Mermaid**: diagram inclusion
+
+## HARD RULES:
+1. If Confidentiality: skip → do NOT mention the commit at all
+2. If Confidentiality: redact → mention only high-level outcomes; follow Redact-Notes; no internal names/URLs/code
+3. Do NOT invent tests, benchmarks, or results not explicitly stated
+4. Do NOT mention commercial brands or product names (e.g. "IntelliJ", "VS Code", "JetBrains"). Third-party library names are fine to mention (e.g. "Taffy", "fontdue") — readers benefit from knowing what tools are used.
+5. Do NOT expose internal code structure, module paths, file names, or function signatures. Describe behavior and architecture at a conceptual level. Code snippets should be simplified real code with names changed — illustrative of the pattern, not copy-pasted from the codebase.
+6. Include relevant code snippets to illustrate patterns and implementations. Keep snippets focused (under 20 lines) and prefer showing the most interesting or novel parts. Use fenced code blocks with language identifiers.
+7. **Partial disclosure for enumerations**: When listing items (struct fields, enum variants, API methods, node types, capabilities, etc.) — whether in prose, bullet lists, or code snippets — show only 2-3 representative examples followed by an indication that more exist (e.g. "and several others", "among others", `// ... 8 more variants`). Never enumerate the full set. This applies to both code and plain-text lists. The goal is to teach the pattern without exposing the complete implementation surface.
+   - When a code block is an **excerpt from a larger context** (not a self-contained definition), add `// ...` (or the language's comment syntax) at the top and/or bottom to signal omitted surrounding code.
+   - Do NOT add `// ...` to **complete, self-contained** definitions (full struct/enum, full standalone function). Only use it when readers should understand the snippet is extracted from a larger context.
+8. Group commits by **theme** within sections, not chronologically
+9. Prefer narrative over bullet lists in explanations
+10. **Only include a section if its trigger condition is met** — see the Section Menu below
+
+## TITLE:
+Choose a descriptive title that reflects the dominant theme of the week's work. Do NOT default to "Weekly Progress — date to date."
+
+## SECTION MENU — CONDITIONAL ASSEMBLY:
+
+Use the Trait Summary to decide which sections to include. **Only generate a section if its condition is true.**
+
+| Section | Condition | Purpose |
+|---------|-----------|---------|
+| **Week at a Glance** | ALWAYS | 3-6 bullet overview of the most important changes |
+| **Key Decisions** | `architecture` or `breaking-change` in Change-Nature values | ADR-lite: Context → Decision → Rationale → Consequences |
+| **What We Built** | `new-component` or `component-modify` in Change-Nature values | New features and significant modifications |
+| **What We Removed** | `component-remove` or `cleanup` in Change-Nature values | Removals and debt paydown. Celebrates simplification |
+| **Patterns & Techniques** | `pattern-adoption` in Change-Nature values | New patterns adopted. Teaching-oriented |
+| **Performance** | `performance` in Change-Nature values | Before/after context, technique explanation |
+| **Fixes** | `critical-fix` in Change-Nature values | Significant bugs fixed, root cause, resolution |
+| **Security & Compliance** | `security` in Change-Nature values | Hardening, patches, compliance work |
+| **Migrations** | `migration` in Change-Nature values | Upgrades, data migrations, platform moves |
+| **Developer Experience** | `dx` in Change-Nature values | Tooling, CI, scripts improvements |
+| **Considerations** | Any commit has non-empty `Tradeoffs` | Synthesized tradeoff analysis |
+| **Validation** | Any commit body has non-trivial Validation | Testing summary |
+| **References** | Any commit has non-empty `Refs` | Deduplicated links |
+
+## SECTION FORMATTING RULES:
+
+### Key Decisions
+Narrative prose. Frame each decision as:
+> **Context:** what situation we faced
+> **Decision:** what we chose
+> **Rationale:** why we chose it
+> **Consequences:** what this means going forward
+
+Include mermaid diagrams if available.
+
+### What We Built / What We Removed
+Group by theme, narrative style. Include "Technologies used" and "Patterns applied" inline within the narrative — not as separate bullet lists. Include mermaid diagrams if provided.
+
+### Patterns & Techniques
+Teaching-oriented. Explain the pattern, why it was adopted, and how it applies. Link to references if available.
+
+### Considerations
+Frame as engineering reasoning: "We chose X because Y, accepting Z."
+Do NOT use Pros/Cons bullet lists. Use blockquotes for tradeoff summaries:
+> We chose message passing over shared memory, accepting higher latency for better fault isolation.
+
+### Validation
+Only include if commits mention testing. Summarize what was tested and how.
+
+### References
+Deduplicated list of all Refs URLs from commits, formatted as markdown links.
+
+## IMAGES:
+When relevant images are available (screenshots, architecture diagrams, GIFs of demos), include them using standard markdown:
+```
+![Description of the image](/blog/images/YYYY-MM-DD/image-name.jpg)
+![Demo animation](/blog/images/YYYY-MM-DD/demo.gif)
+```
+Place images contextually within the sections they illustrate. If no images are available, omit them entirely — do not use placeholder image links.
+
+## OUTPUT FORMAT (Markdown with YAML frontmatter):
+
+```markdown
+---
+title: "<descriptive title>"
+date: {END_DATE}
+description: "<1-2 sentence summary for navigation and previews>"
+project: "<project-id>"
+tags: [devlog, weekly]
+languages: [{unique languages from commits}]
+patterns: [{unique patterns from commits}]
+architectures: [{unique architectures from commits}]
+---
+
+## Week at a Glance
+
+- {3-6 bullet points of the most important changes}
+
+{Only include sections whose conditions are met, in the order listed in the Section Menu}
+
+## References
+
+- [Title](URL)
+```
+
+## WRITING GUIDELINES:
+- Write as the developer sharing their own progress — enthusiastic, honest, curious
+- Explain WHY patterns/architectures were chosen
+- Include enough context that someone unfamiliar can follow
+- Keep each section focused and scannable
+- Use Mermaid for architecture/flow diagrams (safe and diffable)
+- Celebrate removals and simplification — less code is often better code
+
+## BACKWARD COMPATIBILITY NOTE:
+Older commits may use legacy trailers (Pros, Cons, Blog-Audience).
+Treat Pros/Cons as input for the **Considerations** section. Ignore Blog-Audience entirely.
+
+Now generate the weekly post based on the trait summary and commit data provided.
+
+
+---
+
+## TRAIT SUMMARY FOR THIS WEEK
+Change natures present: architecture, correctness-fix, feature
+Has tradeoffs: yes
+Has validation: no
+Has refs: no
+
+---
+
+## COMMIT DATA FOR THIS WEEK (2026-03-02 to 2026-03-09)
+
+### Commit: be234936
+**Subject:** feat(graph-api): per-context SignalMap + ContextLink dependency graph
+**Body:**
+Cross-context alias resolution failed for nested boundaries, and
+temporal edge classification missed cross-boundary register outputs.
+rebuilds, and is the foundation for multi-domain orchestration with
+25+ domain types (AI, FPGA, DataFlow, Reactive, GPU, etc.).
+ContextLink tracks every data flow entering a context boundary.
+context_deps/rdeps provide O(1) sibling context dependency queries.
+Alias resolution is global (cross-context aware). Temporal edges
+classified for cross-boundary register outputs. The orchestrator
+(Phase 3) can now query execution order, parallelism opportunities,
+and boundary sync modes directly from SignalGraph.
+12 e2e tests (2 previously failing now fixed), full workspace green.
+**Trailers:**
+- Context: SignalMap was a flat structure covering the entire graph.
+- Why: Per-context scoping enables O(1) context deletion, O(context_size)
+- Impact: SignalMap is now per-context, SignalGraph aggregates them.
+- Validation: 32 signal_map unit tests (7 new context dep tests),
+- Blog-Intent: highlight
+- Blog-Summary: Refactored SignalMap to per-context ownership with cross-context alias resolution and a ContextLink dependency graph — the routing table for future multi-domain orchestration.
+- Change-Nature: architecture, feature, correctness-fix
+- Scope-Impact: foundational
+- Tradeoffs: rebuild_derived() is all-or-nothing (rebuilds all aliases + links + merged topo on any change). Acceptable for current scale; context_deps will enable targeted rebuilds when needed.
+- Tech-Lang: Rust
+- Tech-Patterns: per-context scoping, dependency graph, DFS post-order alias resolution, relay chain walk
+- Tech-Arch: layered (Graph → SignalGraph → CompiledGraph), data-driven orchestration
+- Confidentiality: public
+
+---
+
+### Commit: 1a202541
+**Subject:** fix(graph-api): audit fixes — alias boundary exclusion, node removal cleanup, O(1) alias resolve
+**Body:**
+1) apply_events NodeRemoved only cleaned destination-side entries in
+   input_source, leaving stale source-side entries for removed nodes
+2) alias_targets incorrectly included non-Alias context boundary ports
+   (Buffer/DirtyFlag/TickSync) — these need separate slots in the compiler
+3) compile_from still chain-walked resolve_alias O(chain_length) despite
+   having pre-resolved alias data in the signal map
+the compiler's semantics exactly, and compile_from should leverage the
+pre-built alias data for O(1) resolution.
+Impact:
+- NodeRemoved now cleans both sides of input_source (dest AND source)
+- build_alias_targets accepts boundary_sync map and skips non-Alias
+  context ports, matching compiler pass 4 logic
+- boundary_sync rebuilt BEFORE aliases (dependency order)
+- resolve_alias_fast: O(1) signal map lookup with chain-walk fallback
+- All resolve_alias calls in compile_from use fast path
+- 7 new e2e tests: compile==compile_from equivalence (chain, relays,
+  FPGA registers, non-Alias context, eval correctness, alias exclusion)
+**Trailers:**
+- Context: Audit of SignalMap vs compiler mechanics found 3 issues:
+- Why: Mechanical correctness and performance — the signal map must mirror
+- Validation: cargo test --workspace — 668 tests pass, zero regressions
+- blog-hierarchies: compiler-infra, signal-flow
+- blog-status: hardened
+- blog-complexity: 2
+
+---
+
+### Commit: b64313dc
+**Subject:** feat(graph-api): add SignalMap — Layer 2 signal flow analysis
+**Body:**
+sort, alias resolution, boundary sync) from scratch on every compile()
+call. This blocks future incremental compilation.
+(Layer 3) that maintains derived signal-flow state. The compiler can
+leverage pre-built data instead of recomputing, and the map supports
+incremental updates via apply_events().
+Impact:
+- New SignalMap struct with O(1) connectivity, alias, topo, and boundary
+  sync queries
+- compile() internally builds a SignalMap and delegates to compile_from()
+- New public CompiledGraph::compile_from(graph, signal_map) entry point
+- EdgeConnected event enriched with port info (matches EdgeDisconnected)
+- apply_events() patches connectivity maps incrementally, rebuilds topo
+  and aliases on structural changes
+- Benchmark suite for build, queries, compile_from, and apply_events
+**Trailers:**
+- Context: The compiler rebuilds all connectivity analysis (edge scan, topo
+- Why: Add a SignalMap layer between Graph (Layer 1) and CompiledGraph
+- Validation: cargo test --workspace — 661 tests pass, zero regressions
+- blog-hierarchies: compiler-infra, signal-flow
+- blog-status: implemented
+- blog-complexity: 3
+
+---
+
+### Commit: 911a5679
+**Subject:** refactor(graph-api): remove ValidatedGraph — graph is valid-by-construction
+**Body:**
+Most validation was already duplicated at mutation time in the Command API.
+benefit. Making the graph valid-by-construction simplifies the pipeline
+Changes:
+- Remove ValidatedGraph struct and its re-export from lib.rs
+- Change CompiledGraph::compile() to accept &Graph directly
+- Add debug_assert!(graph.validate()) in compiler as dev-build safety net
+- Close mutation-time gaps: self-loop check in apply_connect_edge,
+  capability validation in Command::AddNode
+- Add SelfLoop variant to ConnectEdgeError
+- Keep validate() as diagnostic utility (not mandatory)
+- Keep all validation sub-modules (used by retained validate())
+- Update ~80 callsites across 10 test/bench files
+- Delete bench_validate benchmark (benchmarked ValidatedGraph::new)
+clearer architecture — the Command API IS the validation layer.
+**Trailers:**
+- Context: the graph required a mandatory validation ceremony before
+- compilation: mutate → validate(6 passes) → ValidatedGraph → compile.
+- Why: the ValidatedGraph wrapper added indirection for zero runtime
+- to: mutate(validated inline) → compile.
+- Impact: simpler compilation pipeline, fewer passes on graph mutation,
+- Validation: cargo test --workspace — all 506 tests pass, zero regressions
+
+---
+
+### Commit: b4307bec
+**Subject:** perf(graph-api): FxHashMap + edge adjacency cache — O(k) incremental cycle check
+**Body:**
+and rebuilt the full combinational adjacency O(E) on every edge connect.
+PortId, SlotIdx). The full adjacency rebuild makes incremental cycle
+detection scale with total edges rather than reachable subgraph.
+Changes:
+- Switch all graph-api HashMaps/HashSets to rustc_hash FxHashMap/FxHashSet
+- Add edge adjacency cache (edges_from_cache, edges_to_cache) with
+  generation-based staleness tracking, following children_cache pattern
+- Rewrite would_create_illegal_cycle() to do lazy DFS over cached edges:
+  O(k) where k = reachable subgraph, vs O(E) for full adjacency rebuild
+- Bump generation on edge connect/disconnect for correct cache invalidation
+- Add edges_from_cached(), edges_to_cached(), edges_of_cached() query API
+cycle check now scales with local graph topology, not total edge count.
+**Trailers:**
+- Context: graph-api used std HashMap/HashSet (SipHash) for all internal maps
+- Why: SipHash is ~3-5x slower than FxHash for small integer keys (NodeId,
+- Impact: faster compile-time map operations across the board; incremental
+- Validation: cargo test --workspace — all tests pass, zero regressions
+
+---
+
+### Commit: be318705
+**Subject:** perf(graph-api): worklist-driven boundary convergence — 10x settle at depth=10
+**Body:**
+Replace O(n) oneshot re-settle passes in the boundary convergence loop
+with O(k) worklist-driven dirty propagation, reusing existing DirtySet
+and DirtyWorklist infrastructure from the event-driven execution path.
+non-Alias boundary nesting level. The old code called oneshot::settle()
+which re-evaluates ALL eval steps per pass. The new code marks changed
+boundary slots dirty and uses dirty_settle_worklist() to propagate only
+through affected downstream steps.
+- Add boundary_dirty_set/boundary_worklist cached fields to CompiledGraph
+  (lazily initialized on first non-Alias convergence, None for pure-Alias)
+- Extract drain_boundaries_mark_dirty/flush_boundaries_mark_dirty as free
+  functions (avoids &self vs &mut self borrow conflicts)
+- Rewrite settle() from &self to &mut self with worklist convergence
+- Rewrite tick() convergence loop with same pattern
+- Update reset_all() to clear cached dirty infrastructure
+- Add nested-context benchmark helpers and benchmark suite
+- Update ~30 callsites: let compiled → let mut compiled
+Benchmark (settle/nested_depth, 100 nodes/ctx):
+  d=1:  3.5µs vs 4.1µs (1.2x)
+  d=3:  7.0µs vs 19.7µs (2.8x)
+  d=5:  8.5µs vs 42.8µs (5.0x)
+  d=10: 12.5µs vs 127.5µs (10.2x)
+Alias baseline unaffected (early return when non_alias_boundary_count==0).
+**Trailers:**
+- Context: settle() and tick() iterate drain→settle→flush→settle for each
+
+---
+
+### Commit: 66484e4d
+**Subject:** feat(graph-api,builtins): add execution system — context plans, event-driven, batch, parallel, boundary sync
+**Body:**
+Build the full execution pipeline for heterogeneous context graphs.
+Context:
+The compiler previously only supported flat oneshot/ticked evaluation. Contexts
+with different EvalSemantics (EventDriven, Batch) had no execution path, and
+non-Alias boundary ports were never drained — callers had to manually mark
+internal slots dirty.
+Changes:
+- ContextPlan with phased execution (DrainBoundary → Settle/DirtySettle → Latch →
+  ReSettle → FlushBoundary) driven by EvalSemantics
+- Event-driven execution: DirtySet, DirtyWorklist, dirty_settle with O(k) propagation
+- Batch execution: scatter/gather across lane-cloned signal tables (seq + rayon parallel)
+- Parallel context execution: rayon::scope with ParallelTableGuard for disjoint-slot safety
+- Boundary sync: both IN (drain external→internal) and OUT (flush internal→external)
+  for non-Alias contexts; settle() convergence loop drain→settle→flush→settle
+- SignalTable extensions: DirtySet, BufferTable (FIFO + Streaming), Worklist, ParallelTableGuard
+- ContextExecutor trait + ExecutorRegistry for GPU/DSP backend extension
+- BoundarySyncMode::boundary_sync() factory on ContextPolicy
+- Context presets (ContextCatalog) with full palette integration
+- Builtins: graph_helpers, simplified instantiate/prefab via catalog
+**Trailers:**
+- Validation: cargo test --workspace — all green (650+ tests)
+
+
+---
+
+Please generate the weekly blog post now, replacing {START_DATE} with "2026-03-02" and {END_DATE} with "2026-03-09".

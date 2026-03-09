@@ -1,0 +1,205 @@
+=== COMMIT ===
+be23493681c4449647bff61109ad7d10e9892dfd
+feat(graph-api): per-context SignalMap + ContextLink dependency graph
+Context: SignalMap was a flat structure covering the entire graph.
+Cross-context alias resolution failed for nested boundaries, and
+temporal edge classification missed cross-boundary register outputs.
+Why: Per-context scoping enables O(1) context deletion, O(context_size)
+rebuilds, and is the foundation for multi-domain orchestration with
+25+ domain types (AI, FPGA, DataFlow, Reactive, GPU, etc.).
+Impact: SignalMap is now per-context, SignalGraph aggregates them.
+ContextLink tracks every data flow entering a context boundary.
+context_deps/rdeps provide O(1) sibling context dependency queries.
+Alias resolution is global (cross-context aware). Temporal edges
+classified for cross-boundary register outputs. The orchestrator
+(Phase 3) can now query execution order, parallelism opportunities,
+and boundary sync modes directly from SignalGraph.
+Validation: 32 signal_map unit tests (7 new context dep tests),
+12 e2e tests (2 previously failing now fixed), full workspace green.
+
+Blog-Intent: highlight
+Blog-Summary: Refactored SignalMap to per-context ownership with cross-context alias resolution and a ContextLink dependency graph — the routing table for future multi-domain orchestration.
+Change-Nature: architecture, feature, correctness-fix
+Scope-Impact: foundational
+Tradeoffs: rebuild_derived() is all-or-nothing (rebuilds all aliases + links + merged topo on any change). Acceptable for current scale; context_deps will enable targeted rebuilds when needed.
+Tech-Lang: Rust
+Tech-Patterns: per-context scoping, dependency graph, DFS post-order alias resolution, relay chain walk
+Tech-Arch: layered (Graph → SignalGraph → CompiledGraph), data-driven orchestration
+Confidentiality: public
+
+=== END ===
+=== COMMIT ===
+1a2025416be4b04385d10269c9842d6a15d7e838
+fix(graph-api): audit fixes — alias boundary exclusion, node removal cleanup, O(1) alias resolve
+Context: Audit of SignalMap vs compiler mechanics found 3 issues:
+1) apply_events NodeRemoved only cleaned destination-side entries in
+   input_source, leaving stale source-side entries for removed nodes
+2) alias_targets incorrectly included non-Alias context boundary ports
+   (Buffer/DirtyFlag/TickSync) — these need separate slots in the compiler
+3) compile_from still chain-walked resolve_alias O(chain_length) despite
+   having pre-resolved alias data in the signal map
+
+Why: Mechanical correctness and performance — the signal map must mirror
+the compiler's semantics exactly, and compile_from should leverage the
+pre-built alias data for O(1) resolution.
+
+Impact:
+- NodeRemoved now cleans both sides of input_source (dest AND source)
+- build_alias_targets accepts boundary_sync map and skips non-Alias
+  context ports, matching compiler pass 4 logic
+- boundary_sync rebuilt BEFORE aliases (dependency order)
+- resolve_alias_fast: O(1) signal map lookup with chain-walk fallback
+- All resolve_alias calls in compile_from use fast path
+- 7 new e2e tests: compile==compile_from equivalence (chain, relays,
+  FPGA registers, non-Alias context, eval correctness, alias exclusion)
+
+Validation: cargo test --workspace — 668 tests pass, zero regressions
+
+blog-hierarchies: compiler-infra, signal-flow
+blog-status: hardened
+blog-complexity: 2
+
+=== END ===
+=== COMMIT ===
+b64313dcf54c760705fe05ad7a0243c7e4601f55
+feat(graph-api): add SignalMap — Layer 2 signal flow analysis
+Context: The compiler rebuilds all connectivity analysis (edge scan, topo
+sort, alias resolution, boundary sync) from scratch on every compile()
+call. This blocks future incremental compilation.
+
+Why: Add a SignalMap layer between Graph (Layer 1) and CompiledGraph
+(Layer 3) that maintains derived signal-flow state. The compiler can
+leverage pre-built data instead of recomputing, and the map supports
+incremental updates via apply_events().
+
+Impact:
+- New SignalMap struct with O(1) connectivity, alias, topo, and boundary
+  sync queries
+- compile() internally builds a SignalMap and delegates to compile_from()
+- New public CompiledGraph::compile_from(graph, signal_map) entry point
+- EdgeConnected event enriched with port info (matches EdgeDisconnected)
+- apply_events() patches connectivity maps incrementally, rebuilds topo
+  and aliases on structural changes
+- Benchmark suite for build, queries, compile_from, and apply_events
+
+Validation: cargo test --workspace — 661 tests pass, zero regressions
+
+blog-hierarchies: compiler-infra, signal-flow
+blog-status: implemented
+blog-complexity: 3
+
+=== END ===
+=== COMMIT ===
+911a5679d19f39c6982cf5c75e43fc60e56aca3c
+refactor(graph-api): remove ValidatedGraph — graph is valid-by-construction
+Context: the graph required a mandatory validation ceremony before
+compilation: mutate → validate(6 passes) → ValidatedGraph → compile.
+Most validation was already duplicated at mutation time in the Command API.
+
+Why: the ValidatedGraph wrapper added indirection for zero runtime
+benefit. Making the graph valid-by-construction simplifies the pipeline
+to: mutate(validated inline) → compile.
+
+Changes:
+- Remove ValidatedGraph struct and its re-export from lib.rs
+- Change CompiledGraph::compile() to accept &Graph directly
+- Add debug_assert!(graph.validate()) in compiler as dev-build safety net
+- Close mutation-time gaps: self-loop check in apply_connect_edge,
+  capability validation in Command::AddNode
+- Add SelfLoop variant to ConnectEdgeError
+- Keep validate() as diagnostic utility (not mandatory)
+- Keep all validation sub-modules (used by retained validate())
+- Update ~80 callsites across 10 test/bench files
+- Delete bench_validate benchmark (benchmarked ValidatedGraph::new)
+
+Impact: simpler compilation pipeline, fewer passes on graph mutation,
+clearer architecture — the Command API IS the validation layer.
+
+Validation: cargo test --workspace — all 506 tests pass, zero regressions
+
+=== END ===
+=== COMMIT ===
+b4307bec3d32943a8f45b6529ef02fe978b910e8
+perf(graph-api): FxHashMap + edge adjacency cache — O(k) incremental cycle check
+Context: graph-api used std HashMap/HashSet (SipHash) for all internal maps
+and rebuilt the full combinational adjacency O(E) on every edge connect.
+
+Why: SipHash is ~3-5x slower than FxHash for small integer keys (NodeId,
+PortId, SlotIdx). The full adjacency rebuild makes incremental cycle
+detection scale with total edges rather than reachable subgraph.
+
+Changes:
+- Switch all graph-api HashMaps/HashSets to rustc_hash FxHashMap/FxHashSet
+- Add edge adjacency cache (edges_from_cache, edges_to_cache) with
+  generation-based staleness tracking, following children_cache pattern
+- Rewrite would_create_illegal_cycle() to do lazy DFS over cached edges:
+  O(k) where k = reachable subgraph, vs O(E) for full adjacency rebuild
+- Bump generation on edge connect/disconnect for correct cache invalidation
+- Add edges_from_cached(), edges_to_cached(), edges_of_cached() query API
+
+Impact: faster compile-time map operations across the board; incremental
+cycle check now scales with local graph topology, not total edge count.
+
+Validation: cargo test --workspace — all tests pass, zero regressions
+
+=== END ===
+=== COMMIT ===
+be318705c7cd59ffdd413c588d31f87bcedfcc2c
+perf(graph-api): worklist-driven boundary convergence — 10x settle at depth=10
+Replace O(n) oneshot re-settle passes in the boundary convergence loop
+with O(k) worklist-driven dirty propagation, reusing existing DirtySet
+and DirtyWorklist infrastructure from the event-driven execution path.
+
+Context: settle() and tick() iterate drain→settle→flush→settle for each
+non-Alias boundary nesting level. The old code called oneshot::settle()
+which re-evaluates ALL eval steps per pass. The new code marks changed
+boundary slots dirty and uses dirty_settle_worklist() to propagate only
+through affected downstream steps.
+
+- Add boundary_dirty_set/boundary_worklist cached fields to CompiledGraph
+  (lazily initialized on first non-Alias convergence, None for pure-Alias)
+- Extract drain_boundaries_mark_dirty/flush_boundaries_mark_dirty as free
+  functions (avoids &self vs &mut self borrow conflicts)
+- Rewrite settle() from &self to &mut self with worklist convergence
+- Rewrite tick() convergence loop with same pattern
+- Update reset_all() to clear cached dirty infrastructure
+- Add nested-context benchmark helpers and benchmark suite
+- Update ~30 callsites: let compiled → let mut compiled
+
+Benchmark (settle/nested_depth, 100 nodes/ctx):
+  d=1:  3.5µs vs 4.1µs (1.2x)
+  d=3:  7.0µs vs 19.7µs (2.8x)
+  d=5:  8.5µs vs 42.8µs (5.0x)
+  d=10: 12.5µs vs 127.5µs (10.2x)
+
+Alias baseline unaffected (early return when non_alias_boundary_count==0).
+
+=== END ===
+=== COMMIT ===
+66484e4dc379ccb80363ec7ede84fcd4225924e0
+feat(graph-api,builtins): add execution system — context plans, event-driven, batch, parallel, boundary sync
+Build the full execution pipeline for heterogeneous context graphs.
+
+Context:
+The compiler previously only supported flat oneshot/ticked evaluation. Contexts
+with different EvalSemantics (EventDriven, Batch) had no execution path, and
+non-Alias boundary ports were never drained — callers had to manually mark
+internal slots dirty.
+
+Changes:
+- ContextPlan with phased execution (DrainBoundary → Settle/DirtySettle → Latch →
+  ReSettle → FlushBoundary) driven by EvalSemantics
+- Event-driven execution: DirtySet, DirtyWorklist, dirty_settle with O(k) propagation
+- Batch execution: scatter/gather across lane-cloned signal tables (seq + rayon parallel)
+- Parallel context execution: rayon::scope with ParallelTableGuard for disjoint-slot safety
+- Boundary sync: both IN (drain external→internal) and OUT (flush internal→external)
+  for non-Alias contexts; settle() convergence loop drain→settle→flush→settle
+- SignalTable extensions: DirtySet, BufferTable (FIFO + Streaming), Worklist, ParallelTableGuard
+- ContextExecutor trait + ExecutorRegistry for GPU/DSP backend extension
+- BoundarySyncMode::boundary_sync() factory on ContextPolicy
+- Context presets (ContextCatalog) with full palette integration
+- Builtins: graph_helpers, simplified instantiate/prefab via catalog
+
+Validation: cargo test --workspace — all green (650+ tests)
+
+=== END ===
