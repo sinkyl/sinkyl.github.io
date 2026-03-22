@@ -170,6 +170,40 @@ export async function initMermaidRenderer(): Promise<void> {
 
     await mermaid.run();
 
+    // Fix text color in styled nodes: Mermaid's internal SVG <style> tag
+    // overrides inline `color`. Inject a <style> into each SVG that forces
+    // styled nodes to use their inline color value.
+    document.querySelectorAll('.mermaid svg').forEach((svg) => {
+      const styledNodes = svg.querySelectorAll('.node');
+      const overrides: string[] = [];
+
+      styledNodes.forEach((node) => {
+        const id = node.id;
+        // Mermaid splits style: fill/stroke on rect, color on g.label
+        const label = node.querySelector('.label');
+        const labelStyle = label?.getAttribute('style') || '';
+        const nodeStyle = node.getAttribute('style') || '';
+        const combined = nodeStyle + ';' + labelStyle;
+        const colorMatch = combined.match(/color:\s*([^;!]+)/);
+        if (colorMatch && id) {
+          const color = colorMatch[1].trim();
+          overrides.push(`#${id} .nodeLabel, #${id} .nodeLabel p, #${id} .nodeLabel span, #${id} .nodeLabel div { color: ${color} !important; fill: ${color} !important; }`);
+        }
+      });
+
+      if (overrides.length > 0) {
+        const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+        styleEl.textContent = overrides.join('\n');
+        svg.prepend(styleEl);
+      }
+
+      // Set rx/ry as SVG attributes (Firefox ignores CSS rx/ry on <rect>)
+      svg.querySelectorAll('.node rect').forEach((rect) => {
+        if (!rect.getAttribute('rx')) rect.setAttribute('rx', '4');
+        if (!rect.getAttribute('ry')) rect.setAttribute('ry', '4');
+      });
+    });
+
     document.querySelectorAll('.mermaid').forEach((div) => {
       div.setAttribute('data-processed', 'true');
 

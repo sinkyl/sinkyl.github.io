@@ -45,24 +45,23 @@
 }
 
 /* --- Nodes: rect, polygon, circle shapes --- */
+/* No !important on fill/stroke so Mermaid inline `style` directives win */
 :is(.mermaid, .mermaid-modal-diagram) svg .node rect,
 :is(.mermaid, .mermaid-modal-diagram) svg .node polygon,
 :is(.mermaid, .mermaid-modal-diagram) svg .node circle,
 :is(.mermaid, .mermaid-modal-diagram) svg .node .label-container {
-  fill: var(--mermaid-node-bg) !important;
-  stroke: var(--mermaid-node-border) !important;
-  stroke-width: 1.5px !important;
-  rx: 4;
-  ry: 4;
+  fill: var(--mermaid-node-bg);
+  stroke: var(--mermaid-node-border);
+  stroke-width: 1.5px;
 }
 
 /* --- Node labels --- */
 :is(.mermaid, .mermaid-modal-diagram) svg .node .nodeLabel,
 :is(.mermaid, .mermaid-modal-diagram) svg .node .nodeLabel p,
 :is(.mermaid, .mermaid-modal-diagram) svg .node .nodeLabel span {
-  color: var(--mermaid-node-text) !important;
-  fill: var(--mermaid-node-text) !important;
-  font-size: 12px !important;
+  color: var(--mermaid-node-text);
+  fill: var(--mermaid-node-text);
+  font-size: 12px;
 }
 
 /* --- Edges: lines + arrows --- */
