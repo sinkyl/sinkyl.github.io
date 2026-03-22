@@ -135,6 +135,7 @@ architectures: [{unique architectures from commits}]
 - Include enough context that someone unfamiliar can follow
 - Keep each section focused and scannable
 - Use Mermaid for architecture/flow diagrams (safe and diffable)
+- When styling Mermaid nodes with a fill color, always include `color:#000` for readable text on dark-themed sites (e.g., `style X fill:#ff6b6b,stroke:#c0392b,color:#000`)
 - Celebrate removals and simplification — less code is often better code
 
 ## BACKWARD COMPATIBILITY NOTE:

@@ -52,10 +52,10 @@ graph LR
 
   Before -->|"-2,034 lines"| After
 
-  style S1 fill:#ff6b6b,stroke:#c0392b
-  style R fill:#ff6b6b,stroke:#c0392b
-  style G fill:#ff6b6b,stroke:#c0392b
-  style ST fill:#ff6b6b,stroke:#c0392b
+  style S1 fill:#ff6b6b,stroke:#c0392b,color:#000
+  style R fill:#ff6b6b,stroke:#c0392b,color:#000
+  style G fill:#ff6b6b,stroke:#c0392b,color:#000
+  style ST fill:#ff6b6b,stroke:#c0392b,color:#000
 ```
 
 ### ConnectionMap as Sole Connectivity Store
@@ -89,7 +89,7 @@ graph TB
     SIG2["SignalMap"] --> CM2
   end
 
-  style VE fill:#ff6b6b,stroke:#c0392b
+  style VE fill:#ff6b6b,stroke:#c0392b,color:#000
 ```
 
 ## What We Built
@@ -165,18 +165,18 @@ graph TB
   E --> E2
   F --> F2
 
-  style A fill:#ff6b6b,stroke:#c0392b
-  style B fill:#ff6b6b,stroke:#c0392b
-  style C fill:#ff6b6b,stroke:#c0392b
-  style D fill:#ff6b6b,stroke:#c0392b
-  style E fill:#ff6b6b,stroke:#c0392b
-  style F fill:#ff6b6b,stroke:#c0392b
-  style A2 fill:#2ecc71,stroke:#27ae60
-  style B2 fill:#2ecc71,stroke:#27ae60
-  style C2 fill:#2ecc71,stroke:#27ae60
-  style D2 fill:#2ecc71,stroke:#27ae60
-  style E2 fill:#2ecc71,stroke:#27ae60
-  style F2 fill:#2ecc71,stroke:#27ae60
+  style A fill:#ff6b6b,stroke:#c0392b,color:#000
+  style B fill:#ff6b6b,stroke:#c0392b,color:#000
+  style C fill:#ff6b6b,stroke:#c0392b,color:#000
+  style D fill:#ff6b6b,stroke:#c0392b,color:#000
+  style E fill:#ff6b6b,stroke:#c0392b,color:#000
+  style F fill:#ff6b6b,stroke:#c0392b,color:#000
+  style A2 fill:#2ecc71,stroke:#27ae60,color:#000
+  style B2 fill:#2ecc71,stroke:#27ae60,color:#000
+  style C2 fill:#2ecc71,stroke:#27ae60,color:#000
+  style D2 fill:#2ecc71,stroke:#27ae60,color:#000
+  style E2 fill:#2ecc71,stroke:#27ae60,color:#000
+  style F2 fill:#2ecc71,stroke:#27ae60,color:#000
 ```
 
 **NodeKind::Structural** (-2,034 lines) — relay, group, and stack types plus their compiler support. Visual concerns move to the UI layer where they belong.
@@ -219,11 +219,11 @@ graph LR
   CL --> B
   CL --> UI
 
-  style CL fill:#3498db,stroke:#2980b9
-  style G fill:#e67e22,stroke:#d35400
-  style B fill:#2ecc71,stroke:#27ae60
-  style UI fill:#9b59b6,stroke:#8e44ad
-  style APP fill:#95a5a6,stroke:#7f8c8d
+  style CL fill:#3498db,stroke:#2980b9,color:#000
+  style G fill:#e67e22,stroke:#d35400,color:#000
+  style B fill:#2ecc71,stroke:#27ae60,color:#000
+  style UI fill:#9b59b6,stroke:#8e44ad,color:#000
+  style APP fill:#95a5a6,stroke:#7f8c8d,color:#000
 ```
 
 ## Considerations
