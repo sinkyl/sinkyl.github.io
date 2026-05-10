@@ -1,7 +1,7 @@
 ---
 title: "Observability, Two Dogfoods, and the AI Authoring Loop"
 date: 2026-05-03
-description: "A six-step observability rollout, two end-to-end dogfoods, opt-in inter-context parallelism, a deterministic replay harness, and a brand-new agent that probes the AI surface from outside."
+description: "A six-step observability rollout, two end-to-end dogfoods, opt-in inter-context parallelism, and a deterministic replay harness."
 project: "xtranodly"
 tags: [devlog, weekly]
 languages: [Rust, Python]
@@ -19,7 +19,7 @@ architectures: [Compile-then-run execution, Context policy model, Tracing span t
 - Wired `TransferMode::Conditional` and `Sampled` through the planner — `Conditional` became real predicate-gated copies, `Sampled` documented as alias-of-`Direct` until queue-based modes diverge.
 - Picked up real perf wins: per-context contiguous slot allocation (-8.7% on the multi-counter case) and dropping unconditional span allocation + a redundant `catch_unwind` (10/100-node tick: 408→386 ns / 3926→3805 ns).
 - Removed the `FPGA` preset (alias of `StateMachine`) onto an archive branch to slim the system while the rest of the architecture matures.
-- Spawned a new **prober** agent that simulates an external AI consumer end-to-end — caught five friction points in the AI authoring loop on its first dry run, then two self-findings (mandatory artifact persistence, durable storage) on its first real session.
+- Closed five friction points in the AI authoring loop — a `mcp_starter_graph` tool, refreshed welcome instructions text, and explicit type-promotion rustdoc all landed in the same arc.
 
 ## Key Decisions
 
@@ -28,7 +28,7 @@ architectures: [Compile-then-run execution, Context policy model, Tracing span t
 > **Rationale:** Any shared abstraction would need an `is_mcp` toggle whose only job is gating that footgun. The asymmetry is a hard contract, not a configuration choice.
 > **Consequences:** A locked architectural invariant: `mcp-server` stdout is sacred. The init helpers enforce it by construction. A new test surface (`tests/trace_capture.rs`, `tests/injections.rs`) keeps it that way.
 
-> **Context:** AI agents authoring graphs through MCP had to call the right `tick()` / `settle()` / `dirty_settle()` based on policy mix — and getting it wrong silently produced wrong output. The visionary's first framing was `run_until_quiescent()`.
+> **Context:** AI agents authoring graphs through MCP had to call the right `tick()` / `settle()` / `dirty_settle()` based on policy mix — and getting it wrong silently produced wrong output. An early `run_until_quiescent()` framing surfaced as the natural fit, then was rejected on closer examination.
 > **Decision:** Reject "quiescent." Ship `run_cycle()` instead.
 > **Rationale:** "Quiescence" is undefined for `Ticked` graphs (they tick forever, no fixed-point). `run_cycle` maps to "one unit of forward progress" without implying convergence. It's accurate for all four dispatch paths (`Settle`, `DirtySettle`, `Tick`, `BatchSettle`).
 > **Consequences:** AI authors get a single entry point: `runner.run_cycle()` returns a `RunCycleKind` so the agent sees what just happened. Precedence is `Ticked > Reactive > Batch > DataFlow` — a graph mixing `Ticked` and `Reactive` must tick, else the `Ticked` sub-context's registers silently fail to latch.
@@ -38,7 +38,7 @@ architectures: [Compile-then-run execution, Context policy model, Tracing span t
 > **Rationale:** An unwritten convention quietly drifts every time a new domain shows up. Same status as the observability invariants — the contract decays silently if maintenance isn't a real obligation.
 > **Consequences:** No retroactive migration of existing `math.*` (F64-default stays). Two new dogfoods (sensor + synth) get to apply the convention from day one — first time we exercise 3-level real-world families (`audio.osc.*` with 4 siblings, `audio.fx.*` with 3).
 
-> **Context:** Inter-context parallelism via `rayon::scope` was the longest-running visionary item. The first cut shipped with a per-rank fallback: any rank whose contexts contained `StatefulCustom` steps fell back to sequential, because `ParallelTableGuard` only modeled the transient signal table. The multi-voice synth was the first dogfood with real same-rank stateful cohorts — and it failed the "uses ≥2 threads" assertion.
+> **Context:** Inter-context parallelism via `rayon::scope` was the longest-running roadmap item. The first cut shipped with a per-rank fallback: any rank whose contexts contained `StatefulCustom` steps fell back to sequential, because `ParallelTableGuard` only modeled the transient signal table. The multi-voice synth was the first dogfood with real same-rank stateful cohorts — and it failed the "uses ≥2 threads" assertion.
 > **Decision:** Three independent layers — monotonic-append state allocation, `&mut [Value]`-bounded dispatch, and `StatefulEvalFn`'s type signature — already prove persistent state is *disjoint by NodeId structurally*, not by convention. Lift the fallback. Extend the parallel guard with `get_state_range_mut`.
 > **Rationale:** Same-rank contexts have no dep relation, no shared state slots; concurrent dispatch is sound by construction. Determinism is preserved bit-for-bit because each node still produces the same outputs from the same `(inputs, state)` pair regardless of which worker dispatches it.
 > **Consequences:** A new "Persistent state is disjoint by NodeId" architectural invariant. The multi-voice TDD wall flips to a positive lock. A determinism canary (two sibling Accumulator contexts, 64 settles, parallel vs. serial bit-for-bit) guards against future regressions.
@@ -72,7 +72,7 @@ The lifecycle taxonomy is a typed enum (`graph.compile.start`, `runner.tick.end`
 
 The synth dogfood replay round-trip passes bit-for-bit under `ToleranceMode::Exact` across 256 ticks — empirical evidence the runner is end-to-end deterministic for the most complex dogfood today. Mid-week we found a silent gap: pre-tick reads at `tick == 0` failed because `replay()` constructed a fresh runner without ever calling `settle()`. The fix is a single `settled_before_first_tick: bool` flag on the trace, set automatically when capture-side calls `settle()` at tick zero. Replay mirrors the capture's settle/tick sequence — the natural contract.
 
-**Two dogfoods, end-to-end.** Both followed the same TDD-outside-in shape: spec → failing E2E test → designer implementation → bit-for-bit reference fixture → edge coverage.
+**Two dogfoods, end-to-end.** Both followed the same TDD-outside-in shape: spec → failing E2E test → implementation → bit-for-bit reference fixture → edge coverage.
 
 The **sensor-fusion** dogfood (IoT dashboard) added five new nodes across four new roots: `sensor.synthetic_temperature`, `accum.ewma`, `format.f64_to_string`, `string.concat`, `bool.to_string`. The redundant `accum.count` design (M3 + M4 in the spec) was deliberately picked to surface the long-standing accumulator double-fire bug — but the topology landed clean. A minimal repro (one `Ticked` context feeding one `accum.count` directly) confirmed the bug had been silently fixed by the cross-context temporal-edge guards from the previous week. Phase 4 added 14 edge tests (backpressure last-write-wins, IO purity boundary, sensor disconnect, EWMA alpha=0/1 corners).
 
@@ -127,11 +127,11 @@ flowchart LR
 
 Voices V0-V3 sit at the same rank in the cross-context dep graph — they have no dep relation to each other. Under `parallel_inter_context: true`, all four dispatch concurrently through `rayon::scope`. The disjoint-by-NodeId state allocation is what makes that sound. The second assertion was the TDD wall that motivated lifting the stateful-fallback in `ParallelTableGuard`. Phase 4 added 14 edge tests covering voice independence, peak-parallelism stress, monophonic equivalence (multi-voice with N=1 is bit-for-bit equal to single-voice — `math.add(x, 0) = x` is transparent), and full replay round-trip.
 
-**The AI-authoring-loop trio.** Three sibling commits closed the gap visionary articulated as "the AI knows engine internals." `requires_capabilities` (typed bitmask) plus `archetypes_for(caps)` (computes the 8-archetype list on demand from the 112-policy matrix) means AI agents stop grepping source. `run_cycle()` auto-selects a driver from policy mix. The replay harness gives a regression substrate that's reachable from the agent loop, not just Rust integration tests.
+**The AI-authoring-loop trio.** Three sibling commits closed the gap where AI consumers had to know engine internals. `requires_capabilities` (typed bitmask) plus `archetypes_for(caps)` (computes the 8-archetype list on demand from the 112-policy matrix) means AI agents stop grepping source. `run_cycle()` auto-selects a driver from policy mix. The replay harness gives a regression substrate that's reachable from the agent loop, not just Rust integration tests.
 
 **Buffered transfer mode, finally executable.** The `BufferTable` infrastructure had been wired into `ContextPlan` for nine months. The orchestrator's dispatch loop quietly bypassed the recipe, calling `settle_context` / `latch_context` directly. Multi-context graphs with `TransferMode::Buffered` cross-context edges silently dropped values — the FIFO never drained, never flushed. This week wired drain-before-pass + flush-after-pass at the orchestrator seam (gated on `plan.has_buffers()` so the no-buffers fast path stays free), then mirrored the same pattern on the single-root fast path so an intra-context buffered edge inside a single context behaves correctly too. A new `streaming_backpressure.rs` test suite locks the at-capacity contract: silent FIFO drop with FIFO order preserved.
 
-**The prober agent.** A new role-based agent that simulates an external AI consumer through `xn-mcp` + `xn`. Source-blind by design — the discipline *is* the value. Its first dry run surfaced five friction points (welcome instructions undersold the toolkit, `config_drives_port_types` was an undocumented mechanism, no starter-graph endpoint, etc.). All five closed the same day with a `mcp_starter_graph` tool, refreshed `instructions` text, and explicit type-promotion rustdoc. The first real session caught a commit-narrative inaccuracy a build-agent would have missed, and reduced tool-calls-to-success by ~40%.
+**Five AI-authoring-loop friction points closed.** The welcome instructions text was undersold and missed half the toolkit; `config_drives_port_types` was a load-bearing mechanism with no published rustdoc; there was no starter-graph endpoint for first-time MCP sessions. All five fixes landed in the same arc — a new `mcp_starter_graph` tool seeds new sessions with a runnable graph, the `instructions` text was refreshed end-to-end, and type-promotion semantics gained explicit rustdoc on the catalog manifest.
 
 ## What We Removed
 
@@ -148,7 +148,7 @@ For numerical dogfoods: ship a re-runnable reference script + committed fixture
 BEFORE prose predicates. No range bounds without a fixture.
 ```
 
-That pattern now lives in `DESIGN_PATTERNS.md` and `CLAUDE.md` as a cross-cutting authoring rule.
+That pattern now lives in the project's design notes as a cross-cutting authoring rule.
 
 **Lifecycle-taxonomy event names.** Free-form string event names would let any one consumer drift the taxonomy the moment someone renames an event for clarity. The typed enum (`#[non_exhaustive]`, ~13 variants today) returns stable dotted names through `as_str()`. Three consumer surfaces — human log readers, AI agents over MCP, analyzer-diagnostic correlators — read the same lifecycle taxonomy.
 
@@ -170,7 +170,7 @@ The replay harness's pre-tick `settle()` mismatch was the most consequential sil
 
 The `BufferTable`'s nine-month-old wiring gap closed as a feature commit (the dispatch path was the missing piece) but functionally it was a fix — multi-context graphs with `TransferMode::Buffered` cross-context edges had been silently dropping values whenever a real consumer materialised. None had, until the synth + FX dogfood started shaping the next set of contracts.
 
-The accumulator double-fire bug from the prior month was confirmed silently fixed by the cross-context temporal-edge guards. Two regression tests now lock both halves: `accum.count` fires exactly once per tick when driven by a `Ticked` upstream, *and* closed loops through `accum.*` are still rejected as real same-tick cycles (the architect's separate ruling on persistent-state ≠ temporal-decoupling).
+The accumulator double-fire bug from the prior month was confirmed silently fixed by the cross-context temporal-edge guards. Two regression tests now lock both halves: `accum.count` fires exactly once per tick when driven by a `Ticked` upstream, *and* closed loops through `accum.*` are still rejected as real same-tick cycles (a separate ruling on persistent-state ≠ temporal-decoupling).
 
 ## Considerations
 
@@ -185,5 +185,3 @@ The accumulator double-fire bug from the prior month was confirmed silently fixe
 ## Validation
 
 Workspace test count climbed from ~1180 at the start of the week to over 1400 by the end. Two dogfoods ship with full edge suites (sensor: 14 tests; synth: 18 tests; multi-voice: 14 tests). The synth replay round-trip passes bit-for-bit under `Exact` across 256 ticks. The multi-voice serial-vs-parallel canary stays bit-for-bit while observing ≥2 distinct rayon worker thread IDs. Three new tracing tests capture span trees on the MCP response without breaking the no-subscriber fast path. Clippy stays at `-D warnings` clean. Six per-tick wall-clock-duration tests confirm the perf gate (`tracing::enabled!`) is honoured — zero `Instant::now()` calls when no subscriber is listening.
-
-The prober agent's first session reduced tool-calls-to-success from ~12 (dry run) to ~7 (post-fix), with the F1-F5 baseline empirically closed and one meta-finding (a commit-narrative inaccuracy) caught that no build-agent would have noticed.

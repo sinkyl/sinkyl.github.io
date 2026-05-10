@@ -108,7 +108,7 @@ Once that landed, the consolidation pass added `ErrorBehavior { Passthrough, Rec
 
 **Ergonomic graph authoring.** The Graph API gained 1-call `add_node` / `add_context_node` helpers. The preset API flattened from sub-modules with `policy()` fns to 8 flat functions. Port constants — previously `OUT = PortId(2)` everywhere, which silently referenced non-existent slots on unary nodes — are now per-node semantic names (`ADD_A`, `ADD_B`, `ADD_OUT`, `NEG_IN`, `NEG_OUT`, …). Roughly 95 call sites migrated in one pass.
 
-**Typed integer primitives, justified by data.** The `int.*` family (`int.add`, `int.subtract`, six `int.cmp.*` variants) had been landed once, then explicitly reverted at the user's direction: *"build the CPU with sandwiches, log friction, decide on `int.*` from data after."* The RV32 4-register CPU dogfood produced the empirical record — every dynamic-operand integer add was a 4-node cast sandwich, every I64 comparison required an upstream `cast.i64_to_f64`. Eight typed siblings now live alongside their F64 cousins. The catalog grew from 60 to 68 nodes.
+**Typed integer primitives, justified by data.** The `int.*` family (`int.add`, `int.subtract`, six `int.cmp.*` variants) had been landed once, then explicitly reverted to gather empirical evidence first — build the CPU with the existing primitives, log the friction, decide on `int.*` from data. The RV32 4-register CPU dogfood produced that record — every dynamic-operand integer add was a 4-node cast sandwich, every I64 comparison required an upstream `cast.i64_to_f64`. Eight typed siblings now live alongside their F64 cousins. The catalog grew from 60 to 68 nodes.
 
 ## What We Removed
 
